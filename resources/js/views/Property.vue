@@ -679,7 +679,7 @@
                                         <div class="col-md-6 col-lg-6">
                                             <ul class="property__detail-info-list list-unstyled">
                                                 <!-- <li><b>Property ID:</b> {{property.id}}</li> -->
-                                                <li><b>Price:</b> KSH{{property.price}}</li>
+                                                <li><b>Price:</b> KSH {{property.price}}</li>
                                                 <li><b>Property Size:</b> {{property.size}} Sq Ft</li>
                                                 <li v-if="property.category_id == 1"><b>Bedrooms:</b> {{property.bedrooms}}</li>
                                                 <li v-if="property.category_id == 1"><b>Bathrooms:</b> {{property.bathrooms}}</li>

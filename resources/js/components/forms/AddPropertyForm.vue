@@ -25,7 +25,7 @@
                       >
                       <div class="col-sm-10">
                          <select name="category" v-model="form.category_id" class="form-select" id="">
-                            <option value="0" selected>Select Category</option>
+                            <option value="0" selected disabled>Select Category</option>
                             <option v-for="category in categories" :value="category.id"
                             :selected="category.id == form.category_id" :key="category.id">{{ category.name}}</option>
  
@@ -38,7 +38,7 @@
                       <label for="inputPassword" class="form-label">Location</label>
                       <div class="col-sm-10">
                          <select name="location" v-model="form.location_id" class="form-select" id="">
-                            <option value="0" selected>Select Location</option>
+                            <option value="0" selected disabled>Select Location</option>
                             <option v-for="location in locations" :value="location.id"
                             :selected="location.id == form.location_id" :key="location.id">{{ location.name}}</option>
  

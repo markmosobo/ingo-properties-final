@@ -677,11 +677,11 @@
                                 <h6 class="text-capitalize detail-heading">property details</h6>
                                 <!-- INFO PROPERTY DETAIL -->
                                 <div class="property__detail-info">
-                                    <div class="row">
+                                    <div v-if="property.category_id == 3 || property.category_id == 4 || property.category_id == 7" class="row">
                                         <div class="col-md-6 col-lg-6">
                                             <ul class="property__detail-info-list list-unstyled">
                                                 <!-- <li><b>Property ID:</b> {{property.id}}</li> -->
-                                                <li><b>Price:</b> KSH{{property.price}}</li>
+                                                <li><b>Price:</b> KSH {{property.price}}</li>
                                                 <li><b>Property Size:</b> {{property.size}} Sq Ft</li>
                                                 <li><b>Bedrooms:</b> {{property.bedrooms}}</li>
                                                 <li><b>Bathrooms:</b> {{property.bathrooms}}</li>
@@ -691,7 +691,50 @@
                                             <ul class="property__detail-info-list list-unstyled">
                                                 <!-- <li><b>Garage:</b> 1</li>
                                                 <li><b>Garage Size:</b> 458 SqFt</li> -->
-                                                <li><b>Property Status:</b> {{property.property_status}}</li>
+                                                <li><b>Property Status:</b> for {{property.property_status}}</li>
+                                                <li><b>Property Location:</b> {{property.location}}</li>
+                                                <li v-if="property.status == 1"><b>Current Status:</b> Open</li>
+                                                <li v-else><b>Current Status:</b> Closed</li>
+                                                <li v-if="property.negotiable == 1"><b>Negotiable:</b> Yes</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div v-else-if="property.category_id == 1 || property.category_id == 2" class="row">
+                                        <div class="col-md-6 col-lg-6">
+                                            <ul class="property__detail-info-list list-unstyled">
+                                                <!-- <li><b>Property ID:</b> {{property.id}}</li> -->
+                                                <li><b>Price:</b> KSH {{property.price}}</li>
+                                                <li><b>Property Size:</b> {{property.size}} Sq Ft</li>
+                                                <li><b>Estate Name:</b> {{property.estate_name}}</li>
+                                                <li v-if="property.negotiable == 1"><b>Negotiable:</b> Yes</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6 col-lg-6">
+                                            <ul class="property__detail-info-list list-unstyled">
+                                                <!-- <li><b>Garage:</b> 1</li>
+                                                <li><b>Garage Size:</b> 458 SqFt</li> -->
+                                                <li><b>Property Status:</b> for {{property.property_status}}</li>
+                                                <li><b>Property Location:</b> {{property.location}}</li>
+                                                <li v-if="property.status == 1"><b>Current Status:</b> Open</li>
+                                                <li v-else><b>Current Status:</b> Closed</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div v-else class="row">
+                                        <div class="col-md-6 col-lg-6">
+                                            <ul class="property__detail-info-list list-unstyled">
+                                                <!-- <li><b>Property ID:</b> {{property.id}}</li> -->
+                                                <li><b>Price:</b> KSH {{property.price}}</li>
+                                                <li><b>Land Area:</b> {{property.land_area}} Acres</li>
+                                                <li><b>Land Type:</b> {{property.land_type}}</li>
+                                                <li v-if="property.negotiable == 1"><b>Negotiable:</b> Yes</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6 col-lg-6">
+                                            <ul class="property__detail-info-list list-unstyled">
+                                                <!-- <li><b>Garage:</b> 1</li>
+                                                <li><b>Garage Size:</b> 458 SqFt</li> -->
+                                                <li><b>Property Status:</b> for {{property.property_status}}</li>
                                                 <li><b>Property Location:</b> {{property.location}}</li>
                                                 <li v-if="property.status == 1"><b>Current Status:</b> Open</li>
                                                 <li v-else><b>Current Status:</b> Closed</li>
@@ -727,7 +770,8 @@
                             <div class="clearfix"></div>
 
                             <!-- FEATURES -->
-                            <div class="single__detail-features">
+                            <div v-if="property.category_id == 1 || property.category_id == 2 || property.category_id == 3 
+                            || property.category_id == 4 || property.category_id == 7" class="single__detail-features">
                                 <h6 class="text-capitalize detail-heading">features</h6>
                                 <ul class="list-unstyled icon-checkbox">
                                     <li v-if="property.electricity == 1">24 hour electricity</li>
