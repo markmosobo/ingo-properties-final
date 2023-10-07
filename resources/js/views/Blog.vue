@@ -279,7 +279,7 @@
                                         by
                                     </span>
                                     <a href="#">
-                                        {{blog.author.first_name}} {{blog.author.last_name}},
+                                        {{author}},
                                     </a>
                                 </li>
                                 <li class="list-inline-item">
@@ -293,7 +293,7 @@
                                         in
                                     </span>
                                     <a href="#">
-                                        {{blog.category.name}}
+                                        {{blogCategory}}
                                     </a>
                                 </li>
                             </ul>
@@ -316,7 +316,7 @@
                                 </figure> -->
                                 <div class="wrap__profile-author-detail">
                                     <div class="wrap__profile-author-detail-name">author</div>
-                                    <h5>{{blog.author.first_name}} {{blog.author.last_name}}</h5>
+                                    <h5> {{author}}</h5>
                                     <!-- <p>Hi, nice to meet you let me introduce for you, I am Jhon Doe freelancer designer
                                         &amp; web programmer from
                                         base lampung</p> -->
@@ -432,6 +432,8 @@ export default{
     data(){
         return {
             blog: [],
+            author: '',
+            blogCategory: '',
             blogcategories: [],
             recentblogs: []
         }
@@ -445,7 +447,7 @@ export default{
             return "/storage/blogs/";
         },
         viewBlog(id){
-            this.$router.push('/blogs/'+id)
+            this.$router.push('/ourblogs/'+id)
         },
         format_date(value){
           if(value){
@@ -455,7 +457,8 @@ export default{
         getData(){
             axios.get('/api/blog/'+this.$route.params.id).then((response) => {
                 this.blog = response.data.blog
-                console.log(response)
+                this.author = this.blog.author.first_name + " " + this.blog.author.last_name
+                this.blogCategory = this.blog.category.name
             })
         },
         loadLists(){

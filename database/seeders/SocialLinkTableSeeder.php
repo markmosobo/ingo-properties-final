@@ -36,5 +36,17 @@ class SocialLinkTableSeeder extends Seeder
             'link' => '',
             'status' => 0
         ]);
+
+        SocialLink::create([
+            'name' => 'LinkedIn',
+            'link' => '',
+            'status' => 0
+        ]);
+
+        SocialLink::create([
+            'name' => 'Youtube',
+            'link' => '',
+            'status' => 0
+        ]);
     }
 }

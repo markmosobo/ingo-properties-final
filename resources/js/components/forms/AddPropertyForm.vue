@@ -65,7 +65,25 @@
                         <div class="invalid-feedback">Please enter social link!</div>
                       </div>
                    </div>
-                   <div class="col-sm-6">
+                   <div v-if="form.category_id == '1' || form.category_id == '3' || form.category_id == '5'" class="col-sm-6">
+                      <label for="validationCustom04" class="form-label">Property Status</label>
+                      <div class="col-sm-10">
+                        <select name="property_status" class="form-select" v-model="form.property_status" id="property_status">
+                        <option value="rent">For Rent</option>
+                        </select>
+                      </div>
+ 
+                   </div>
+                   <div v-else-if="form.category_id == '2' || form.category_id == '4' || form.category_id == '6'" class="col-sm-6">
+                      <label for="validationCustom04" class="form-label">Property Status</label>
+                      <div class="col-sm-10">
+                        <select name="property_status" class="form-select" v-model="form.property_status" id="property_status">
+                        <option value="sale">For Sale</option>
+                        </select>
+                      </div>
+ 
+                   </div> 
+                   <div v-else class="col-sm-6">
                       <label for="validationCustom04" class="form-label">Property Status</label>
                       <div class="col-sm-10">
                         <select name="property_status" class="form-select" v-model="form.property_status" id="property_status">
@@ -74,7 +92,7 @@
                         </select>
                       </div>
  
-                   </div>
+                   </div>                   
                 </div>
                 <div class="row mb-3"></div>
                 <div class="form-group row">
@@ -338,7 +356,258 @@
                    </div>
                 </div>
              </div>
-             <!--property-->
+             <!--rent property-->
+             <div v-else-if="form.category_id == '1' || form.category_id == '2'" class="row flex flex-row justify-content-around g-3 needs-validation" novalidate="" autocomplete="off">
+                <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
+                <div class="row mb-3"></div>
+                <div class="form-group row">
+                <div class="col-sm-6">
+                   <label for="validationCustom04" class="form-label">Facilities</label>
+                   <div class="col-sm-10">
+                     <div class="dropdown col-sm-10">
+                           <button class="btn dropdown-toggle"
+                                 type="button" 
+                                 id="multiSelectDropdown"
+                                 data-bs-toggle="dropdown" 
+                                 aria-expanded="false">
+                              Select
+                           </button>
+                           <ul class="dropdown-menu" 
+                              aria-labelledby="multiSelectDropdown">
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.electricity" 
+                                          value="1">
+                                       24 Hour Electricity
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.air_conditioning" 
+                                          value="1">
+                                        Air Conditioning
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.alarm" 
+                                          value="1">
+                                        Alarm
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.balcony"
+                                          value="1">
+                                        Balcony
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.chandelier" 
+                                          value="1">
+                                        Chandelier
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.car_parking"
+                                          value="1">
+                                        Car Parking
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.dining_area"
+                                          value="1">
+                                        Dining Area
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.dishwasher" 
+                                          value="1">
+                                        Dishwasher 
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.gym" 
+                                          value="1">
+                                        Gym
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.hot_water" 
+                                          value="1">
+                                        Hot Water
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.kitchen_cabinets" 
+                                          value="1">
+                                        Kitchen Cabinets
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.kitchen_shelf" 
+                                          value="1">
+                                        Kitchen Shelf
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.microwave" 
+                                          value="1">
+                                        Microwave
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.pets_allow" 
+                                          value="1">
+                                        Pets Allow
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.pop_ceiling" 
+                                          value="1">
+                                        Pop Ceiling
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.prepaid_meter"
+                                          value="1">
+                                        Pre-Paid Meter
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.refrigerator"
+                                          value="1">
+                                        Refrigerator
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.swimming_pool"
+                                          value="1">
+                                        Swimming Pool
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.tv" 
+                                          value="1">
+                                        TV
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.wardrobe" 
+                                          value="1">
+                                        Wardrobe
+                                 </label>
+                              </li>
+                              <li>
+                                 <label>
+                                 <input type="checkbox" v-model="form.wifi"
+                                          value="1">
+                                        Wifi
+                                 </label>
+                              </li>
+                           </ul>
+                     </div>
+                      <div class="invalid-feedback">Please enter facilities!</div>
+                   </div>
+                </div> 
+                <div class="col-sm-6">
+                   <label for="inputPassword" class="form-label">Parking Space</label>
+                   <div class="col-sm-10">
+                            <div class="form-check">
+                               <input class="form-check-input hideable" type="radio" v-model="form.parking_space" name="yes" id="yes" value="1">
+                               <label class="form-check-label" for="gridRadios1">
+                                  Yes
+                               </label>
+                            </div>
+                            <div class="form-check">
+                               <input class="form-check-input hideable" type="radio" v-model="form.parking_space" name="no" id="no" value="2">
+                               <label class="form-check-label" for="gridRadios2">
+                                  No
+                               </label>
+                            </div>
+                      <div class="invalid-feedback">Please check one!</div>
+                   </div>
+                </div>
+                </div>
+                <div class="row mb-3"></div>
+                <div class="form-group row">
+                <div class="col-sm-6">
+                   <label for="validationCustom04" class="form-label">Price</label>
+                      <div class="input-group has-validation col-sm-10">
+                         <span class="input-group-text" id="inputGroupPrepend"
+                           >Kes</span
+                         >
+                         <input
+                           type="number"
+                           name="username"
+                           class="form-control"
+                           v-model="form.price"
+                           id="yourUsername"
+                           required
+                         />
+                      <div class="invalid-feedback">Please enter  price!</div>
+                   </div>
+                </div> 
+                <div class="col-sm-6">
+                   <label for="validationCustom04" class="form-label">Phone Number</label>
+                   <div class="col-sm-10">
+                      <input type="number" placeholder="Phone Number" v-model="form.phone_number" id="phone_number" name="phone_number" class="form-control"
+                         required="" />
+                      <div class="invalid-feedback">Please enter phone number!</div>
+                   </div>
+                </div> 
+               </div>
+               <div class="row mb-3"></div>
+                <div class="form-group row">
+                <div class="col-sm-6">
+                   <input type="checkbox" v-model="form.negotiable" class="form-check-input">
+                   <label for="validationCustom04" class="form-label">Negotiable</label>
+                </div> 
+                <!-- <div class="col-sm-6">
+                   <label for="validationCustom04" class="form-label">Name</label>
+                   <div class="col-sm-10">
+                      <input type="text" placeholder="Name" v-model="form.name" id="name" name="name" class="form-control"
+                         required="" />
+                   </div>
+                </div>  -->
+                </div>
+                <div class="row mb-3"></div>
+                <div class="form-group row">
+                <div class="col-sm-12">
+                  <label for="validationCustom04" class="form-label">Description</label>
+                   <div class="col-sm-11">
+                     <textarea rows="3" placeholder="Description*" v-model="form.description" id="description" name="description" class="form-control"
+                         required="">
+                     </textarea>
+                      <div class="invalid-feedback">Please enter description!</div>
+                   </div>
+               </div> 
+                </div>
+                <div class="col-lg-12 felx mt-4 row">
+                   <div class="col-sm-6 col-lg-6">
+                      <button @click.prevent="prev()" class="btn rounded-pill btn-dark">Previous</button>
+                   </div>
+                   <div class="col-sm-6 col-lg-6 text-end">
+                      <button type="submit" @click.prevent="submit()" class="btn rounded-pill btn-success">Submit</button>
+                   </div>
+                </div>
+             </div>
              <div v-else class="row flex flex-row justify-content-around g-3 needs-validation" novalidate="" autocomplete="off">
                 <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
                 <div class="row mb-3"></div>
@@ -358,7 +627,7 @@
                        <option value="9">9</option>
                        <option value="10+">10+</option>
                      </select>
-                      <div class="invalid-feedback">Please enter shipper bedrooms!</div>
+                      <div class="invalid-feedback">Please enter bedrooms!</div>
                    </div>
                 </div>
                 <div class="col-sm-6">
@@ -761,6 +1030,7 @@
           this.categories = response.data.lists.categories;
           this.propertytypes = response.data.lists.propertytypes;
           this.locations = response.data.lists.locations;
+          console.log(this.categories);
  
           });
        },
@@ -793,7 +1063,7 @@
        this.user = localStorage.getItem('user');
        this.user = JSON.parse(this.user);
        this.form.created_by = this.user.id;
-
+       this.form.phone_number = this.user.phone
        console.log("user",this.user)
 
     }

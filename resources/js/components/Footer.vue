@@ -74,23 +74,22 @@
                             Follow us and stay in touch to get the latest news
                         </p>
                         <p>
-                            <button class="btn btn-social btn-social-o facebook mr-1">
+                            <button v-if="facebookLink !== null" @click="visitFacebookLink(facebookLink)" class="btn btn-social btn-social-o facebook mr-1">
                                 <i class="fab fa-facebook"></i>
                             </button>
-                            <button class="btn btn-social btn-social-o twitter mr-1">
+                            <button v-if="xLink !== null" @click="visitXLink(xLink)" class="btn btn-social btn-social-o twitter mr-1">
                                 <i class="fab fa-twitter"></i>
                             </button>
-
-                            <button class="btn btn-social btn-social-o linkedin mr-1">
+                            <button v-if="linkedInLink !== null" @click="visitLinkedInLink(linkedInLink)" class="btn btn-social btn-social-o linkedin mr-1">
                                 <i class="fab fa-linkedin"></i>
                             </button>
-                            <button class="btn btn-social btn-social-o instagram mr-1">
+                            <button v-if="instagramLink !== null" @click="visitInstagramLink(instagramLink)" class="btn btn-social btn-social-o instagram mr-1">
                                 <i class="fab fa-instagram"></i>
                             </button>
-                            <button class="btn btn-social btn-social-o instagram mr-1">
+                            <button v-if="tiktokLink !== null" @click="visitTiktokLink(tiktokLink)" class="btn btn-social btn-social-o instagram mr-1">
                                 <i class="fab fa-tiktok"></i>
                             </button>
-                            <button class="btn btn-social btn-social-o youtube mr-1">
+                            <button v-if="youtubeLink !== null" @click="visitYoutubeLink(youtubeLink)" class="btn btn-social btn-social-o youtube mr-1">
                                 <i class="fab fa-youtube"></i>
                             </button>
                         </p>
@@ -151,19 +150,48 @@ export default {
   data(){
     return {
         contacts: [],
-        sociallinks: []
+        sociallinks: [],
+        facebookLink: '',
+        xLink: '',
+        instagramLink: '',
+        tiktokLink: '',
+        linkedInLink: '',
+        youtubeLink: ''
     }
   },
   methods: {
         loadLists() {
-                axios.get('/api/lists').then((response) => {
-                this.contacts = response.data.lists.contacts;
-                this.sociallinks = response.data.lists.sociallinks;
-                console.log("contacts", this.contacts)
-                console.log("social", this.sociallinks)
+            axios.get('/api/lists').then((response) => {
+            this.contacts = response.data.lists.contacts;
+            this.sociallinks = response.data.lists.sociallinks;
+            this.facebookLink = this.sociallinks[0].link;
+            this.xLink = this.sociallinks[1].link;
+            this.instagramLink = this.sociallinks[2].link;
+            this.tiktokLink = this.sociallinks[3].link;
+            this.linkedInLink = this.sociallinks[4].link;
+            this.youtubeLink = this.sociallinks[5].link;
+            console.log("link", this.sociallinks)
 
-                });
-            },
+            });
+        },
+        visitFacebookLink(url){
+            window.open(url,'_blank')
+        },
+        visitXLink(url){
+            window.open(url,'_blank')
+        },
+        visitInstagramLink(url){
+            window.open(url,'_blank')
+        },
+        visitTiktokLink(url){
+            window.open(url,'_blank')
+        },
+        visitLinkedInLink(url){
+            window.open(url,'_blank')
+        },
+        visitYoutubeLink(url){
+            window.open(url,'_blank')
+        }
     },
     mounted(){
         this.loadLists();

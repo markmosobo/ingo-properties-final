@@ -307,9 +307,11 @@
                         <div class="slider-container">
                             <img class="slider" :src="getPhoto() + currentImage" alt="Image 1">
                             <div class="thumbnail-container">
+                                <div class="slider">
                                 <img v-for="item in property.images" :key="item.id" class="thumbnail" :src="getPhoto() + item.name" alt="Image 1" @click="changeImage(item.id)">
                                 <!-- <img class="thumbnail" :src="getPhoto() + image2" alt="Image 2" @click="changeImage(image2)">
                                 <img class="thumbnail" :src="getPhoto() + image3" alt="Image 3" @click="changeImage(image3)"> -->
+                                </div>    
                             </div>
                         </div>
 
@@ -1246,6 +1248,8 @@ export default {
 .slider {
     max-width: 100%;
     height: auto;
+    display: flex;
+    transition: transform 0.5s ease;
 }
 
 .thumbnail-container {
