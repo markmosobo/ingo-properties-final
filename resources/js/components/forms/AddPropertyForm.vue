@@ -551,7 +551,7 @@
                    <label for="validationCustom04" class="form-label">Price</label>
                       <div class="input-group has-validation col-sm-10">
                          <span class="input-group-text" id="inputGroupPrepend"
-                           >Kes</span
+                           >KSH</span
                          >
                          <input
                            type="number"
@@ -838,11 +838,9 @@
                 <div class="row mb-3"></div>
                 <div class="form-group row">
                 <div class="col-sm-6">
-                   <label for="validationCustom04" class="form-label">Price</label>
+                   <label for="validationCustom04" class="form-label">Price(KSH)</label>
                       <div class="input-group has-validation col-sm-10">
-                         <span class="input-group-text" id="inputGroupPrepend"
-                           >Kes</span
-                         >
+                         
                          <input
                            type="number"
                            name="username"
@@ -851,6 +849,14 @@
                            id="yourUsername"
                            required
                          />
+                         <span class="input-group-text" id="inputGroupPrepend"
+                           >
+                           <select v-model="form.price_period">
+                              <option value="Month">Per Month</option>
+                              <option value="Year">Per Year</option>
+                              <option value="Quarter">Per Quarter</option>
+                           </select>
+                         </span>
                       <div class="invalid-feedback">Please enter  price!</div>
                    </div>
                 </div> 
@@ -974,6 +980,7 @@
           bathrooms: '',
           parking_space: '',
           price: '',
+          price_period: '',
           phone_number: '',
           negotiable: '',
           created_by: '',
@@ -1080,24 +1087,6 @@
     cursor: pointer;
     text-align: center;
  }
- 
- .picture {
-    width: 106px;
-    height: 106px;
-    background-color: #99999;
-    border: 4px solid #CCCCCC;
-    color: #FFFFFF;
-    border-radius: 50%;
-    margin: 0px auto;
-    overflow: hidden;
-    transition: all 0.2s;
-    -webkit-transition: all 0.2s;
- }
- 
- .picture:hover {
-    border-color: #2ca8ff;
- }
- 
  .content.ct-wizard-green .picture:hover {
     border-color: #05ae0e;
  }
