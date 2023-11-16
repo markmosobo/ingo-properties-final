@@ -55,7 +55,8 @@ class Property extends Model
         'swimming_pool',
         'tv',
         'wardrobe',
-        'wifi'
+        'wifi',
+        'price_period'
     ];
 
     public function type()

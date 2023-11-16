@@ -22,20 +22,20 @@
     
                     <div class="card-body pb-0">
                       <h5 class="card-title">All Users <span>| Today</span></h5>
-                      <!-- <p class="card-text">
+                      <p class="card-text">
                    
                       <router-link to="/add-user" custom v-slot="{ href, navigate, isActive }">
                           <a
                             :href="href"
                             :class="{ active: isActive }"
-                            class="btn btn-sm btn-primary rounded-pill"
+                            class="btn btn-sm btn-success rounded-pill"
                             @click="navigate"
                           >
                             Add User
                           </a>
                       </router-link>
             
-                      </p> -->
+                      </p> 
     
                       <table id="AllUsersTable" class="table table-borderless">
                         <thead>
@@ -65,7 +65,7 @@
                             <td>{{format_date(user.created_at)}}</td>
                             <td>
                               <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-success rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                   Action
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">

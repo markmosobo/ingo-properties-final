@@ -184,7 +184,19 @@
               <i class="bi bi-circle"></i><span>All Users</span>
               </a>
             </router-link>
-          </li>                
+          </li>  
+          <li>
+            <router-link to="/roles" custom v-slot="{ href, navigate, isActive }">
+                <a
+                  :href="href"
+                  :class="{ active: isActive }"
+                  class="nav-link"
+                  @click="navigate"
+                >
+              <i class="bi bi-circle"></i><span>Roles</span>
+              </a>
+            </router-link>
+          </li>                          
         </ul>
       </li><!-- End Components Nav --> 
 
@@ -238,6 +250,106 @@
           </li>                
         </ul>
       </li><!-- End Components Nav --> 
+
+      <li class="nav-heading">Property Management System</li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-gem"></i><span>Manage Properties</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+              <router-link to="/pmsproperties" custom v-slot="{ href, navigate, isActive }">
+                <a
+                  :href="href"
+                  :class="{ active: isActive }"
+                  class="nav-link"
+                  @click="navigate"
+                >
+                <i class="bi bi-circle"></i><span>All Properties</span>
+                </a>
+              </router-link>
+          </li>
+          <li>
+              <router-link to="/pmslandlords" custom v-slot="{ href, navigate, isActive }">
+                <a
+                  :href="href"
+                  :class="{ active: isActive }"
+                  class="nav-link"
+                  @click="navigate"
+                >
+                <i class="bi bi-circle"></i><span>Landlords</span>
+                </a>
+              </router-link>
+          </li>
+          <li>
+            <a href="icons-boxicons.html">
+              <i class="bi bi-circle"></i><span>Statements</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Icons Nav -->
+
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#tenants-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-gem"></i><span>Manage Tenants</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="tenants-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <router-link to="/pmstenants" custom v-slot="{ href, navigate, isActive }">
+              <a
+                :href="href"
+                :class="{ active: isActive }"
+                class="nav-link"
+                @click="navigate"
+              >          
+              <i class="bi bi-circle"></i><span>All Tenants</span>
+            </a>
+            </router-link>
+          </li>
+          <li>
+            <a href="icons-remix.html">
+              <i class="bi bi-circle"></i><span>Statements</span>
+            </a>
+          </li>
+          <!--<li>
+            <a href="icons-boxicons.html">
+              <i class="bi bi-circle"></i><span>Boxicons</span>
+            </a>
+          </li>-->
+        </ul>
+      </li><!-- End Tenants Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#expenses-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-gem"></i><span>Manage Expenses</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="expenses-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <router-link to="/pmsexpenses" custom v-slot="{ href, navigate, isActive }">
+              <a
+                :href="href"
+                :class="{ active: isActive }"
+                class="nav-link"
+                @click="navigate"
+              >          
+              <i class="bi bi-circle"></i><span>All Expenses</span>
+            </a>
+            </router-link>
+          </li>
+          <li>
+            <a href="icons-remix.html">
+              <i class="bi bi-circle"></i><span>Statements</span>
+            </a>
+          </li>
+          <!--<li>
+            <a href="icons-boxicons.html">
+              <i class="bi bi-circle"></i><span>Boxicons</span>
+            </a>
+          </li>-->
+        </ul>
+      </li><!-- End Expenses Nav -->
 
     </ul>
 

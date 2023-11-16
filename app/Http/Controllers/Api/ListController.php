@@ -20,6 +20,8 @@ use App\Models\Contact;
 use App\Models\SocialLink;
 use App\Models\Message;
 use App\Models\Project;
+use App\Models\Landlord;
+use App\Models\PmsProperty;
 
 class ListController extends Controller
 {
@@ -27,6 +29,7 @@ class ListController extends Controller
     {
         $users = User::latest()->with('role')->get();
         $properties = Property::latest()->with('type','images')->get();
+        $pmsproperties = PmsProperty::latest()->with('landlord','images')->get();
         $saleproperties = Property::latest()->with('type','images')->where('property_status','sale')->where('status',1)->get();
         $rentproperties = Property::latest()->with('type','images')->where('property_status','rent')->where('status',1)->get();
         $featuredproperties = Property::latest()->where('featured',1)->with('type','images')->where('status','=',1)->orWhere('status','=',2)->get();
@@ -43,6 +46,7 @@ class ListController extends Controller
         $services = Service::all();
         $contacts = Contact::all();
         $sociallinks = SocialLink::all();
+        $landlords = Landlord::all();
         $recentblogs= Blog::with('category')->orderBy('id', 'DESC')->limit(6)->get();
         $homefeaturedproperties = Property::latest()->where('featured',1)->with('type','images')->where('status',1)->limit(6)->get();
         $recentproperties = Property::inRandomOrder()->with('type','images')->where('featured',0)->where('status',1)->limit(6)->get();
@@ -87,6 +91,8 @@ class ListController extends Controller
                 'featuredproject' => $featuredproject,
                 'closedproperties' => $closedproperties,
                 'openproperties' => $openproperties,
+                'landlords' => $landlords,
+                'pmsproperties' => $pmsproperties,
 
                 
             ]

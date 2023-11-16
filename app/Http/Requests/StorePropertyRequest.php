@@ -67,7 +67,8 @@ class StorePropertyRequest extends FormRequest
             'swimming_pool' => 'sometimes',
             'tv' => 'sometimes',
             'wardrobe' => 'sometimes',
-            'wifi' => 'sometimes'
+            'wifi' => 'sometimes',
+            'price_period' => 'sometimes'
 
         ];
     }

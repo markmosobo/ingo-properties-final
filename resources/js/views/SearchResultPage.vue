@@ -253,7 +253,7 @@
         <div class="clearfix"></div>
         <!-- END HEADER -->
 
-        <div class="search__area bg__shadow">
+        <!-- <div class="search__area bg__shadow">
             <div class="container">
                 <div class="search__area-inner">
                     <div class="row">
@@ -335,13 +335,13 @@
                                 </select>
                             </div>
                         </div>
-                        <!-- <div class="col-12 col-lg-3 col-md-3">
+                        <div class="col-12 col-lg-3 col-md-3">
                             <div class="form-group">
                                 <div class="filter__price">
                                     <input class="price-range" type="text" name="my_range" value="" />
                                 </div>
                             </div>
-                        </div> -->
+                        </div>
                         <div class="col-12 col-lg-3 col-md-3">
                             <div class="form-group">
                                 <button class="btn btn-success rounded-pill text-uppercase btn-block"> search <i
@@ -352,7 +352,7 @@
 
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- LISTING LIST -->
         <section>
@@ -622,6 +622,11 @@ export default {
     
     components: {
       Branch,
+    },
+    data(){
+        return {
+            searchResults: []
+        }
     },
     methods: {
         viewProperty(id){

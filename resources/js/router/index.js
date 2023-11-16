@@ -17,6 +17,9 @@ import AllProperties from '../views/properties/AllProperties.vue'
 import FeaturedProperties from '../views/properties/FeaturedProperties.vue'
 import MyProperties from '../views/properties/MyProperties.vue'
 import AddProperty from '../views/properties/AddProperty.vue'
+import AddPmsProperty from '../views/pms/AddPmsProperty.vue'
+import AddPmsLandlord from '../views/pms/AddPmsLandlord.vue'
+import AddPmsTenant from '../views/pms/AddPmsTenant.vue'
 import ViewProperty from '../views/properties/ViewProperty.vue'
 import EditProperty from '../views/properties/EditProperty.vue'
 import AllCategories from '../views/categories/AllCategories.vue'
@@ -56,12 +59,22 @@ import AddSocialLink from '../views/sociallinks/AddSocialLink.vue'
 import EditSocialLink from '../views/sociallinks/EditSocialLink.vue'
 import Profile from '../views/Profile.vue'
 import AllUsers from '../views/users/AllUsers.vue'
+import AddUser from '../views/users/AddUser.vue'
 import ViewUser from '../views/users/ViewUser.vue'
 import OurServices from '../views/OurServices.vue'
 import Service from '../views/Service.vue'
 import SearchResultPage from '../views/SearchResultPage.vue'
 import Projects from '../views/Projects.vue'
+import Roles from '../views/roles/Roles.vue'
+import AddRole from '../views/roles/AddRole.vue'
 import Project from '../views/Project.vue'
+import PmsLandlords from '../views/pms/PmsLandlords.vue'
+import PmsTenants from '../views/pms/PmsTenants.vue'
+import PmsExpenses from '../views/pms/PmsExpenses.vue'
+import PmsUnits from '../views/pms/PmsUnits.vue'
+import AddPmsUnit from '../views/pms/AddPmsUnit.vue'
+import EditPmsUnit from '../views/pms/EditPmsUnit.vue'
+
 const routes = [
     {
         path:'/',
@@ -232,6 +245,11 @@ const routes = [
         name: 'all-users',
         component: AllUsers
     },
+    {
+        path:'/add-user',
+        name: 'add-user',
+        component: AddUser
+    },    
     //forms
     {
         path:'/add-category',
@@ -408,6 +426,16 @@ const routes = [
         component: AddSocialLink
     },
     {
+        path:'/roles',
+        name: 'roles',
+        component: Roles
+    },    
+    {
+        path:'/add-role',
+        name: 'add-role',
+        component: AddRole
+    },    
+    {
         path:'/profile',
         name: 'profile',
         component: Profile,
@@ -421,6 +449,58 @@ const routes = [
         component: SearchResultPage,
         props: true
     },
+
+    //pms routes
+    {
+        path:'/pmsproperties',
+        name: 'pmsproperties',
+        component : () => import("../views/pms/PmsProperties.vue")
+    },
+    {
+        path:'/pmsunits/:id',
+        name: 'pmsunits',
+        component: PmsUnits
+    }, 
+    {
+        path:'/add-pmsunit/:id',
+        name: 'add-pmsunit',
+        component: AddPmsUnit
+    },
+    {
+        path:'/edit-pmsunit/:id',
+        name: 'edit-pmsunit',
+        component: EditPmsUnit
+    },           
+    {
+        path:'/add-pmsproperty',
+        name: 'add-pmsproperty',
+        component: AddPmsProperty
+    },
+    {
+        path:'/pmslandlords',
+        name: 'pmslandlords',
+        component: PmsLandlords
+    },
+    {
+        path:'/add-pmslandlord',
+        name: 'add-pmslandlord',
+        component: AddPmsLandlord
+    },    
+    {
+        path:'/pmstenants',
+        name: 'pmstenants',
+        component: PmsTenants
+    },    
+    {
+        path:'/add-pmstenant',
+        name: 'add-pmstenant',
+        component: AddPmsTenant
+    }, 
+    {
+        path:'/pmsexpenses',
+        name: 'pmsexpenses',
+        component: PmsExpenses
+    },        
 ];
 
 const router = createRouter({

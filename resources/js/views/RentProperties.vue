@@ -394,9 +394,14 @@
                                         </li>
                                     </ul>
 
+                                    <!-- Start Custom Preloader -->
+                                    <div v-if="isLoading" class="text-center mt-3">
+                                        <div class="spinner-border text-primary" role="status">
+                                        </div>
+                                    </div>
+                                    <!-- End Custom Preloader -->
 
-
-                                    <div class="tab-content" id="myTabContent">
+                                    <div v-else class="tab-content" id="myTabContent">
                                         <div class="tab-pane fade" id="pills-tab-one" role="tabpanel"
                                             aria-labelledby="pills-tab-one">
                                             <div class="row">
@@ -623,6 +628,7 @@ export default {
     data(){
         return {
             rentproperties: [],
+            isLoading: true, // Add loading state
 
         }
     },
@@ -639,9 +645,13 @@ export default {
         },
         loadLists() {
              axios.get('api/lists').then((response) => {
+             this.isLoading = true; // Set isLoading to true before making the API call
+
              this.categories = response.data.lists.categories;
              this.propertytypes = response.data.lists.propertytypes;
              this.rentproperties = response.data.lists.rentproperties;
+            // Set isLoading to false once data is loaded
+            this.isLoading = false;
 
            })
         }

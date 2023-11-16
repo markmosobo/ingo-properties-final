@@ -259,7 +259,14 @@
                 <div class="row">
                     <!-- BLOG START -->
                     <div class="col-lg-8">
-                        <div class="row">
+                        <!-- Start Custom Preloader -->
+                        <div v-if="isLoading" class="text-center mt-3">
+                            <div class="spinner-border text-primary" role="status">
+                            </div>
+                        </div>
+                        <!-- End Custom Preloader -->
+
+                        <div v-else class="row">
                             <div v-for="blog in blogs" :key="blog.id" class="col-md-6 col-lg-6">
                                 <div class="blog__grid mt-0">
                                     <!-- BLOG  -->
@@ -516,7 +523,8 @@ import moment from 'moment';
 export default{
     data(){
         return {
-            blogs: []
+            blogs: [],
+            isLoading: true, // Add loading state
         }
     },
     components: {
@@ -537,8 +545,13 @@ export default{
         },
         getData(){
             axios.get('api/lists').then((response) => {
+                this.isLoading = true; // Set isLoading to true before making the API call
+
                 this.blogs = response.data.lists.blogs
                 this.blogcategories = response.data.lists.blogcategories
+                // Set isLoading to false once data is loaded
+                this.isLoading = false;
+
                 console.log(response)
             })
         }

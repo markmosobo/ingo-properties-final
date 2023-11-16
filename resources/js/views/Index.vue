@@ -291,25 +291,25 @@
                                         {{property.location}}
                                     </p>
                                     <ul v-if="property.property_type_id !== null" class="list-inline card__content">
-                                        <li class="list-inline-item">
+                                        <li v-if="property.category_id == '3' || property.category_id == '4'" class="list-inline-item">
 
                                             <span>
                                                 baths <br>
                                                 <i class="fa fa-bath"></i> {{property.bathrooms}}
                                             </span>
                                         </li>
-                                        <li class="list-inline-item">
+                                        <li v-if="property.category_id == '3' || property.category_id == '4'" class="list-inline-item">
                                             <span>
                                                 beds <br>
                                                 <i class="fa fa-bed"></i> {{property.bedrooms}}
                                             </span>
                                         </li>
-                                        <li class="list-inline-item">
+                                        <!-- <li class="list-inline-item">
                                             <span>
                                                 rooms <br>
                                                 <i class="fa fa-inbox"></i> 3
                                             </span>
-                                        </li>
+                                        </li> -->
                                         <li v-bind:hidden="property.size == null" class="list-inline-item">
                                             <span>
                                                 area <br>
@@ -400,25 +400,25 @@
                                         {{property.location}}
                                     </p>
                                     <ul v-if="property.property_type_id !== null" class="list-inline card__content">
-                                        <li class="list-inline-item">
+                                        <li v-if="property.category_id == '3' || property.category_id == '4'" class="list-inline-item">
 
                                             <span>
                                                 baths <br>
                                                 <i class="fa fa-bath"></i> {{property.bathrooms}}
                                             </span>
                                         </li>
-                                        <li class="list-inline-item">
+                                        <li v-if="property.category_id == '3' || property.category_id == '4'" class="list-inline-item">
                                             <span>
                                                 beds <br>
                                                 <i class="fa fa-bed"></i> {{property.bedrooms}}
                                             </span>
                                         </li>
-                                        <li class="list-inline-item">
+                                        <!-- <li class="list-inline-item">
                                             <span>
                                                 rooms <br>
                                                 <i class="fa fa-inbox"></i> 3
                                             </span>
-                                        </li>
+                                        </li> -->
                                         <li class="list-inline-item">
                                             <span>
                                                 area <br>

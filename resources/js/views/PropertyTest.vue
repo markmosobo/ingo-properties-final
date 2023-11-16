@@ -278,7 +278,7 @@
                             </div>
                             <div class="col-md-4 col-lg-4">
                                 <div class="single__detail-area-price">
-                                    <h3 class="text-capitalize text-gray">KSH{{property.price}}/mo</h3>
+                                    <h3 class="text-capitalize text-gray">KSH {{property.price}}/{{property.price_period ? property.price_period : 'Month'}}</h3>
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
                                             <a href="#" class="badge badge-success p-2 rounded"><i
