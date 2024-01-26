@@ -37,15 +37,12 @@
                    <div class="col-sm-6">
                       <label for="inputPassword" class="form-label">Type*</label>
                       <div class="col-sm-10">
-                        <input
-                            type="text"
-                            placeholder="Type"
-                            id="title"
-                            name="title"
-                            v-model="form.type"
-                            class="form-control"
-                            required=""
-                        />
+                         <select name="unit" v-model="form.type" class="form-select" id="">
+                            <option value="0" selected disabled>Select Type</option>
+                            <option value="Residential">Residential</option>
+                            <option value="Commercial">Commercial</option>
+ 
+                         </select>
                         <div class="invalid-feedback">Please enter title!</div>
                       </div>
                    </div>
@@ -57,7 +54,7 @@
                       <label for="inputPassword" class="form-label">Deposit*</label>
                       <div class="col-sm-10">
                         <input
-                            type="text"
+                            type="number"
                             placeholder="Deposit"
                             id="title"
                             name="title"
@@ -72,7 +69,7 @@
                       <label for="inputPassword" class="form-label">Monthly Rent*</label>
                       <div class="col-sm-10">
                         <input
-                            type="text"
+                            type="number"
                             placeholder="Monthly Rent"
                             id="title"
                             name="title"
@@ -91,7 +88,7 @@
                       <label for="inputPassword" class="form-label">Electricity Meter No*</label>
                       <div class="col-sm-10">
                         <input
-                            type="text"
+                            type="number"
                             placeholder="Electricity Meter No"
                             id="title"
                             name="title"
@@ -106,7 +103,7 @@
                       <label for="inputPassword" class="form-label">Water Meter No*</label>
                       <div class="col-sm-10">
                         <input
-                            type="text"
+                            type="number"
                             placeholder="Water Meter No"
                             id="title"
                             name="title"

@@ -55,7 +55,7 @@
                             <!-- <td>{{property["images"][0]["name"]}}</td> -->
                             <td>{{property.name}}</td>
                             <td>{{property.landlord.first_name}} {{property.landlord.last_name}}</td>
-                            <td>{{property.units_no}}</td>
+                            <td>{{property.units.length}}</td>
                             <td>
                               <div class="btn-group" role="group">
                                   <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -63,7 +63,8 @@
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
                                   <!-- <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a> -->                                            
-                                  <a @click="navigateTo('/pmsunits/'+property.id )" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>View Units</a>
+                                  <a @click="navigateTo('/pmsunits/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Units</a>
+                                  <a @click="navigateTo('/pmspropertystatements/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Statements</a>                                  
                                   </div>
                               </div>
                             </td>

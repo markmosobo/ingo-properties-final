@@ -74,6 +74,30 @@ import PmsExpenses from '../views/pms/PmsExpenses.vue'
 import PmsUnits from '../views/pms/PmsUnits.vue'
 import AddPmsUnit from '../views/pms/AddPmsUnit.vue'
 import EditPmsUnit from '../views/pms/EditPmsUnit.vue'
+import ViewPmsUnit from '../views/pms/ViewPmsUnit.vue'
+import EditPmsTenant from '../views/pms/EditPmsTenant.vue'
+import AddPmsExpense from '../views/pms/AddPmsExpense.vue'
+import EditPmsExpense from '../views/pms/EditPmsExpense.vue'
+import PmsPropertyStatements from '../views/pms/PmsPropertyStatements.vue'
+
+function guardMyroute(to, from, next)
+{
+ var isAuthenticated= false;
+//this is just an example. You will have to find a better or 
+// centralised way to handle you localstorage data handling 
+if(localStorage.getItem('user'))
+  isAuthenticated = true;
+ else
+  isAuthenticated= false;
+ if(isAuthenticated) 
+ {
+  next(); // allow to enter route
+ } 
+ else
+ {
+  next('/login'); // go to '/login';
+ }
+}
 
 const routes = [
     {
@@ -168,277 +192,330 @@ const routes = [
     {
         path:'/dashboard',
         name: 'dashboard',
-        component: Home
+        component: Home,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-projects',
         name: 'all-projects',
-        component: AllProjects
+        component: AllProjects,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-properties',
         name: 'all-properties',
-        component: AllProperties
+        component: AllProperties,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/featured-properties',
         name: 'featured-properties',
-        component: FeaturedProperties
+        component: FeaturedProperties,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/my-properties',
         name: 'my-properties',
-        component: MyProperties
+        component: MyProperties,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-categories',
         name: 'all-categories',
-        component: AllCategories
+        component: AllCategories,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-propertytypes',
         name: 'all-propertytypes',
-        component: AllPropertyTypes
+        component: AllPropertyTypes,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-conditions',
         name: 'all-conditions',
-        component: AllConditions
+        component: AllConditions,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-furnishings',
         name: 'all-furnishings',
-        component: AllFurnishings
+        component: AllFurnishings,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-locations',
         name: 'all-locations',
-        component: AllLocations
+        component: AllLocations,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-blogcategories',
         name: 'all-blogcategories',
-        component: AllBlogCategories
+        component: AllBlogCategories,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-blogs',
         name: 'all-blogs',
-        component: AllBlogs
+        component: AllBlogs,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/featured-blogs',
         name: 'featured-blogs',
-        component: FeaturedBlogs
+        component: FeaturedBlogs,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-abouts',
         name: 'all-abouts',
-        component: AllAbouts
+        component: AllAbouts,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-contacts',
         name: 'all-contacts',
-        component: AllContacts
+        component: AllContacts,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/all-users',
         name: 'all-users',
-        component: AllUsers
+        component: AllUsers,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-user',
         name: 'add-user',
-        component: AddUser
+        component: AddUser,
+        beforeEnter : guardMyroute,
     },    
     //forms
     {
         path:'/add-category',
         name: 'add-category',
-        component: AddCategory
+        component: AddCategory,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-project',
         name: 'add-project',
-        component: AddProject
+        component: AddProject,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-property',
         name: 'add-property',
-        component: AddProperty
+        component: AddProperty,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-propertytype',
         name: 'add-propertytype',
-        component: AddPropertyType
+        component: AddPropertyType,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-condition',
         name: 'add-condition',
-        component: AddCondition
+        component: AddCondition,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-furnishing',
         name: 'add-furnishing',
-        component: AddFurnishing
+        component: AddFurnishing,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-location',
         name: 'add-location',
-        component: AddLocation
+        component: AddLocation,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-sociallink',
         name: 'add-sociallink',
-        component: AddSocialLink
+        component: AddSocialLink,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/editproject/:id',
         name: 'editproject',
-        component: EditProject
+        component: EditProject,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/editproperty/:id',
         name: 'editproperty',
-        component: EditProperty
+        component: EditProperty,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/edit-category/:id',
         name: 'edit-category',
-        component: EditCategory
+        component: EditCategory,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/edit-propertytype/:id',
         name: 'edit-propertytype',
-        component: EditPropertyType
+        component: EditPropertyType,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/edit-condition/:id',
         name: 'edit-condition',
-        component: EditCondition
+        component: EditCondition,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/edit-furnishing/:id',
         name: 'edit-furnishing',
-        component: EditFurnishing
+        component: EditFurnishing,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/edit-location/:id',
         name: 'edit-location',
-        component: EditLocation
+        component: EditLocation,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/edit-about/:id',
         name: 'edit-about',
-        component: EditAbout
+        component: EditAbout,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/edit-contact/:id',
         name: 'edit-contact',
-        component: EditContact
+        component: EditContact,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/edit-service/:id',
         name: 'edit-service',
-        component: EditService
+        component: EditService,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/edit-blog/:id',
         name: 'edit-blog',
-        component: EditBlog
+        component: EditBlog,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/edit-sociallink/:id',
         name: 'edit-sociallink',
-        component: EditSocialLink
+        component: EditSocialLink,
+        beforeEnter : guardMyroute,
     },
     {
         path: '/viewproject/:id',
         name: 'viewproject',
         component: ViewProject,
+        beforeEnter : guardMyroute,
 
     },
     {
         path: '/viewproperty/:id',
         name: 'viewproperty',
         component: ViewProperty,
+        beforeEnter : guardMyroute,
 
     },
     {
         path: '/viewcategory/:id',
         name: 'viewcategory',
         component: ViewCategory,
+        beforeEnter : guardMyroute,
 
     },
     {
         path: '/viewpropertytype/:id',
         name: 'viewpropertytype',
         component: ViewPropertyType,
+        beforeEnter : guardMyroute,
 
     },
     {
         path: '/viewcondition/:id',
         name: 'viewcondition',
         component: ViewCondition,
+        beforeEnter : guardMyroute,
 
     },
     {
         path: '/viewfurnishing/:id',
         name: 'viewfurnishing',
         component: ViewFurnishing,
+        beforeEnter : guardMyroute,
 
     },
     {
         path: '/viewlocation/:id',
         name: 'viewlocation',
         component: ViewLocation,
+        beforeEnter : guardMyroute,
 
     },
     {
         path: '/viewblog/:id',
         name: 'viewblog',
         component: ViewBlog,
+        beforeEnter : guardMyroute,
 
     },
     {
         path: '/viewuser/:id',
         name: 'viewuser',
         component: ViewUser,
+        beforeEnter : guardMyroute,
 
     },
     {
         path:'/add-blogcategory',
         name: 'add-blogcategory',
-        component: AddBlogCategory
+        component: AddBlogCategory,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-blog',
         name: 'add-blog',
-        component: AddBlog
+        component: AddBlog,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-about',
         name: 'add-about',
-        component: AddAbout
+        component: AddAbout,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-sociallink',
         name: 'add-sociallink',
-        component: AddSocialLink
+        component: AddSocialLink,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/roles',
         name: 'roles',
-        component: Roles
+        component: Roles,
+        beforeEnter : guardMyroute,
     },    
     {
         path:'/add-role',
         name: 'add-role',
-        component: AddRole
+        component: AddRole,
+        beforeEnter : guardMyroute,
     },    
     {
         path:'/profile',
         name: 'profile',
         component: Profile,
+        beforeEnter : guardMyroute,
         // meta: { requiresAuth: true }
          // Add this meta field to indicate that authentication is required
 
@@ -454,53 +531,93 @@ const routes = [
     {
         path:'/pmsproperties',
         name: 'pmsproperties',
-        component : () => import("../views/pms/PmsProperties.vue")
+        component : () => import("../views/pms/PmsProperties.vue"),
+        beforeEnter : guardMyroute,
     },
     {
         path:'/pmsunits/:id',
         name: 'pmsunits',
-        component: PmsUnits
+        component: PmsUnits,
+        beforeEnter : guardMyroute,
     }, 
     {
         path:'/add-pmsunit/:id',
         name: 'add-pmsunit',
-        component: AddPmsUnit
+        component: AddPmsUnit,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/edit-pmsunit/:id',
         name: 'edit-pmsunit',
-        component: EditPmsUnit
-    },           
+        component: EditPmsUnit,
+        beforeEnter : guardMyroute,
+    }, 
+    {
+        path:'/view-pmsunit/:id',
+        name: 'view-pmsunit',
+        component: ViewPmsUnit,
+        beforeEnter : guardMyroute,
+    },               
     {
         path:'/add-pmsproperty',
         name: 'add-pmsproperty',
-        component: AddPmsProperty
+        component: AddPmsProperty,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/pmslandlords',
         name: 'pmslandlords',
-        component: PmsLandlords
+        component: PmsLandlords,
+        beforeEnter : guardMyroute,
     },
     {
         path:'/add-pmslandlord',
         name: 'add-pmslandlord',
-        component: AddPmsLandlord
+        component: AddPmsLandlord,
+        beforeEnter : guardMyroute,
     },    
     {
         path:'/pmstenants',
         name: 'pmstenants',
-        component: PmsTenants
+        component: PmsTenants,
+        beforeEnter : guardMyroute,
     },    
     {
         path:'/add-pmstenant',
         name: 'add-pmstenant',
-        component: AddPmsTenant
+        component: AddPmsTenant,
+        beforeEnter : guardMyroute,
     }, 
+    {
+        path:'/edit-pmstenant/:id',
+        name: 'edit-pmstenant',
+        component: EditPmsTenant,
+        beforeEnter : guardMyroute,
+    },    
     {
         path:'/pmsexpenses',
         name: 'pmsexpenses',
-        component: PmsExpenses
-    },        
+        component: PmsExpenses,
+        beforeEnter : guardMyroute,
+    }, 
+    {
+        path:'/add-pmsexpense',
+        name: 'add-pmsexpense',
+        component: AddPmsExpense,
+        beforeEnter : guardMyroute,
+    }, 
+    {
+        path:'/edit-pmsexpense/:id',
+        name: 'edit-pmsexpense',
+        component: EditPmsExpense,
+        beforeEnter : guardMyroute,
+    }, 
+    {
+        path:'/pmspropertystatements/:id',
+        name: 'pmspropertystatements',
+        component: PmsPropertyStatements,
+        beforeEnter : guardMyroute,
+    },               
 ];
 
 const router = createRouter({
@@ -508,22 +625,6 @@ const router = createRouter({
     routes
 });
 
-
-router.beforeEach((to, from, next) => {
-    const isAuthenticated = '';
-    
-    if (to.matched.some(route => route.meta.requiresAuth)) {
-      // If the route requires authentication and the user is not authenticated, redirect to the login page
-      if (!isAuthenticated) {
-        next('/login');
-      } else {
-        next();
-      }
-    } else {
-      // If the route doesn't require authentication, proceed as usual
-      next();
-    }
-  });
 
 
 export default router;

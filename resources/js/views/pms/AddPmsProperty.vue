@@ -4,7 +4,7 @@
        <div class="card-body">
           <!-- General Form Elements -->
           <form @submit.prevent="">
-             <h5 class="card-title text-center">Add property</h5>
+             <h5 class="card-title text-center">Add Property</h5>
  
              <div class="row m-auto p-auto justify-content- g-3 needs-validation" novalidate="" autocomplete="off">
                 <div class="row  mb-3"></div>
@@ -135,8 +135,7 @@
           .then(function (response) {
              console.log(response);
              let propdata = response.data.property
-             console.log("data",propdata)             
-             // this.step = 1;
+             console.log("data",propdata.id)             
 
              toast.fire(
                 'Success!',
@@ -154,6 +153,7 @@
              //    'error'
              // )
           });
+
           this.$router.push('/pmsproperties');              
        },
         loadLists() {

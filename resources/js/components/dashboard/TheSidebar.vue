@@ -282,11 +282,6 @@
                 </a>
               </router-link>
           </li>
-          <li>
-            <a href="icons-boxicons.html">
-              <i class="bi bi-circle"></i><span>Statements</span>
-            </a>
-          </li>
         </ul>
       </li><!-- End Icons Nav -->
 

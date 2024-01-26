@@ -22,10 +22,9 @@
     
                     <div class="card-body pb-0">
                       <h5 class="card-title">{{unit.name}} Units <span>| Today</span></h5>
-                      <p class="card-text">
-                   
+                      <p class="card-text">                 
                           <a
-                            class="btn btn-sm btn-primary rounded-pill"
+                            class="btn btn-sm btn-primary rounded-pill active"
                             @click="navigateTo('/add-pmsunit/'+unit.id )"
                           >
                             Add Unit
@@ -55,16 +54,20 @@
                             <td>{{property.type ?? 'N/A'}}</td>
                             <td>{{property.deposit ?? 'N/A'}}</td>
                             <td>{{property.monthly_rent ?? 'N/A'}}</td>
-                            <td>{{property.status}}</td>
+                            <td>
+                              <span v-if="property.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Vacant</span>   
+                              <span v-else-if="property.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Occupied</span>
+                              <span v-else class="badge bg-light text-dark"><i class="bi bi-star me-1"></i> Closed</span>                              
+                            </td>
                             <td>
                               <div class="btn-group" role="group">
                                   <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                   Action
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a> 
+                                  <a @click="navigateTo('/view-pmsunit/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a> 
                                   <a @click="navigateTo('/edit-pmsunit/'+property.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>                                           
-                                  <a @click="navigateTo('/pmsproperties/'+property.id )" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>View Units</a>
+                                  <a @click="deleteUnit(property.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
                                   </div>
                               </div>
                             </td>
@@ -162,7 +165,7 @@
     
              });
         },
-        deleteProperty(id){
+        deleteUnit(id){
                 Swal.fire({
                   title: 'Are you sure?',
                   text: "You won't be able to revert this!",
@@ -174,10 +177,10 @@
                 }).then((result) => {
                   if (result.isConfirmed) { 
                   //send request to the server
-                  axios.delete('/api/property/'+id).then(() => {
+                  axios.delete('/api/pmsunit/'+id).then(() => {
                   toast.fire(
                     'Deleted!',
-                    'Property has been deleted.',
+                    'Unit has been deleted.',
                     'success'
                   )
                   this.loadLists();

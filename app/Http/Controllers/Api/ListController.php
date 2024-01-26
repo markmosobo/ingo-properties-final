@@ -22,6 +22,9 @@ use App\Models\Message;
 use App\Models\Project;
 use App\Models\Landlord;
 use App\Models\PmsProperty;
+use App\Models\PmsUnit;
+use App\Models\PmsTenant;
+use App\Models\PmsExpense;
 
 class ListController extends Controller
 {
@@ -29,7 +32,7 @@ class ListController extends Controller
     {
         $users = User::latest()->with('role')->get();
         $properties = Property::latest()->with('type','images')->get();
-        $pmsproperties = PmsProperty::latest()->with('landlord','images')->get();
+        $pmsproperties = PmsProperty::latest()->with('landlord','images','units')->get();
         $saleproperties = Property::latest()->with('type','images')->where('property_status','sale')->where('status',1)->get();
         $rentproperties = Property::latest()->with('type','images')->where('property_status','rent')->where('status',1)->get();
         $featuredproperties = Property::latest()->where('featured',1)->with('type','images')->where('status','=',1)->orWhere('status','=',2)->get();
@@ -47,6 +50,10 @@ class ListController extends Controller
         $contacts = Contact::all();
         $sociallinks = SocialLink::all();
         $landlords = Landlord::all();
+        $units = PmsUnit::all();
+        $pmstenants = PmsTenant::with('unit','property')->get();
+        $pmsexpenses = PmsExpense::with('user')->get();
+
         $recentblogs= Blog::with('category')->orderBy('id', 'DESC')->limit(6)->get();
         $homefeaturedproperties = Property::latest()->where('featured',1)->with('type','images')->where('status',1)->limit(6)->get();
         $recentproperties = Property::inRandomOrder()->with('type','images')->where('featured',0)->where('status',1)->limit(6)->get();
@@ -93,6 +100,9 @@ class ListController extends Controller
                 'openproperties' => $openproperties,
                 'landlords' => $landlords,
                 'pmsproperties' => $pmsproperties,
+                'units' => $units,
+                'pmstenants' => $pmstenants,
+                'pmsexpenses' => $pmsexpenses
 
                 
             ]

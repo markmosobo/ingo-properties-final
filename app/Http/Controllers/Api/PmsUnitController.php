@@ -57,5 +57,33 @@ class PmsUnitController extends Controller
             'message' => "Unit Updated successfully!",
             'unit' => $unit
         ], 200);
-    }       
+    } 
+
+    public function vacate(Request $request, $id)
+    {
+        $unit=PmsUnit::findOrFail($id);
+        if($unit){
+            $unit->update(array('status' => 0));
+            $unit->save();
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => "Unit Vacated successfully!",
+        ], 200);
+        
+    }   
+
+    public function destroy(Request $request, $id)
+    {
+        $unit = PmsUnit::findOrFail($id);
+        if($unit){
+        $unit->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => "Unit Deleted successfully!",
+        ], 200);
+        }
+    }           
 }

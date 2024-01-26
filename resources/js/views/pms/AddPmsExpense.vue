@@ -5,11 +5,42 @@
           <!-- General Form Elements -->
           <form @submit.prevent="">
           <fieldset v-if="step == 1">
-             <h5 class="card-title text-center">Edit unit</h5>
+             <h5 class="card-title text-center">Add Expense</h5>
  
              <div class="row m-auto p-auto justify-content- g-3 needs-validation" novalidate="" autocomplete="off">
                 <div class="row  mb-3"></div>
+                 <div class="form-group row">
+                   <div class="col-sm-6">
+                      <label for="validationCustom04" class="form-label"
+                      >Property*</label
+                      >
+                      <div class="col-sm-10">
+                         <select @change="getUnits" name="landlord" v-model="form.pms_property_id" class="form-select" id="">
+                            <option value="0" selected disabled>Select Property</option>
+                            <option v-for="property in properties" :value="property.id"
+                            :selected="property.id == form.pms_property_id" :key="property.id">{{ property.name}} </option>
  
+                         </select>
+ 
+                      <div class="invalid-feedback">Please enter category!</div>
+                      </div>
+                   </div>  
+                   <div class="col-sm-6">
+                      <label for="validationCustom04" class="form-label"
+                      >Unit*</label
+                      >
+                      <div class="col-sm-10">
+                         <select :disabled="!form.pms_property_id" name="unit" v-model="form.pms_unit_id" class="form-select" id="">
+                            <option value="0" selected disabled>Select Unit</option>
+                            <option v-for="unit in propunits" :value="unit.id"
+                            :selected="unit.id == form.unit_id" :key="unit.id">{{ unit.unit_number}}</option>
+ 
+                         </select>
+ 
+                      <div class="invalid-feedback">Please enter category!</div>
+                      </div>
+                   </div>                     
+                </div>
                 <div class="row mb-3"></div>
                 <div class="form-group row">
                    <input
@@ -20,14 +51,14 @@
                       class="form-control"
                    />
                     <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Unit Number*</label>
+                      <label for="inputPassword" class="form-label">Payment Type*</label>
                       <div class="col-sm-10">
                         <input
                             type="text"
-                            placeholder="Unit Number"
+                            placeholder="Payment Type"
                             id="title"
                             name="title"
-                            v-model="form.unit_number"
+                            v-model="form.payment_type"
                             class="form-control"
                             required=""
                         />
@@ -35,14 +66,17 @@
                       </div>
                    </div>
                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Type*</label>
+                      <label for="inputPassword" class="form-label">Paid To*</label>
                       <div class="col-sm-10">
-                         <select name="unit" v-model="form.type" class="form-select" id="">
-                            <option value="0" selected disabled>Select Type</option>
-                            <option value="Residential">Residential</option>
-                            <option value="Commercial">Commercial</option>
- 
-                         </select>
+                        <input
+                            type="text"
+                            placeholder="Paid To"
+                            id="title"
+                            name="title"
+                            v-model="form.paid_to"
+                            class="form-control"
+                            required=""
+                        />
                         <div class="invalid-feedback">Please enter title!</div>
                       </div>
                    </div>
@@ -51,29 +85,14 @@
                 <div class="row mb-3"></div>
                 <div class="form-group row">
                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Deposit*</label>
+                      <label for="inputPassword" class="form-label">Amount Paid*</label>
                       <div class="col-sm-10">
                         <input
-                            type="number"
-                            placeholder="Deposit"
+                            type="text"
+                            placeholder="Amount Paid"
                             id="title"
                             name="title"
-                            v-model="form.deposit"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Monthly Rent*</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="number"
-                            placeholder="Monthly Rent"
-                            id="title"
-                            name="title"
-                            v-model="form.monthly_rent"
+                            v-model="form.amount_paid"
                             class="form-control"
                             required=""
                         />
@@ -81,46 +100,14 @@
                       </div>
                    </div>
 
-                </div>
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Electricity Meter No*</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="number"
-                            placeholder="Electricity Meter No"
-                            id="title"
-                            name="title"
-                            v-model="form.electricity_meter"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Water Meter No*</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="number"
-                            placeholder="Water Meter No"
-                            id="title"
-                            name="title"
-                            v-model="form.water_meter"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
 
                 </div>
+
              </div>
              <!--  button -->
              <div class="col-lg-12 felx mt-4 row">
                 <div class="col-sm-6 col-lg-6">
-                    <button @click.prevent="back()" class="btn btn-sm btn-dark rounded-pill">Back</button>
+                    <!-- <button @click.prevent="prev()" class="btn btn-dark">Previous</button> -->
                 </div>
                 <div class="col-sm-6 col-lg-6 text-end">
                     <button type="submit" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Submit</button>
@@ -173,37 +160,37 @@
           loading: false,
           step: 1, 
           roles: [],
+          propunits: [],
+          properties: [],
+          user: []
        }   
     },
     methods: {
-       //ID upload
-       onChangePhoto(e) {
-         console.log('loadings');
-         let file = e.target.files[0];
-         console.log(file)
-         let reader = new FileReader();
-         reader.onloadend = (file) => {
-            // console.log('RESULT', reader.result)
-            this.form.image = reader.result;
+      async getUnits() {
+         try {
+           //const propunits = this.units.find(unit => unit.pms_property_id === this.form.pms_property_id);
+           this.propunits = this.units.filter(item => item.pms_property_id === this.form.pms_property_id && item.status === 0);
+
+           console.log("amoit", this.propunits)
+         } catch (error) {
+           console.error(error);
          }
-         reader.readAsDataURL(file);
+       },       
+       loadLists() {
+          axios.get('api/lists').then((response) => {
+          this.units = response.data.lists.units;
+          this.properties = response.data.lists.pmsproperties;
+ 
+          });
        },
-        getUnit() {
-             axios.get('/api/pmsunit/'+this.$route.params.id).then((response) => {
-     
-             this.form = response.data.unit[0];
-             console.log("props", this.form)
-    
-             });
-        },       
        submit(){
-          axios.put("/api/pmsunit/"+this.$route.params.id, this.form)
+          axios.post("api/pmsexpenses", this.form)
           .then(function (response) {
              console.log(response);
              // this.step = 1;
              toast.fire(
                 'Success!',
-                'Unit updated!',
+                'Expense added!',
                 'success'
              )
           })
@@ -215,15 +202,15 @@
              //    'error'
              // )
           });
-          this.$router.push('/pmsunits/'+this.form.pms_property_id)
-       },
-       back(){
-         this.$router.push('/pmsunits/'+this.form.pms_property_id)
+          this.$router.push('/pmsexpenses')
        }
  
     },
     mounted() {
-      this.getUnit()
+      this.loadLists()
+      this.user = JSON.parse(localStorage.getItem('user'));
+      this.form.checked_by = this.user.id
+      console.log(this.user.id)      
     }
  
  }

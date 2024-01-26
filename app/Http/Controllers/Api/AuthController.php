@@ -15,8 +15,8 @@ class AuthController extends Controller
     private $apiToken;
     public function __construct()
      {
-     $this->apiToken = uniqid(base64_encode(Str::random(40)));
-     $this->middleware('auth:api', ['except' => ['login', 'register']]);
+       $this->apiToken = uniqid(base64_encode(Str::random(40)));
+       $this->middleware('auth:api', ['except' => ['login', 'register']]);
      }
 
     public function login(Request $request){ 
@@ -68,8 +68,10 @@ class AuthController extends Controller
       ]); 
     }
 
-    public function logout() {
+    public function logout(Request $request) {
         auth()->logout();
+        $request->session()->flush();
+
         return response()->json(['message' => 'User successfully signed out']);
     }
 

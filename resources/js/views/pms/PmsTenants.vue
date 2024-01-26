@@ -41,22 +41,20 @@
                         <thead>
                           <tr>
                             <th scope="col">Full Name</th>
-                            <th scope="col">Rent(KES)</th>
-                            <th scope="col">House No.</th>
+                            <th scope="col">Property</th>
                             <th scope="col">Unit No</th>
                             <th scope="col">Status</th>
                             <th scope="col">Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="property in properties" :key="property.id">
-                            <td>{{property.title}}</td>
-                            <td>{{(property.price).toLocaleString()}}</td>
-                            <td>{{property.location}}</td>
-                            <td>{{(property.price).toLocaleString()}}</td>
+                          <tr v-for="tenant in tenants" :key="tenant.id">
+                            <td>{{tenant.first_name}} {{tenant.last_name}}</td>
+                            <td>{{tenant.property.name}}</td>
+                            <td>{{tenant.unit.unit_number}}</td>
                             <td>
-                              <span v-if="property.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Pending</span>   
-                              <span v-else-if="property.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Approved</span>
+                              <span v-if="tenant.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Vacated</span>   
+                              <span v-else-if="tenant.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Occupying</span>
                               <span v-else class="badge bg-light text-dark"><i class="bi bi-star me-1"></i> Closed</span>
 
                             </td>
@@ -67,13 +65,10 @@
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
                                   <!-- <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                             -->
-                                  <a v-if="property.created_by == user.id" @click="navigateTo('/editproperty/'+property.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                  <a v-if="property.status == 0" @click="approveProperty(property.id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Approve</a>
-                                  <a v-if="property.featured == 0 && property.status == 1" @click="featureProperty(property.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Feature</a>
-                                  <a v-if="property.featured == 1 && property.status == 1" @click="unfeatureProperty(property.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Unfeature</a>
-                                  <a v-if="property.status == 1" @click="closeProperty(property.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Close</a>
-                                  <a v-if="property.status == 2" @click="reopenProperty(property.id)" class="dropdown-item" href="#"><i class="ri-refresh-fill mr-2"></i>Reopen</a>
-                                  <a @click="deleteProperty(property.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
+                                  <a @click="navigateTo('/edit-pmstenant/'+tenant.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
+                                  <a v-if="tenant.status == 1" @click="vacateTenant(tenant.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Vacate</a>
+                                  <a v-if="tenant.status == 2" @click="reopenTenant(tenant.id)" class="dropdown-item" href="#"><i class="ri-refresh-fill mr-2"></i>Reopen</a>
+                                  <a @click="deleteTenant(tenant.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
                                   </div>
                               </div>
                             </td>
@@ -86,7 +81,7 @@
                   </div>
                 </div><!-- End Top Selling -->
     
-            </div>
+          </div>
         </section>
     </TheMaster>
     </template>
@@ -112,9 +107,8 @@
     export default {
       data(){
         return {
-          properties: [],
+          tenants: [],
           categories: [],
-          propertytypes: [],
           user: []
         }
       },
@@ -126,11 +120,11 @@
         navigateTo(location){
             this.$router.push(location)
         },
-        approveProperty(id){
-          axios.put('api/approveproperty/'+ id).then(() => {
+        vacateTenant(id){
+          axios.put('api/vacatetenant/'+ id).then(() => {
             toast.fire(
               'Successful',
-              'Property has been approved',
+              'Tenant has been vacated',
               'success'
             ); 
             this.loadLists();                    
@@ -138,11 +132,11 @@
               console.log('error')
           })
         },
-        featureProperty(id){
-          axios.put('api/featureproperty/'+ id).then(() => {
+        reopenTenant(id){
+          axios.put('api/reopentenant/'+ id).then(() => {
             toast.fire(
               'Successful',
-              'Property has been featured',
+              'tenant has been reopened',
               'success'
             ); 
             this.loadLists();                    
@@ -150,43 +144,7 @@
               console.log('error')
           })
         },
-        unfeatureProperty(id){
-          axios.put('api/unfeatureproperty/'+ id).then(() => {
-            toast.fire(
-              'Successful',
-              'Property has been unfeatured',
-              'success'
-            ); 
-            this.loadLists();                    
-          }).catch(() => {
-              console.log('error')
-          })
-        },
-        closeProperty(id){
-          axios.put('api/closeproperty/'+ id).then(() => {
-            toast.fire(
-              'Successful',
-              'Property has been closed',
-              'success'
-            ); 
-            this.loadLists();                    
-          }).catch(() => {
-              console.log('error')
-          })
-        },
-        reopenProperty(id){
-          axios.put('api/reopenproperty/'+ id).then(() => {
-            toast.fire(
-              'Successful',
-              'Property has been reopened',
-              'success'
-            ); 
-            this.loadLists();                    
-          }).catch(() => {
-              console.log('error')
-          })
-        },
-        deleteProperty(id){
+        deleteTenant(id){
                 Swal.fire({
                   title: 'Are you sure?',
                   text: "You won't be able to revert this!",
@@ -198,10 +156,10 @@
                 }).then((result) => {
                   if (result.isConfirmed) { 
                   //send request to the server
-                  axios.delete('/api/property/'+id).then(() => {
+                  axios.delete('/api/pmstenant/'+id).then(() => {
                   toast.fire(
                     'Deleted!',
-                    'Property has been deleted.',
+                    'Tenant has been deleted.',
                     'success'
                   )
                   this.loadLists();
@@ -220,9 +178,8 @@
         },
         loadLists() {
              axios.get('api/lists').then((response) => {
-             this.categories = response.data.lists.categories;
-             this.propertytypes = response.data.lists.propertytypes;
-             this.properties = response.data.lists.properties;
+
+             this.tenants = response.data.lists.pmstenants;
              console.log("props", response)
              setTimeout(() => {
                   $("#AllPropertiesTable").DataTable();

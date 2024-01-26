@@ -27,11 +27,15 @@ class PmsPropertyController extends Controller
         }
 
         // You can dynamically generate unit numbers based on your requirements
-        $unitNumbers = ['101', '102', '103'];
-
-        foreach ($unitNumbers as $unitNumber) {
+        for ($i = 1; $i <= $property->units_no; $i++)
+        {
+            $unitNumber = "Unit-" . $i;
             $property->units()->create(['unit_number' => $unitNumber]);
         }
+
+        // foreach ($unitNumbers as $unitNumber) {
+        //     $property->units()->create(['unit_number' => $unitNumber]);
+        // }
 
         return response()->json([
             'status' => true,

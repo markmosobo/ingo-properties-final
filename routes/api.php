@@ -25,6 +25,8 @@ use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\LandlordController;
 use App\Http\Controllers\Api\PmsPropertyController;
 use App\Http\Controllers\Api\PmsUnitController;
+use App\Http\Controllers\Api\PmsTenantController;
+use App\Http\Controllers\Api\PmsExpenseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +60,8 @@ Route::post('sociallinks', [SocialLinkController::class, 'store']);
 Route::post('messages', [MessageController::class, 'store']);
 Route::post('projects', [ProjectController::class, 'store']);
 Route::post('landlords', [LandlordController::class, 'store']);
+Route::post('tenants', [PmsTenantController::class, 'store']);
+Route::post('pmsexpenses', [PmsExpenseController::class, 'store']);
 Route::post('pmsunits/{id}', [PmsUnitController::class, 'store']);
 
 Route::get('users', [UserController::class, 'index']);
@@ -99,6 +103,7 @@ Route::get('landlord/{id}', [LandlordController::class, 'single']);
 Route::get('pmsproperty/{id}', [PmsPropertyController::class, 'single']);
 Route::get('pmsunits/{id}', [PmsUnitController::class, 'units']);
 Route::get('pmsunit/{id}', [PmsUnitController::class, 'single']);
+Route::get('pmstenant/{id}', [PmsTenantController::class, 'single']);
 
 Route::put('property/{id}', [PropertyController::class, 'update']);
 Route::put('category/{id}', [CategoryController::class, 'update']);
@@ -118,6 +123,8 @@ Route::put('message/{id}', [MessageController::class, 'update']);
 Route::put('project/{id}', [ProjectController::class, 'update']);
 Route::put('landlord/{id}', [LandlordController::class, 'update']);
 Route::put('pmsunit/{id}', [PmsUnitController::class, 'update']);
+Route::put('pmstenant/{id}', [PmsTenantController::class, 'update']);
+Route::put('pmsexpense/{id}', [PmsExpenseController::class, 'update']);
 
 Route::delete('property/{id}', [PropertyController::class, 'destroy']);
 Route::delete('category/{id}', [CategoryController::class, 'destroy']);
@@ -136,6 +143,13 @@ Route::delete('sociallink/{id}', [SocialLinkController::class, 'destroy']);
 Route::delete('message/{id}', [MessageController::class, 'destroy']);
 Route::delete('project/{id}', [ProjectController::class, 'destroy']);
 Route::delete('landlord/{id}', [LandlordController::class, 'destroy']);
+Route::delete('pmstenant/{id}', [PmsTenantController::class, 'destroy']);
+Route::delete('pmsunit/{id}', [PmsUnitController::class, 'destroy']);
+Route::delete('pmsexpense/{id}', [PmsExpenseController::class, 'destroy']);
+
+Route::put('vacatetenant/{id}',[PmsTenantController::class,'vacate']);
+Route::put('vacateunit/{id}',[PmsUnitController::class,'vacate']);
+
 
 Route::put('approveproperty/{id}',[PropertyController::class,'approve']);
 Route::put('featureproperty/{id}',[PropertyController::class,'feature']);

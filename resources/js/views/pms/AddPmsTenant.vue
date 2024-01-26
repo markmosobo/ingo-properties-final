@@ -5,7 +5,7 @@
           <!-- General Form Elements -->
           <form @submit.prevent="">
           <fieldset v-if="step == 1">
-             <h5 class="card-title text-center">Tenant's Personal Information</h5>
+             <h5 class="card-title text-center">Add Tenant</h5>
  
              <div class="row m-auto p-auto justify-content- g-3 needs-validation" novalidate="" autocomplete="off">
                 <div class="row  mb-3"></div>
@@ -68,7 +68,7 @@
                             placeholder="ID Number"
                             id="title"
                             name="title"
-                            v-model="form.id_no"
+                            v-model="form.id_number"
                             class="form-control"
                             required=""
                         />
@@ -83,7 +83,7 @@
                             placeholder="Phone Number"
                             id="title"
                             name="title"
-                            v-model="form.phone_no"
+                            v-model="form.phone_number"
                             class="form-control"
                             required=""
                         />
@@ -94,11 +94,36 @@
                 </div>
                 <div class="row mb-3"></div>
                 <div class="form-group row">
-                   <div class="col-sm-12">
-                      <label for="validationCustom04" class="form-label">Description</label>
-                      <textarea v-model="form.description" class="form-control" placeholder="Description goes here*" id="inputNanme4"></textarea>
+                   <div class="col-sm-6">
+                      <label for="validationCustom04" class="form-label"
+                      >Property*</label
+                      >
+                      <div class="col-sm-10">
+                         <select @change="getUnits" name="landlord" v-model="form.pms_property_id" class="form-select" id="">
+                            <option value="0" selected disabled>Select Property</option>
+                            <option v-for="property in properties" :value="property.id"
+                            :selected="property.id == form.pms_property_id" :key="property.id">{{ property.name}} </option>
  
-                   </div>
+                         </select>
+ 
+                      <div class="invalid-feedback">Please enter category!</div>
+                      </div>
+                   </div>  
+                   <div class="col-sm-6">
+                      <label for="validationCustom04" class="form-label"
+                      >Unit*</label
+                      >
+                      <div class="col-sm-10">
+                         <select :disabled="!form.pms_property_id" name="unit" v-model="form.pms_unit_id" class="form-select" id="">
+                            <option value="0" selected disabled>Select Unit</option>
+                            <option v-for="unit in propunits" :value="unit.id"
+                            :selected="unit.id == form.unit_id" :key="unit.id">{{ unit.unit_number}}</option>
+ 
+                         </select>
+ 
+                      <div class="invalid-feedback">Please enter category!</div>
+                      </div>
+                   </div>                     
                 </div>
              </div>
              <!--  button -->
@@ -157,6 +182,8 @@
           successMessage: "",
           loading: false,
           step: 1, 
+          propunits: [],
+          properties: []
        }   
     },
     methods: {
@@ -172,20 +199,32 @@
          }
          reader.readAsDataURL(file);
        },
+      async getUnits() {
+         try {
+           //const propunits = this.units.find(unit => unit.pms_property_id === this.form.pms_property_id);
+           this.propunits = this.units.filter(item => item.pms_property_id === this.form.pms_property_id && item.status === 0);
+
+           console.log("amoit", this.propunits)
+         } catch (error) {
+           console.error(error);
+         }
+       },       
        loadLists() {
           axios.get('api/lists').then((response) => {
           this.blogcategories = response.data.lists.blogcategories;
+          this.units = response.data.lists.units;
+          this.properties = response.data.lists.pmsproperties;
  
           });
        },
        submit(){
-          axios.post("api/projects", this.form)
+          axios.post("api/tenants", this.form)
           .then(function (response) {
              console.log(response);
              // this.step = 1;
              toast.fire(
                 'Success!',
-                'Project added!',
+                'Tenant added!',
                 'success'
              )
           })
@@ -197,7 +236,7 @@
              //    'error'
              // )
           });
-          this.$router.push('/all-projects')
+          this.$router.push('/pmstenants')
  
        }
  
