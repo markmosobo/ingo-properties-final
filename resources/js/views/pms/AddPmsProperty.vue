@@ -53,7 +53,7 @@
                       <div class="invalid-feedback">Please enter category!</div>
                       </div>
                    </div>                
-                   <div class="col-sm-6">
+<!--                    <div class="col-sm-6">
                       <label for="inputPassword" class="form-label">Media</label>
                       <div class="col-sm-10">
                       <Uploader 
@@ -61,7 +61,7 @@
                         @change="changeMedia"
                        />
                        </div>
-                   </div>                  
+                   </div>  -->                 
                 </div>
                 <div class="row mb-3"></div>
                

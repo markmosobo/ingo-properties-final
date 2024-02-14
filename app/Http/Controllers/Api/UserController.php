@@ -125,4 +125,15 @@ class UserController extends Controller
             $user->save();
         }
     }
+
+    public function single(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        return response()->json([
+            'status' => true,
+            'message' => "success",
+            'user' => $user
+        ], 200);
+    }
 }
