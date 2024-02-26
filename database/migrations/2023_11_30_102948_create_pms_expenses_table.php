@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('pms_expenses', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('ref_no')->nullable();
             $table->integer('pms_property_id')->unsigned();
             $table->integer('pms_unit_id')->unsigned();            
             $table->string('payment_type')->nullable();

@@ -42,7 +42,7 @@
                           <tr>
                             <th scope="col">Type</th>
                             <th scope="col">Amount(KES)</th>
-                            <th scope="col">Paid To</th>
+                            <th scope="col">Expended To</th>
                             <th scope="col">Checked By</th>
                             <th scope="col">Checked On</th>
                             <th scope="col">Action</th>
@@ -63,7 +63,7 @@
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
                                   <!-- <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                             -->
                                   <a v-if="expense.created_by == user.id" @click="navigateTo('/editexpense/'+expense.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                  <a class="dropdown-item" href="#"><i class="ri-printer-fill mr-2"></i>Print</a>
+                                  <a class="dropdown-item" @click="generateInvoice(expense.id)" href="#"><i class="ri-printer-fill mr-2"></i>Download Invoice</a>
                                   <a @click="deleteExpense(expense.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
                                   </div>
                               </div>
@@ -91,6 +91,7 @@
     import "datatables.net-dt/css/jquery.dataTables.min.css";
     import $ from "jquery";
     import moment  from 'moment';
+    import jsPDF from 'jspdf';
 
     const toast = Swal.mixin({
         toast: true,
@@ -107,7 +108,8 @@
           expenses: [],
           categories: [],
           propertytypes: [],
-          user: []
+          user: [],
+          pmsexpense: []
         }
       },
       methods: {
@@ -118,6 +120,60 @@
         },
         navigateTo(location){
             this.$router.push(location)
+        },
+        generateInvoice(id) {
+          //get expense
+          axios.get('/api/pmsexpense/'+id).then((response) => {
+              this.pmsexpense = response.data.pmsexpense
+                        // Create a new instance of jsPDF
+          const pdf = new jsPDF();
+          var img = new Image();
+          img.src = '/images/ingo-colored-logo.png';
+
+          pdf.addImage(img, 'PNG', 10, 10, 50, 50, { align: "center" })
+          pdf.setFont("helvetica");
+          pdf.setFontSize(20);
+          pdf.text("Expense Report", 100, 20, { align: "center" });
+
+          // Invoice Information
+          pdf.setFontSize(12);
+          pdf.text("Reference Number: ", 10, 40);
+          pdf.text("Date: " + new Date(this.pmsexpense['created_at']).toLocaleDateString(), 10, 50);
+
+          // Customer Information
+          pdf.text("Expended To: "+ this.pmsexpense.paid_to, 10, 70);
+          pdf.text("Checked By: "+this.pmsexpense.user.first_name + " "+ this.pmsexpense.user.last_name, 10, 80);
+          pdf.text("Property: "+this.pmsexpense.property.name, 10, 90);
+          pdf.text("Unit: "+this.pmsexpense.unit.unit_number, 10, 100);
+
+          // Add a horizontal line
+          pdf.line(10, 110, 200, 110);
+
+          // Table Header
+          // pdf.setFontType("bold");
+          pdf.text("Property", 20, 120);
+          pdf.text("Remarks", 80, 120);
+          pdf.text("Cost", 160, 120);
+
+          // Table Rows
+          // pdf.setFontType("normal");
+          pdf.text(this.pmsexpense.property.name+" - "+this.pmsexpense.unit.unit_number, 20, 130);
+          pdf.text(this.pmsexpense.payment_type+" by "+this.pmsexpense.paid_to, 80, 130);
+          pdf.text("KES "+this.pmsexpense.amount_paid.toFixed(2), 160, 130);
+
+
+          // Total
+          // pdf.setFontType("bold");
+          pdf.text("Total: KES " + this.pmsexpense.amount_paid.toFixed(2), 160, 160);
+          pdf.text("Balance: KES " + "0.00", 160, 170);
+          // Add content to the PDF
+          // pdf.text('Hello, this is a PDF generated with Vue.js!', 10, 10);
+
+          // Save the PDF
+          pdf.save(this.pmsexpense.paid_to+'-pdf.pdf');
+              console.log("user", response)
+          })
+
         },
         deleteExpense(id){
                 Swal.fire({

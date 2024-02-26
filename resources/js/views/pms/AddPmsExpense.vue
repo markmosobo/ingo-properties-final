@@ -50,15 +50,15 @@
                       value="1"
                       class="form-control"
                    />
-                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Payment Type*</label>
+                   <div class="col-sm-6">
+                      <label for="inputPassword" class="form-label">Amount Paid*</label>
                       <div class="col-sm-10">
                         <input
                             type="text"
-                            placeholder="Payment Type"
+                            placeholder="Amount Paid"
                             id="title"
                             name="title"
-                            v-model="form.payment_type"
+                            v-model="form.amount_paid"
                             class="form-control"
                             required=""
                         />
@@ -84,15 +84,16 @@
                 </div>
                 <div class="row mb-3"></div>
                 <div class="form-group row">
+
                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Amount Paid*</label>
+                      <label for="inputPassword" class="form-label">Remarks*</label>
                       <div class="col-sm-10">
                         <input
                             type="text"
-                            placeholder="Amount Paid"
+                            placeholder="Remarks e.g Payment Type"
                             id="title"
                             name="title"
-                            v-model="form.amount_paid"
+                            v-model="form.payment_type"
                             class="form-control"
                             required=""
                         />

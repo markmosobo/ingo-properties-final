@@ -199,15 +199,22 @@
          }
          reader.readAsDataURL(file);
        },
-      async getUnits() {
-         try {
-           //const propunits = this.units.find(unit => unit.pms_property_id === this.form.pms_property_id);
-           this.propunits = this.units.filter(item => item.pms_property_id === this.form.pms_property_id && item.status === 0);
+       getUnits() {
+             axios.get('/api/pmsunits/'+this.form.pms_property_id).then((response) => {
+     
+             this.propunits = response.data.units;
+             console.log("props", response)
+    
+             });
 
-           console.log("amoit", this.propunits)
-         } catch (error) {
-           console.error(error);
-         }
+         // try {
+         //   //const propunits = this.units.find(unit => unit.pms_property_id === this.form.pms_property_id);
+         //   this.propunits = this.units.filter(item => item.pms_property_id === this.form.pms_property_id && item.status === 0);
+
+         //   console.log("amoit", this.propunits)
+         // } catch (error) {
+         //   console.error(error);
+         // }
        },       
        loadLists() {
           axios.get('api/lists').then((response) => {
