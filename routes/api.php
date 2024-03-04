@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\PmsPropertyController;
 use App\Http\Controllers\Api\PmsUnitController;
 use App\Http\Controllers\Api\PmsTenantController;
 use App\Http\Controllers\Api\PmsExpenseController;
+use App\Http\Controllers\Api\PmsStatementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +64,7 @@ Route::post('landlords', [LandlordController::class, 'store']);
 Route::post('tenants', [PmsTenantController::class, 'store']);
 Route::post('pmsexpenses', [PmsExpenseController::class, 'store']);
 Route::post('pmsunits/{id}', [PmsUnitController::class, 'store']);
+Route::post('pmsstatements', [PmsStatementController::class, 'store']);
 
 Route::get('users', [UserController::class, 'index']);
 Route::get('properties', [PropertyController::class, 'index']);
@@ -105,6 +107,7 @@ Route::get('pmsunits/{id}', [PmsUnitController::class, 'units']);
 Route::get('pmsunit/{id}', [PmsUnitController::class, 'single']);
 Route::get('pmstenant/{id}', [PmsTenantController::class, 'single']);
 Route::get('pmsexpense/{id}', [PmsExpenseController::class, 'single']);
+Route::get('pmsstatement/{id}', [PmsStatementController::class, 'single']);
 
 Route::put('property/{id}', [PropertyController::class, 'update']);
 Route::put('category/{id}', [CategoryController::class, 'update']);
@@ -126,6 +129,7 @@ Route::put('landlord/{id}', [LandlordController::class, 'update']);
 Route::put('pmsunit/{id}', [PmsUnitController::class, 'update']);
 Route::put('pmstenant/{id}', [PmsTenantController::class, 'update']);
 Route::put('pmsexpense/{id}', [PmsExpenseController::class, 'update']);
+Route::put('pmsstatement/{id}', [PmsStatementController::class, 'update']);
 
 Route::delete('property/{id}', [PropertyController::class, 'destroy']);
 Route::delete('category/{id}', [CategoryController::class, 'destroy']);
