@@ -21,17 +21,17 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Managed Properties <span>| Today</span></h5>
+                      <h5 class="card-title">{{property.name}} Tenants <span>| Today</span></h5>
                       <p class="card-text">
                    
-                      <router-link to="/add-pmsproperty" custom v-slot="{ href, navigate, isActive }">
+                      <router-link to="/add-pmstenant" custom v-slot="{ href, navigate, isActive }">
                           <a
                             :href="href"
                             :class="{ active: isActive }"
                             class="btn btn-sm btn-primary rounded-pill"
                             @click="navigate"
                           >
-                            Add Property
+                            Add Tenant
                           </a>
                       </router-link>
             
@@ -40,32 +40,35 @@
                       <table id="AllPropertiesTable" class="table table-borderless">
                         <thead>
                           <tr>
-                            <!--<th scope="col">Preview</th>-->
-                            <th scope="col">Name</th>
-                            <th scope="col">Landlord</th>
-                            <th scope="col">Number of Units</th>
+                            <th scope="col">Full Name</th>
+                            <!-- <th scope="col">Property</th> -->
+                            <th scope="col">Unit No</th>
+                            <th scope="col">Status</th>
                             <th scope="col">Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="property in properties" :key="property.id">
-                            <!--<th scope="row"><a href="#">
-                              <img :src="getPhoto() + property.images[0].name" />
-                            </a></th>-->
-                            <!-- <td>{{property["images"][0]["name"]}}</td> -->
-                            <td>{{property.name}}</td>
-                            <td>{{property.landlord.first_name}} {{property.landlord.last_name}}</td>
-                            <td>{{property.units.length}}</td>
+                          <tr v-for="tenant in tenants" :key="tenant.id">
+                            <td>{{tenant.first_name}} {{tenant.last_name}}</td>
+                            <!-- <td>{{tenant.property.name}}</td> -->
+                            <td>{{tenant.unit.unit_number}}</td>
+                            <td>
+                              <span v-if="tenant.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Vacated</span>   
+                              <span v-else-if="tenant.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Occupying</span>
+                              <span v-else class="badge bg-light text-dark"><i class="bi bi-star me-1"></i> Closed</span>
+
+                            </td>
                             <td>
                               <div class="btn-group" role="group">
                                   <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                   Action
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <!-- <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a> -->                                            
-                                  <a @click="navigateTo('/pmsunits/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Units</a>
-                                  <a @click="navigateTo('/pmspropertytenants/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Tenants</a>                                  
-                                  <a @click="navigateTo('/pmspropertystatements/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Statements</a>                                  
+                                  <a @click="navigateTo('/pmstenantstatements/'+tenant.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Statements</a>                                            
+                                  <a @click="navigateTo('/edit-pmstenant/'+tenant.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
+                                  <a v-if="tenant.status == 1" @click="vacateTenant(tenant.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Vacate</a>
+                                  <a v-if="tenant.status == 2" @click="reopenTenant(tenant.id)" class="dropdown-item" href="#"><i class="ri-refresh-fill mr-2"></i>Reopen</a>
+                                  <a @click="deleteTenant(tenant.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
                                   </div>
                               </div>
                             </td>
@@ -78,7 +81,7 @@
                   </div>
                 </div><!-- End Top Selling -->
     
-            </div>
+          </div>
         </section>
     </TheMaster>
     </template>
@@ -104,25 +107,20 @@
     export default {
       data(){
         return {
-          properties: [],
-          categories: [],
-          propertytypes: [],
+          tenants: [],
+          property: [],
           user: []
         }
       },
       methods: {
-        getPhoto()
-        {
-            return "/storage/properties/";
-        },
         navigateTo(location){
             this.$router.push(location)
         },
-        featureProperty(id){
-          axios.put('api/featureproperty/'+ id).then(() => {
+        vacateTenant(id){
+          axios.put('/api/vacatetenant/'+ id).then(() => {
             toast.fire(
               'Successful',
-              'Property has been featured',
+              'Tenant has been vacated',
               'success'
             ); 
             this.loadLists();                    
@@ -130,11 +128,11 @@
               console.log('error')
           })
         },
-        unfeatureProperty(id){
-          axios.put('api/unfeatureproperty/'+ id).then(() => {
+        reopenTenant(id){
+          axios.put('/api/reopentenant/'+ id).then(() => {
             toast.fire(
               'Successful',
-              'Property has been unfeatured',
+              'tenant has been reopened',
               'success'
             ); 
             this.loadLists();                    
@@ -142,31 +140,7 @@
               console.log('error')
           })
         },
-        closeProperty(id){
-          axios.put('api/closeproperty/'+ id).then(() => {
-            toast.fire(
-              'Successful',
-              'Property has been closed',
-              'success'
-            ); 
-            this.loadLists();                    
-          }).catch(() => {
-              console.log('error')
-          })
-        },
-        reopenProperty(id){
-          axios.put('api/reopenproperty/'+ id).then(() => {
-            toast.fire(
-              'Successful',
-              'Property has been reopened',
-              'success'
-            ); 
-            this.loadLists();                    
-          }).catch(() => {
-              console.log('error')
-          })
-        },
-        deleteProperty(id){
+        deleteTenant(id){
                 Swal.fire({
                   title: 'Are you sure?',
                   text: "You won't be able to revert this!",
@@ -178,10 +152,10 @@
                 }).then((result) => {
                   if (result.isConfirmed) { 
                   //send request to the server
-                  axios.delete('/api/property/'+id).then(() => {
+                  axios.delete('/api/pmstenant/'+id).then(() => {
                   toast.fire(
                     'Deleted!',
-                    'Property has been deleted.',
+                    'Tenant has been deleted.',
                     'success'
                   )
                   this.loadLists();
@@ -198,14 +172,21 @@
                                    
                 })
         },
-        loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.categories = response.data.lists.categories;
-             this.propertytypes = response.data.lists.propertytypes;
-             this.properties = response.data.lists.pmsproperties;
-             console.log("props", this.properties)
+        getProperty()
+        {
+          axios.get('/api/pmsproperty/'+ this.$route.params.id).then((response) => {
+            this.property = response.data.property[0] 
+            console.log("dat", this.property)
+          }).catch(() => {
+              console.log('error')
+          })
+        },
+        getPropertyTenants() {
+             axios.get('/api/pmspropertytenants/'+this.$route.params.id).then((response) => {
+             this.tenants = response.data.pmspropertytenants;
+             console.log("props", response)
              setTimeout(() => {
-                  $("#AllPropertiesTable").DataTable();
+                  $("#AllStatementsTable").DataTable();
               }, 10);
     
              });
@@ -215,7 +196,8 @@
           TheMaster,
       },
       mounted(){
-        this.loadLists();
+        this.getPropertyTenants();
+        this.getProperty();
         this.user = localStorage.getItem('user');
         this.user = JSON.parse(this.user);
 

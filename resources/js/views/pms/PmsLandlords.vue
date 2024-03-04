@@ -57,7 +57,7 @@
                                   Action
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <!-- <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                             -->
+                                  <a @click="navigateTo('/pmslandlordproperties/'+landlord.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Property</a>                                             
                                   <a v-if="user.id == 1" @click="navigateTo('/editlandlord/'+landlord.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
                                   <a @click="deleteLandlord(landlord.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
                                   </div>

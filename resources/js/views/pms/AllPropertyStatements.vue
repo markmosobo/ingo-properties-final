@@ -21,7 +21,7 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Statements <span>| Today</span></h5>
+                      <h5 class="card-title">All Properties Statements <span>| Today</span></h5>
                       <p class="card-text">
                    
 <!--                       <router-link to="/add-pmslandlord" custom v-slot="{ href, navigate, isActive }">
@@ -40,19 +40,20 @@
                       <table id="AllStatementsTable" class="table table-borderless">
                         <thead>
                           <tr>
+                            <th scope="col">Property</th>
                             <th scope="col">Transaction On</th>
                             <th scope="col">Invoice</th>
                             <th scope="col">Status</th>
                             <th scope="col">Detail</th>
-                            <th scope="col">Property</th>
                             <th scope="col">Total</th>
                             <th scope="col">Paid</th>
                             <th scope="col">Bal</th>
                             <th scope="col">Action</th>
-                          </tr>
+                          </tr>                         
                         </thead>
                         <tbody>
                           <tr v-for="statement in statements" :key="statement.id">
+                            <td>{{statement.property.name}}</td>
                             <td>{{format_date(statement.updated_at)}}</td>
                             <td>{{statement.ref_no}}</td>
                             <td>
@@ -60,7 +61,6 @@
                               <span v-else class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Not Paid</span>
                             </td>
                             <td>{{statement.details}}</td>
-                            <td>{{statement.property.name}}</td>
                             <td>{{formatNumber(statement.total)}}</td>
                             <td>{{formatNumber(statement.paid)}}</td>
                             <td>{{formatNumber(statement.balance)}}</td>
@@ -82,12 +82,11 @@
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td></td>
                             <td>{{ formatNumber(calculateTotal('total')) }}</td>
                             <td>{{ formatNumber(calculateTotal('paid')) }}</td>
                             <td>{{ formatNumber(calculateTotal('balance')) }}</td>
                             <td></td>
-                          </tr>      
+                          </tr>                           
                         </tbody>
                       </table>
     

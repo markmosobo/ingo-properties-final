@@ -271,6 +271,18 @@
               </router-link>
           </li>
           <li>
+              <router-link to="/allpropertystatements" custom v-slot="{ href, navigate, isActive }">
+                <a
+                  :href="href"
+                  :class="{ active: isActive }"
+                  class="nav-link"
+                  @click="navigate"
+                >
+                <i class="bi bi-circle"></i><span>Property Statements</span>
+                </a>
+              </router-link>
+          </li>          
+          <li>
               <router-link to="/pmslandlords" custom v-slot="{ href, navigate, isActive }">
                 <a
                   :href="href"
@@ -282,6 +294,18 @@
                 </a>
               </router-link>
           </li>
+          <li>
+              <router-link to="/alllandlordstatements" custom v-slot="{ href, navigate, isActive }">
+                <a
+                  :href="href"
+                  :class="{ active: isActive }"
+                  class="nav-link"
+                  @click="navigate"
+                >
+                <i class="bi bi-circle"></i><span>Landlord Statements</span>
+                </a>
+              </router-link>
+          </li>          
         </ul>
       </li><!-- End Icons Nav -->
 
@@ -304,9 +328,16 @@
             </router-link>
           </li>
           <li>
-            <a href="icons-remix.html">
+            <router-link to="/alltenantstatements" custom v-slot="{ href, navigate, isActive }">
+              <a
+                :href="href"
+                :class="{ active: isActive }"
+                class="nav-link"
+                @click="navigate"
+              >
               <i class="bi bi-circle"></i><span>Statements</span>
             </a>
+            </router-link>
           </li>
           <!--<li>
             <a href="icons-boxicons.html">
@@ -333,11 +364,11 @@
             </a>
             </router-link>
           </li>
-          <li>
+<!--           <li>
             <a href="icons-remix.html">
               <i class="bi bi-circle"></i><span>Statements</span>
             </a>
-          </li>
+          </li> -->
           <!--<li>
             <a href="icons-boxicons.html">
               <i class="bi bi-circle"></i><span>Boxicons</span>

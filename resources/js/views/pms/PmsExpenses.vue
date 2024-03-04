@@ -50,8 +50,8 @@
                         </thead>
                         <tbody>
                           <tr v-for="expense in expenses" :key="expense.id">
-                            <td>{{expense.payment_type}}</td>
-                            <td>{{expense.amount_paid}}</td>
+                            <td>{{capitalizeFirstLetter(expense.payment_type)}}</td>
+                            <td>{{formatNumber(expense.amount_paid)}}</td>
                             <td>{{expense.paid_to}}</td>
                             <td>{{expense.user.first_name}} {{expense.user.last_name}}</td>
                             <td>{{format_date(expense.created_at)}}</td>
@@ -117,6 +117,13 @@
           if(value){
             return moment(String(value)).format('MMM Do YYYY')
           }
+        },
+        formatNumber(value) {
+          // Use the toLocaleString method to format the number with commas and decimal places
+          return value.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
         },
         navigateTo(location){
             this.$router.push(location)
@@ -206,6 +213,9 @@
                   }
                                    
                 })
+        },
+        capitalizeFirstLetter(str) {
+          return str.charAt(0).toUpperCase() + str.slice(1);
         },
         loadLists() {
              axios.get('api/lists').then((response) => {

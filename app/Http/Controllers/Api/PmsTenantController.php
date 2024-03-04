@@ -92,5 +92,16 @@ class PmsTenantController extends Controller
             'message' => "Tenant Vacated successfully!",
         ], 200);
         
-    }           
+    } 
+
+    public function propertyTenants(Request $request, $id)
+    {
+        $pmspropertytenants = PmsTenant::with('unit','property')->where('pms_property_id', $id)->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => "retrieved",
+            'pmspropertytenants' => $pmspropertytenants
+        ], 200);
+    }              
 }

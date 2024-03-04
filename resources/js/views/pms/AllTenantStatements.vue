@@ -21,7 +21,7 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Statements <span>| Today</span></h5>
+                      <h5 class="card-title">All Tenants Statements <span>| Today</span></h5>
                       <p class="card-text">
                    
 <!--                       <router-link to="/add-pmslandlord" custom v-slot="{ href, navigate, isActive }">
@@ -40,7 +40,7 @@
                       <table id="AllStatementsTable" class="table table-borderless">
                         <thead>
                           <tr>
-                            <th scope="col">Transaction On</th>
+                            <th scope="col">Tenant</th>
                             <th scope="col">Invoice</th>
                             <th scope="col">Status</th>
                             <th scope="col">Detail</th>
@@ -53,7 +53,7 @@
                         </thead>
                         <tbody>
                           <tr v-for="statement in statements" :key="statement.id">
-                            <td>{{format_date(statement.updated_at)}}</td>
+                            <td>{{statement.tenant.first_name}} {{statement.tenant.last_name}}</td>
                             <td>{{statement.ref_no}}</td>
                             <td>
                               <span v-if="statement.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Paid</span>

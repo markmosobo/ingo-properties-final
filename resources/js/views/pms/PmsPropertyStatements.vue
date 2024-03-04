@@ -21,44 +21,61 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">{{property.name}} Statement <span>| Today</span></h5>
+                      <h5 class="card-title">{{property.name}} Statements <span>| Today</span></h5>
                       <p class="card-text">
                    
 
             
                       </p>
     
-                      <table id="AllPropertiesTable" class="table table-borderless">
+                      <table id="AllStatementsTable" class="table table-borderless">
                         <thead>
                           <tr>
-                            <!--<th scope="col">Preview</th>-->
-                            <th scope="col">Name</th>
-                            <th scope="col">Landlord</th>
-                            <th scope="col">Number of Units</th>
+                            <th scope="col">Transaction On</th>
+                            <th scope="col">Invoice</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Detail</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Paid</th>
+                            <th scope="col">Bal</th>
                             <th scope="col">Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="property in properties" :key="property.id">
-                            <!--<th scope="row"><a href="#">
-                              <img :src="getPhoto() + property.images[0].name" />
-                            </a></th>-->
-                            <!-- <td>{{property["images"][0]["name"]}}</td> -->
-                            <td>{{property.name}}</td>
-                            <td>{{property.landlord.first_name}} {{property.landlord.last_name}}</td>
-                            <td>{{property.units.length}}</td>
+                          <tr v-for="statement in propertystatements" :key="statement.id">
+                            <td>{{format_date(statement.updated_at)}}</td>
+                            <td>{{statement.ref_no}}</td>
+                            <td>
+                              <span v-if="statement.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Paid</span>
+                              <span v-else class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Not Paid</span>
+                            </td>
+                            <td>{{statement.details}}</td>
+                            <td>{{formatNumber(statement.total)}}</td>
+                            <td>{{formatNumber(statement.paid)}}</td>
+                            <td>{{formatNumber(statement.balance)}}</td>
                             <td>
                               <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                   Action
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <!-- <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a> -->                                            
-                                  <a @click="navigateTo('/pmsunits/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Units</a>
+                                  <a @click="navigateTo('/viewstatement/'+statement.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                            
+                                  <!-- <a v-if="user.id == 1" @click="navigateTo('/editstatement/'+statement.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a> -->
+                                  <a v-if="statement.status == 0" @click="settleTenant(statement.id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle</a>
                                   </div>
                               </div>
                             </td>
                           </tr>
+                          <tr>
+                            <td>Total</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{ formatNumber(calculateTotal('total')) }}</td>
+                            <td>{{ formatNumber(calculateTotal('paid')) }}</td>
+                            <td>{{ formatNumber(calculateTotal('balance')) }}</td>
+                            <td></td>
+                          </tr>                          
                         </tbody>
                       </table>
     
@@ -80,7 +97,8 @@
     import "datatables.net-dt/js/dataTables.dataTables";
     import "datatables.net-dt/css/jquery.dataTables.min.css";
     import $ from "jquery";
-    
+    import moment from 'moment';
+
     const toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -94,9 +112,7 @@
       data(){
         return {
           property: [],
-          properties: [],
-          categories: [],
-          propertytypes: [],
+          propertystatements: [],
           user: []
         }
       },
@@ -113,14 +129,27 @@
         navigateTo(location){
             this.$router.push(location)
         },
-        loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.categories = response.data.lists.categories;
-             this.propertytypes = response.data.lists.propertytypes;
-             this.properties = response.data.lists.pmsproperties;
-             console.log("props", this.properties)
+        settleTenant(id){
+            this.$router.push('/settlestatement/'+id)
+        },
+        formatNumber(value) {
+          // Use the toLocaleString method to format the number with commas and decimal places
+          return value.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+        },
+        format_date(value){
+          if(value){
+            return moment(String(value)).format('lll')
+          }
+        },        
+        getPropertyStatements() {
+             axios.get('/api/pmspropertystatements/'+this.$route.params.id).then((response) => {
+             this.propertystatements = response.data.pmspropertystatements;
+             console.log("props", response)
              setTimeout(() => {
-                  $("#AllPropertiesTable").DataTable();
+                  $("#AllStatementsTable").DataTable();
               }, 10);
     
              });
@@ -131,10 +160,21 @@
       },
       mounted(){
         this.getProperty();
+        this.getPropertyStatements();
         this.user = localStorage.getItem('user');
         this.user = JSON.parse(this.user);
 
-      }
+      },
+      computed: {
+      // Calculate total based on the provided key ('total', 'paid', 'balance')
+      calculateTotal() {
+          return (key) => {
+            return this.formatNumber(
+              this.propertystatements.reduce((acc, statement) => acc + parseFloat(statement[key]), 0)
+            );
+          };
+        },
+      },      
     }
     </script>
     

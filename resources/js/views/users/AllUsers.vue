@@ -55,7 +55,7 @@
                             <td>{{user.first_name}} {{user.last_name}}</td>
                             <td>{{(user.email)}}</td>
                             <td>{{user.phone ?? 'N/A'}}</td>
-                            <td>{{user.role['name']}}</td>
+                            <td>{{capitalizeFirstLetter(user.role['name'])}}</td>
                             <td>
                               <span v-if="user.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Pending</span>   
                               <span v-else-if="user.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Active</span>
@@ -151,6 +151,9 @@
           }).catch(() => {
               console.log('error')
           })
+        },
+        capitalizeFirstLetter(str) {
+          return str.charAt(0).toUpperCase() + str.slice(1);
         },
         loadLists() {
              axios.get('api/lists').then((response) => {

@@ -21,7 +21,7 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Managed Properties <span>| Today</span></h5>
+                      <h5 class="card-title">{{landlord.first_name}} {{landlord.last_name}}'s Managed Properties <span>| Today</span></h5>
                       <p class="card-text">
                    
                       <router-link to="/add-pmsproperty" custom v-slot="{ href, navigate, isActive }">
@@ -42,19 +42,19 @@
                           <tr>
                             <!--<th scope="col">Preview</th>-->
                             <th scope="col">Name</th>
-                            <th scope="col">Landlord</th>
+                            <!-- <th scope="col">Landlord</th> -->
                             <th scope="col">Number of Units</th>
                             <th scope="col">Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="property in properties" :key="property.id">
+                          <tr v-for="property in landlordproperties" :key="property.id">
                             <!--<th scope="row"><a href="#">
                               <img :src="getPhoto() + property.images[0].name" />
                             </a></th>-->
                             <!-- <td>{{property["images"][0]["name"]}}</td> -->
                             <td>{{property.name}}</td>
-                            <td>{{property.landlord.first_name}} {{property.landlord.last_name}}</td>
+                            <!-- <td>{{property.landlord.first_name}} {{property.landlord.last_name}}</td> -->
                             <td>{{property.units.length}}</td>
                             <td>
                               <div class="btn-group" role="group">
@@ -104,9 +104,8 @@
     export default {
       data(){
         return {
-          properties: [],
-          categories: [],
-          propertytypes: [],
+          landlordproperties: [],
+          landlord: [],
           user: []
         }
       },
@@ -198,24 +197,32 @@
                                    
                 })
         },
-        loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.categories = response.data.lists.categories;
-             this.propertytypes = response.data.lists.propertytypes;
-             this.properties = response.data.lists.pmsproperties;
-             console.log("props", this.properties)
+        getLandlord()
+        {
+          axios.get('/api/landlord/'+ this.$route.params.id).then((response) => {
+            this.landlord = response.data.landlord 
+            console.log("dat", response)
+          }).catch(() => {
+              console.log('error')
+          })
+        },
+        getLandlordProperties() {
+             axios.get('/api/landlordproperties/'+this.$route.params.id).then((response) => {
+             this.landlordproperties = response.data.pmslandlordproperties;
+             console.log("props", response)
              setTimeout(() => {
                   $("#AllPropertiesTable").DataTable();
               }, 10);
     
              });
-          },
+          }
       },
       components : {
           TheMaster,
       },
       mounted(){
-        this.loadLists();
+        this.getLandlord();
+        this.getLandlordProperties();
         this.user = localStorage.getItem('user');
         this.user = JSON.parse(this.user);
 

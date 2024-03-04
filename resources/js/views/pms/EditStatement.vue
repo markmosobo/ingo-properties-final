@@ -10,21 +10,21 @@
                   <h5 class="card-title">Statement Details</h5>
 
                   <div class="row">
-                    <div class="col-lg-6 col-md-4 label "><strong>{{name}}</strong></div>
+                    <div class="col-lg-12 col-md-4 label "><strong>{{name}}</strong></div>
                     <!-- <div class="col-lg-9 col-md-8">{{form.first_name}} {{form.last_name}}</div> -->
                   </div>
 
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label"><strong>0{{phoneNumber}}</strong></div>
+                    <div class="col-lg-12 col-md-4 label"><strong>0{{phoneNumber}}</strong></div>
                     <!-- <div class="col-lg-9 col-md-8">(254) {{form.phone}}</div> -->
                   </div>
 
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label"><strong>{{tenant}}</strong></div>
+                    <div class="col-lg-12 col-md-4 label"><strong>{{tenant}}</strong></div>
                     <!-- <div class="col-lg-9 col-md-8">{{form.email}}</div> -->
                   </div>
                   <div class="row">
-                    <div class="col-lg-12 col-md-4 label"><strong>Ref No: {{refNo}}</strong></div>
+                    <div class="col-lg-12 col-md-4 label">Ref No:<strong> {{refNo}}</strong></div>
                     <!-- <div class="col-lg-9 col-md-8">{{refNo}}</div> -->
                   </div> 
                   <div class="row">

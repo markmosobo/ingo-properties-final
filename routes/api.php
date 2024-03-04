@@ -102,12 +102,16 @@ Route::get('sociallink/{id}', [SocialLinkController::class, 'single']);
 Route::get('message/{id}', [MessageController::class, 'single']);
 Route::get('project/{id}', [ProjectController::class, 'single']);
 Route::get('landlord/{id}', [LandlordController::class, 'single']);
+Route::get('landlordproperties/{id}', [LandlordController::class, 'landlordProperties']);
 Route::get('pmsproperty/{id}', [PmsPropertyController::class, 'single']);
 Route::get('pmsunits/{id}', [PmsUnitController::class, 'units']);
 Route::get('pmsunit/{id}', [PmsUnitController::class, 'single']);
 Route::get('pmstenant/{id}', [PmsTenantController::class, 'single']);
+Route::get('pmspropertytenants/{id}', [PmsTenantController::class, 'propertyTenants']);
 Route::get('pmsexpense/{id}', [PmsExpenseController::class, 'single']);
 Route::get('pmsstatement/{id}', [PmsStatementController::class, 'single']);
+Route::get('pmspropertystatements/{id}', [PmsStatementController::class, 'propertyStatements']);
+Route::get('pmstenantstatements/{id}', [PmsStatementController::class, 'tenantStatements']);
 
 Route::put('property/{id}', [PropertyController::class, 'update']);
 Route::put('category/{id}', [CategoryController::class, 'update']);

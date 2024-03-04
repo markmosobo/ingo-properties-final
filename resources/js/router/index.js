@@ -78,7 +78,13 @@ import ViewPmsUnit from '../views/pms/ViewPmsUnit.vue'
 import EditPmsTenant from '../views/pms/EditPmsTenant.vue'
 import AddPmsExpense from '../views/pms/AddPmsExpense.vue'
 import EditPmsExpense from '../views/pms/EditPmsExpense.vue'
+import PmsLandlordProperties from '../views/pms/PmsLandlordProperties.vue'
+import PmsPropertyTenants from '../views/pms/PmsPropertyTenants.vue'
 import PmsPropertyStatements from '../views/pms/PmsPropertyStatements.vue'
+import PmsTenantStatements from '../views/pms/PmsTenantStatements.vue'
+import AllTenantStatements from '../views/pms/AllTenantStatements.vue'
+import AllPropertyStatements from '../views/pms/AllPropertyStatements.vue'
+import AllLandlordStatements from '../views/pms/AllLandlordStatements.vue'
 import PmsStatements from '../views/pms/PmsStatements.vue'
 import ViewStatement from '../views/pms/ViewStatement.vue'
 import EditStatement from '../views/pms/EditStatement.vue'
@@ -615,13 +621,49 @@ const routes = [
         name: 'edit-pmsexpense',
         component: EditPmsExpense,
         beforeEnter : guardMyroute,
-    }, 
+    },
+    {
+        path:'/pmslandlordproperties/:id',
+        name: 'pmslandlordproperties',
+        component: PmsLandlordProperties,
+        beforeEnter : guardMyroute,
+    },    
+    {
+        path:'/pmspropertytenants/:id',
+        name: 'pmspropertytenants',
+        component: PmsPropertyTenants,
+        beforeEnter : guardMyroute,
+    },     
     {
         path:'/pmspropertystatements/:id',
         name: 'pmspropertystatements',
         component: PmsPropertyStatements,
         beforeEnter : guardMyroute,
     },
+    {
+        path:'/pmstenantstatements/:id',
+        name: 'pmstenantstatements',
+        component: PmsTenantStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/alltenantstatements',
+        name: 'alltenantstatements',
+        component: AllTenantStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/allpropertystatements',
+        name: 'allpropertystatements',
+        component: AllPropertyStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/alllandlordstatements',
+        name: 'alllandlordtatements',
+        component: AllLandlordStatements,
+        beforeEnter : guardMyroute,
+    },                
     {
         path:'/statements',
         name: 'statements',
