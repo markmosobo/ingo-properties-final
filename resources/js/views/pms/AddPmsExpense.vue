@@ -30,7 +30,7 @@
                       >Unit*</label
                       >
                       <div class="col-sm-10">
-                         <select :disabled="!form.pms_property_id" name="unit" v-model="form.pms_unit_id" class="form-select" id="">
+                         <select @change="getUnitInfo" :disabled="!form.pms_property_id" name="unit" v-model="form.pms_unit_id" class="form-select" id="">
                             <option value="0" selected disabled>Select Unit</option>
                             <option v-for="unit in propunits" :value="unit.id"
                             :selected="unit.id == form.unit_id" :key="unit.id">{{ unit.unit_number}}</option>
@@ -54,7 +54,7 @@
                       <label for="inputPassword" class="form-label">Amount Paid*</label>
                       <div class="col-sm-10">
                         <input
-                            type="text"
+                            type="number"
                             placeholder="Amount Paid"
                             id="title"
                             name="title"
@@ -84,7 +84,31 @@
                 </div>
                 <div class="row mb-3"></div>
                 <div class="form-group row">
-
+                  <div class="col-sm-6">
+                      <label for="validationCustom04" class="form-label"
+                      >Month To Bill*</label
+                      >
+                      <div class="col-sm-10">
+                         <select name="unit" v-model="form.expense_month" class="form-select" id="">
+                            <option value="0" disabled>Select Month</option>
+                            <option value="Jan">Jan</option>
+                            <option value="Feb">Feb</option>
+                            <option value="Mar">Mar</option>
+                            <option value="Apr">Apr</option>
+                            <option value="May">May</option>
+                            <option value="Jun">Jun</option>
+                            <option value="Jul">Jul</option>
+                            <option value="Aug">Aug</option>
+                            <option value="Sep">Sep</option>
+                            <option value="Oct">Oct</option>
+                            <option value="Nov">Nov</option>
+                            <option value="Dec">Dec</option>
+ 
+                         </select>
+ 
+                      <div class="invalid-feedback">Please enter category!</div>
+                      </div>                      
+                   </div>
                    <div class="col-sm-6">
                       <label for="inputPassword" class="form-label">Remarks*</label>
                       <div class="col-sm-10">
@@ -167,16 +191,23 @@
        }   
     },
     methods: {
-      async getUnits() {
-         try {
-           //const propunits = this.units.find(unit => unit.pms_property_id === this.form.pms_property_id);
-           this.propunits = this.units.filter(item => item.pms_property_id === this.form.pms_property_id && item.status === 0);
+     getUnits() {
+             axios.get('/api/pmspropunits/'+this.form.pms_property_id).then((response) => {
+     
+             this.propunits = response.data.units;
+             console.log("props", response)
+    
+             });
 
-           console.log("amoit", this.propunits)
-         } catch (error) {
-           console.error(error);
-         }
-       },       
+         // try {
+         //   //const propunits = this.units.find(unit => unit.pms_property_id === this.form.pms_property_id);
+         //   this.propunits = this.units.filter(item => item.pms_property_id === this.form.pms_property_id && item.status === 0);
+
+         //   console.log("amoit", this.propunits)
+         // } catch (error) {
+         //   console.error(error);
+         // }
+       },         
        loadLists() {
           axios.get('api/lists').then((response) => {
           this.units = response.data.lists.units;

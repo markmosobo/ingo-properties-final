@@ -28,6 +28,17 @@ class PmsUnitController extends Controller
 
     public function units(Request $request, $id)
     {
+        $units = PmsUnit::where('pms_property_id', $id)->where('status',0)->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => "Units",
+            'units' => $units
+        ], 200);
+    }
+
+    public function propUnits(Request $request, $id)
+    {
         $units = PmsUnit::where('pms_property_id', $id)->get();
 
         return response()->json([
@@ -36,6 +47,7 @@ class PmsUnitController extends Controller
             'units' => $units
         ], 200);
     }
+
 
     public function single(Request $request, $id)
     {
@@ -85,5 +97,18 @@ class PmsUnitController extends Controller
             'message' => "Unit Deleted successfully!",
         ], 200);
         }
+    }
+
+    public function unitStatements(Request $request, $id)
+    {
+        // $unit = PmsUnit::findOrFail($id);
+        $tenant = PmsTenant::where('pms_unit_id', $id);
+        $pmsunitstatements = PmsStatement::with('tenant','property')->where('pms_tenant_id', $tenant->id)->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => "Unit Statements",
+            'pmsunitstatements' => $pmsunitstatements
+        ], 200);
     }           
 }

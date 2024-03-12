@@ -270,7 +270,7 @@
                 </a>
               </router-link>
           </li>
-          <li>
+<!--           <li>
               <router-link to="/allpropertystatements" custom v-slot="{ href, navigate, isActive }">
                 <a
                   :href="href"
@@ -281,7 +281,7 @@
                 <i class="bi bi-circle"></i><span>Property Statements</span>
                 </a>
               </router-link>
-          </li>          
+          </li> -->          
           <li>
               <router-link to="/pmslandlords" custom v-slot="{ href, navigate, isActive }">
                 <a
@@ -294,7 +294,7 @@
                 </a>
               </router-link>
           </li>
-          <li>
+<!--           <li>
               <router-link to="/alllandlordstatements" custom v-slot="{ href, navigate, isActive }">
                 <a
                   :href="href"
@@ -305,7 +305,7 @@
                 <i class="bi bi-circle"></i><span>Landlord Statements</span>
                 </a>
               </router-link>
-          </li>          
+          </li>  -->         
         </ul>
       </li><!-- End Icons Nav -->
 

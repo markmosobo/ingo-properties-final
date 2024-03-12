@@ -14,57 +14,17 @@
                           <h6>Filter</h6>
                         </li>
     
-                        <li>
-                            <router-link to="/monthstatements" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            This Month</a>
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link to="/yearstatements" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            This Year</a>
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link to="/statements" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            All Time</a>
-                            </router-link>
-                        </li>
-
+                        <li><a class="dropdown-item" @click="month()" href="#">This Month</a></li>
+                        <li><a class="dropdown-item" @click="lastMonth()" href="#">Last Month</a></li>
+                        <li><a class="dropdown-item" @click="lastNinety()" href="#">Last 90 Days</a></li>
                       </ul>
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Statements <span>| All Time</span></h5>
+                      <h5 class="card-title">{{property.name}} Statements <span>| Last Month</span></h5>
                       <p class="card-text">
                    
-<!--                       <router-link to="/add-pmslandlord" custom v-slot="{ href, navigate, isActive }">
-                          <a
-                            :href="href"
-                            :class="{ active: isActive }"
-                            class="btn btn-sm btn-primary rounded-pill"
-                            @click="navigate"
-                          >
-                            Add Landlord
-                          </a>
-                      </router-link> -->
+
             
                       </p>
     
@@ -75,7 +35,6 @@
                             <th scope="col">Invoice</th>
                             <th scope="col">Status</th>
                             <th scope="col">Detail</th>
-                            <th scope="col">Property</th>
                             <th scope="col">Total</th>
                             <th scope="col">Paid</th>
                             <th scope="col">Bal</th>
@@ -83,7 +42,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="statement in statements" :key="statement.id">
+                          <tr v-for="statement in propertystatements" :key="statement.id">
                             <td>{{format_date(statement.updated_at)}}</td>
                             <td>{{statement.ref_no}}</td>
                             <td>
@@ -91,7 +50,6 @@
                               <span v-else class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Not Paid</span>
                             </td>
                             <td>{{statement.details}}</td>
-                            <td>{{statement.property.name}}</td>
                             <td>{{formatNumber(statement.total)}}</td>
                             <td>{{formatNumber(statement.paid)}}</td>
                             <td>{{formatNumber(statement.balance)}}</td>
@@ -109,8 +67,7 @@
                             </td>
                           </tr>
                           <tr>
-                            <td>Total</td>
-                            <td></td>
+                            <td col="12">Total</td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -118,7 +75,8 @@
                             <td>{{ formatNumber(calculateTotal('paid')) }}</td>
                             <td>{{ formatNumber(calculateTotal('balance')) }}</td>
                             <td></td>
-                          </tr>      
+                          </tr>
+                                                
                         </tbody>
                       </table>
     
@@ -154,11 +112,23 @@
     export default {
       data(){
         return {
-          statements: [],
-          user: []
+          property: [],
+          propertystatements: [],
+          user: [],
+          commission: []
         }
       },
       methods: {
+        getProperty()
+        {
+          axios.get('/api/pmsproperty/'+ this.$route.params.id).then((response) => {
+            this.property = response.data.property[0];
+            this.commission = this.property.commission; 
+            console.log("dat", this.commission)
+          }).catch(() => {
+              console.log('error')
+          })
+        },
         navigateTo(location){
             this.$router.push(location)
         },
@@ -176,23 +146,36 @@
           if(value){
             return moment(String(value)).format('lll')
           }
-        },
-        loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.statements = response.data.lists.statements;
+        },        
+        getPropertyStatements() {
+             axios.get('/api/lastmonthpmspropertystatements/'+this.$route.params.id).then((response) => {
+             this.propertystatements = response.data.lastmonthpmspropertystatements;
              console.log("props", response)
              setTimeout(() => {
                   $("#AllStatementsTable").DataTable();
               }, 10);
     
              });
-          },
+        },
+        month()
+        {
+          this.$router.push('/monthpmspropertystatements/'+ this.$route.params.id)
+        },
+        lastMonth()
+        {
+          this.$router.push('/lastmonthpmspropertystatements/'+ this.$route.params.id)
+        },
+        lastNinety()
+        {
+          this.$router.push('/lastninetypmspropertystatements/'+ this.$route.params.id)
+        }
       },
       components : {
           TheMaster,
       },
       mounted(){
-        this.loadLists();
+        this.getProperty();
+        this.getPropertyStatements();
         this.user = localStorage.getItem('user');
         this.user = JSON.parse(this.user);
 
@@ -202,11 +185,11 @@
       calculateTotal() {
           return (key) => {
             return this.formatNumber(
-              this.statements.reduce((acc, statement) => acc + parseFloat(statement[key]), 0)
+              this.propertystatements.reduce((acc, statement) => acc + parseFloat(statement[key]), 0)
             );
           };
         },
-      }
+      },      
     }
     </script>
     

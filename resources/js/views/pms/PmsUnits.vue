@@ -65,7 +65,8 @@
                                   Action
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a @click="navigateTo('/view-pmsunit/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a> 
+                                  <a @click="navigateTo('/view-pmsunit/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>
+                                  <a @click="navigateTo('/pmsunitstatements/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Statements</a> 
                                   <a @click="navigateTo('/edit-pmsunit/'+property.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>                                           
                                   <a @click="deleteUnit(property.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
                                   </div>
@@ -198,7 +199,7 @@
                 })
         },
         loadLists() {
-             axios.get('/api/pmsunits/'+this.$route.params.id).then((response) => {
+             axios.get('/api/pmspropunits/'+this.$route.params.id).then((response) => {
      
              this.properties = response.data.units;
              console.log("props", response)

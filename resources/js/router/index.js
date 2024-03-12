@@ -81,14 +81,31 @@ import EditPmsExpense from '../views/pms/EditPmsExpense.vue'
 import PmsLandlordProperties from '../views/pms/PmsLandlordProperties.vue'
 import PmsPropertyTenants from '../views/pms/PmsPropertyTenants.vue'
 import PmsPropertyStatements from '../views/pms/PmsPropertyStatements.vue'
+import PmsPropertyExpenses from '../views/pms/PmsPropertyExpenses.vue'
 import PmsTenantStatements from '../views/pms/PmsTenantStatements.vue'
 import AllTenantStatements from '../views/pms/AllTenantStatements.vue'
 import AllPropertyStatements from '../views/pms/AllPropertyStatements.vue'
 import AllLandlordStatements from '../views/pms/AllLandlordStatements.vue'
+import PmsUnitStatements from '../views/pms/PmsUnitStatements.vue'
 import PmsStatements from '../views/pms/PmsStatements.vue'
 import ViewStatement from '../views/pms/ViewStatement.vue'
 import EditStatement from '../views/pms/EditStatement.vue'
 import SettleStatement from '../views/pms/SettleStatement.vue'
+
+//time filtered statements
+import PmsMonthStatements from '../views/pms/PmsMonthStatements.vue'
+import PmsLastMonthStatements from '../views/pms/PmsLastMonthStatements.vue'
+import PmsLastNinetyStatements from '../views/pms/PmsLastNinetyStatements.vue'
+import PmsYearStatements from '../views/pms/PmsYearStatements.vue'
+import PmsQuarterStatements from '../views/pms/PmsQuarterStatements.vue'
+import PmsLastYearStatements from '../views/pms/PmsLastYearStatements.vue'
+
+import PmsMonthPropertyStatements from '../views/pms/PmsMonthPropertyStatements.vue'
+import PmsLastMonthPropertyStatements from '../views/pms/PmsLastMonthPropertyStatements.vue'
+import PmsLastNinetyPropertyStatements from '../views/pms/PmsLastNinetyPropertyStatements.vue'
+import PmsYearPropertyStatements from '../views/pms/PmsYearPropertyStatements.vue'
+import PmsQuarterPropertyStatements from '../views/pms/PmsQuarterPropertyStatements.vue'
+import PmsLastYearPropertyStatements from '../views/pms/PmsLastYearPropertyStatements.vue'
 
 function guardMyroute(to, from, next)
 {
@@ -633,13 +650,55 @@ const routes = [
         name: 'pmspropertytenants',
         component: PmsPropertyTenants,
         beforeEnter : guardMyroute,
-    },     
+    },
+    {
+        path:'/pmspropertyexpenses/:id',
+        name: 'pmspropertyexpenses',
+        component: PmsPropertyExpenses,
+        beforeEnter : guardMyroute,
+    },         
     {
         path:'/pmspropertystatements/:id',
         name: 'pmspropertystatements',
         component: PmsPropertyStatements,
         beforeEnter : guardMyroute,
     },
+    {
+        path:'/monthpmspropertystatements/:id',
+        name: 'monthpmspropertystatements',
+        component: PmsMonthPropertyStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/lastmonthpmspropertystatements/:id',
+        name: 'lastmonthpmspropertystatements',
+        component: PmsLastMonthPropertyStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/lastninetypmspropertystatements/:id',
+        name: 'lastninetypmspropertystatements',
+        component: PmsLastNinetyPropertyStatements,
+        beforeEnter : guardMyroute,
+    },        
+    {
+        path:'/yearpmspropertystatements/:id',
+        name: 'yearpmspropertystatements',
+        component: PmsYearPropertyStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/quarterpmspropertystatements/:id',
+        name: 'quarterpmspropertystatements',
+        component: PmsQuarterPropertyStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/lastyearpmspropertystatements/:id',
+        name: 'lastyearpmspropertystatements',
+        component: PmsLastYearPropertyStatements,
+        beforeEnter : guardMyroute,
+    },                
     {
         path:'/pmstenantstatements/:id',
         name: 'pmstenantstatements',
@@ -669,7 +728,49 @@ const routes = [
         name: 'statements',
         component: PmsStatements,
         beforeEnter : guardMyroute,
-    }, 
+    },
+    {
+        path:'/monthstatements',
+        name: 'monthstatements',
+        component: PmsMonthStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/lastmonthstatements',
+        name: 'lastmonthstatements',
+        component: PmsLastMonthStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/lastninetystatements',
+        name: 'lastninetystatements',
+        component: PmsLastNinetyStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/yearstatements',
+        name: 'yearstatements',
+        component: PmsYearStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/quarterstatements',
+        name: 'quarterstatements',
+        component: PmsQuarterStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/lastyearstatements',
+        name: 'lastyearstatements',
+        component: PmsLastYearStatements,
+        beforeEnter : guardMyroute,
+    },            
+    {
+        path:'/pmsunitstatements/:id',
+        name: 'pmsunitstatements',
+        component: PmsUnitStatements,
+        beforeEnter : guardMyroute,
+    },     
     {
         path:'/viewstatement/:id',
         name: 'viewstatement',

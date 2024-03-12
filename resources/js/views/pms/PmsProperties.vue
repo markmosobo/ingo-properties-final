@@ -64,8 +64,9 @@
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
                                   <!-- <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a> -->                                            
                                   <a @click="navigateTo('/pmsunits/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Units</a>
-                                  <a @click="navigateTo('/pmspropertytenants/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Tenants</a>                                  
-                                  <a @click="navigateTo('/pmspropertystatements/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Statements</a>                                  
+                                  <a @click="navigateTo('/pmspropertytenants/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Tenants</a>
+                                  <a @click="navigateTo('/pmspropertyexpenses/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Expenses</a>                                  
+                                  <a @click="navigateTo('/pmspropertystatements/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Statement</a>                                  
                                   </div>
                               </div>
                             </td>

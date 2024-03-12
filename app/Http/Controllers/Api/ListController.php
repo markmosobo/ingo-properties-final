@@ -26,6 +26,7 @@ use App\Models\PmsUnit;
 use App\Models\PmsTenant;
 use App\Models\PmsExpense;
 use App\Models\PmsStatement;
+use Carbon\Carbon;
 
 class ListController extends Controller
 {
@@ -52,7 +53,20 @@ class ListController extends Controller
         $sociallinks = SocialLink::all();
         $landlords = Landlord::all();
         $units = PmsUnit::all();
+        //statements
         $statements = PmsStatement::with('property', 'tenant')->get();        
+        $monthstatements = PmsStatement::with('property', 'tenant')->whereMonth('created_at', Carbon::now()->month)->get();        
+        $lastmonthstatements = PmsStatement::with('property', 'tenant')->whereBetween('created_at',
+        [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])->get();
+        $lastninetystatements = PmsStatement::with('property', 'tenant')->whereBetween('created_at',
+        [Carbon::now()->subDays(89)->startOfDay(), Carbon::now()->endOfDay()])->get();  
+        $yearstatements = PmsStatement::with('property', 'tenant')->whereBetween('created_at',
+        [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()])->get();
+        $quarterstatements = PmsStatement::with('property', 'tenant')->whereBetween('created_at',
+        [Carbon::now()->startOfQuarter(), Carbon::now()->endOfDay()])->get();
+        $lastyearstatements = PmsStatement::with('property', 'tenant')->whereBetween('created_at',
+        [Carbon::now()->subYear()->startOfYear(), Carbon::now()->subYear()->endOfYear()])->get();
+
         $pmstenants = PmsTenant::with('unit','property')->get();
         $pmsexpenses = PmsExpense::with('user')->get();
 
@@ -105,7 +119,14 @@ class ListController extends Controller
                 'units' => $units,
                 'pmstenants' => $pmstenants,
                 'pmsexpenses' => $pmsexpenses,
-                'statements' => $statements
+                //statements
+                'statements' => $statements,
+                'monthstatements' => $monthstatements,
+                'lastmonthstatements' => $lastmonthstatements,
+                'lastninetystatements' => $lastninetystatements,
+                'yearstatements' => $yearstatements,
+                'quarterstatements' => $quarterstatements,
+                'lastyearstatements' => $lastyearstatements
 
                 
             ]

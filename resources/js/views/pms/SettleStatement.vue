@@ -138,8 +138,9 @@
                         <div class="col-sm-6 col-lg-6">
                         <button @click.prevent="cancel()" class="btn btn-dark">Cancel</button>
                         </div>
-                        <div class="col-sm-6 col-lg-6 text-end">
-                        <button @click.prevent="printReceipt()" class="btn btn-primary">Print Receipt</button>
+                       <div class="col-sm-6 col-lg-6 text-end">
+                        <button @click.prevent="settleReceipt" type="submit" v-if="status == 0 && paid>0" class="btn btn-primary">Print Receipt</button>
+                        <button @click="printReceipt" v-else class="btn btn-primary">Print Receipt</button>
                         </div>
                     </div>
                   </form>
@@ -179,6 +180,8 @@ export default{
             paid: '',
             balance: '',
             total: '',
+            isAmountValid: true,
+
             form:
             {
               payment_method: '',
@@ -193,6 +196,27 @@ export default{
     }, 
     methods:
     {
+      settleReceipt() {
+        this.settleTenant();
+        this.$router.push('/statements')
+
+        // Open a new window for printing
+        const printWindow = window.open("", "_blank");
+
+        // Build the content for printing
+        const receiptContent = this.buildReceiptContent();
+
+        // Write the content to the new window
+        printWindow.document.write(receiptContent);
+
+        // Close the document stream
+        printWindow.document.close();
+
+        // Trigger the print dialog
+        printWindow.print();
+      },
+
+
       printReceipt() {
         this.submit();
         this.$router.push('/statements')
@@ -368,6 +392,37 @@ export default{
       {
         this.$router.push('/statements')
       },
+      settleTenant()
+      {
+       let self = this;  // Store the reference to this
+       let payload = {
+          mpesa_code: this.form.mpesa_code,
+          payment_method: this.form.payment_method,
+          paid: this.form.cash+this.paid,
+          balance: this.payableAmount
+       };
+
+       axios.put("/api/pmsstatement/" + this.$route.params.id, payload)
+          .then(function (response) {
+             console.log(response);
+             // self.step = 1;
+             toast.fire(
+                'Success!',
+                'Invoice updated!',
+                'success'
+             );
+          })
+          .catch(function (error) {
+             console.log(error);
+             // Swal.fire(
+             //    'error!',
+             //    // phone_error + id_error + pass_number,
+             //    'error'
+             // )
+          });
+
+       this.$router.push('/statements')        
+      },      
       submit() {
        let self = this;  // Store the reference to this
        let payload = {
@@ -414,7 +469,14 @@ export default{
     },
     computed: {
         payableAmount() {
-        return this.form.cash - this.total; // Multiply inputValue by 2 (change this multiplier as needed)
+          if (this.paid > 0) {
+            return this.balance - this.form.cash;
+          }
+          else
+          {
+             return this.total - this.form.cash; // Multiply inputValue by 2 (change this multiplier as needed)
+          }
+       
         },
     },
 }

@@ -15,17 +15,6 @@
                         </li>
     
                         <li>
-                            <router-link to="/monthstatements" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            This Month</a>
-                            </router-link>
-                        </li>
-                        <li>
                             <router-link to="/yearstatements" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
@@ -37,14 +26,25 @@
                             </router-link>
                         </li>
                         <li>
-                            <router-link to="/statements" custom v-slot="{ href, navigate, isActive }">
+                            <router-link to="/quarterstatements" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
                                 :class="{ active: isActive }"
                                 class="dropdown-item"
                                 @click="navigate"
                             >
-                            All Time</a>
+                            This Quarter</a>
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link to="/lastyearstatements" custom v-slot="{ href, navigate, isActive }">
+                            <a
+                                :href="href"
+                                :class="{ active: isActive }"
+                                class="dropdown-item"
+                                @click="navigate"
+                            >
+                            Last Year</a>
                             </router-link>
                         </li>
 
@@ -52,7 +52,7 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Statements <span>| All Time</span></h5>
+                      <h5 class="card-title">All Statements <span>| This Year</span></h5>
                       <p class="card-text">
                    
 <!--                       <router-link to="/add-pmslandlord" custom v-slot="{ href, navigate, isActive }">
@@ -179,7 +179,7 @@
         },
         loadLists() {
              axios.get('api/lists').then((response) => {
-             this.statements = response.data.lists.statements;
+             this.statements = response.data.lists.yearstatements;
              console.log("props", response)
              setTimeout(() => {
                   $("#AllStatementsTable").DataTable();

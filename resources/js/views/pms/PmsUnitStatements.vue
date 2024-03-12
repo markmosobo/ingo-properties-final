@@ -14,57 +14,17 @@
                           <h6>Filter</h6>
                         </li>
     
-                        <li>
-                            <router-link to="/monthstatements" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            This Month</a>
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link to="/yearstatements" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            This Year</a>
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link to="/statements" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            All Time</a>
-                            </router-link>
-                        </li>
-
+                        <li><a class="dropdown-item" href="#">Today</a></li>
+                        <li><a class="dropdown-item" href="#">This Month</a></li>
+                        <li><a class="dropdown-item" href="#">This Year</a></li>
                       </ul>
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Statements <span>| All Time</span></h5>
+                      <h5 class="card-title">{{unit.unit_number}} Statements <span>| Today</span></h5>
                       <p class="card-text">
                    
-<!--                       <router-link to="/add-pmslandlord" custom v-slot="{ href, navigate, isActive }">
-                          <a
-                            :href="href"
-                            :class="{ active: isActive }"
-                            class="btn btn-sm btn-primary rounded-pill"
-                            @click="navigate"
-                          >
-                            Add Landlord
-                          </a>
-                      </router-link> -->
+
             
                       </p>
     
@@ -75,7 +35,6 @@
                             <th scope="col">Invoice</th>
                             <th scope="col">Status</th>
                             <th scope="col">Detail</th>
-                            <th scope="col">Property</th>
                             <th scope="col">Total</th>
                             <th scope="col">Paid</th>
                             <th scope="col">Bal</th>
@@ -83,7 +42,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="statement in statements" :key="statement.id">
+                          <tr v-for="statement in unitstatements" :key="statement.id">
                             <td>{{format_date(statement.updated_at)}}</td>
                             <td>{{statement.ref_no}}</td>
                             <td>
@@ -91,7 +50,6 @@
                               <span v-else class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Not Paid</span>
                             </td>
                             <td>{{statement.details}}</td>
-                            <td>{{statement.property.name}}</td>
                             <td>{{formatNumber(statement.total)}}</td>
                             <td>{{formatNumber(statement.paid)}}</td>
                             <td>{{formatNumber(statement.balance)}}</td>
@@ -113,12 +71,11 @@
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td></td>
                             <td>{{ formatNumber(calculateTotal('total')) }}</td>
                             <td>{{ formatNumber(calculateTotal('paid')) }}</td>
                             <td>{{ formatNumber(calculateTotal('balance')) }}</td>
                             <td></td>
-                          </tr>      
+                          </tr>                          
                         </tbody>
                       </table>
     
@@ -154,11 +111,21 @@
     export default {
       data(){
         return {
-          statements: [],
+          unit: [],
+          unitstatements: [],
           user: []
         }
       },
       methods: {
+        getUnit()
+        {
+          axios.get('/api/pmsunit/'+ this.$route.params.id).then((response) => {
+            this.unit = response.data.unit[0] 
+            console.log("dat", this.unit)
+          }).catch(() => {
+              console.log('error')
+          })
+        },
         navigateTo(location){
             this.$router.push(location)
         },
@@ -176,10 +143,10 @@
           if(value){
             return moment(String(value)).format('lll')
           }
-        },
-        loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.statements = response.data.lists.statements;
+        },        
+        getUnitStatements() {
+             axios.get('/api/pmsunitstatements/'+this.$route.params.id).then((response) => {
+             this.unitstatements = response.data.pmsunitstatements;
              console.log("props", response)
              setTimeout(() => {
                   $("#AllStatementsTable").DataTable();
@@ -192,7 +159,8 @@
           TheMaster,
       },
       mounted(){
-        this.loadLists();
+        this.getUnit();
+        this.getUnitStatements();
         this.user = localStorage.getItem('user');
         this.user = JSON.parse(this.user);
 
@@ -202,11 +170,11 @@
       calculateTotal() {
           return (key) => {
             return this.formatNumber(
-              this.statements.reduce((acc, statement) => acc + parseFloat(statement[key]), 0)
+              this.unitstatements.reduce((acc, statement) => acc + parseFloat(statement[key]), 0)
             );
           };
         },
-      }
+      },      
     }
     </script>
     

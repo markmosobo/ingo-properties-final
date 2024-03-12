@@ -22,6 +22,7 @@ class PmsExpenseController extends Controller
             'paid_to' => $request->paid_to,
             'checked_by' => $request->checked_by,
             'ref_no' => $refno,
+            'expense_month' => $request->expense_month
         ]);
         return response()->json([
             'status' => true,
@@ -63,6 +64,17 @@ class PmsExpenseController extends Controller
             'message' => "retreived",
             'pmsexpense' => $pmsexpense
         ], 200);
-    }       
+    }
+
+    public function propertyExpenses(Request $request, $id)
+    {
+        $pmspropertyexpenses = PmsExpense::with('user','unit','property')->where('pms_property_id', $id)->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => "retrieved",
+            'pmspropertyexpenses' => $pmspropertyexpenses
+        ], 200);
+    }        
 
 }

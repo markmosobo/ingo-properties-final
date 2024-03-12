@@ -22,7 +22,8 @@ return new class extends Migration
             $table->foreign('landlord_id')
             ->references('id')
             ->on('landlords')
-            ->onDelete('cascade');            
+            ->onDelete('cascade');
+            $table->integer('commission')->nullable();            
             $table->timestamps();
         });
     }

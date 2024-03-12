@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('paid_to')->nullable();
             $table->float('amount_paid')->nullable();
             $table->integer('checked_by')->unsigned();
+            $table->string('expense_month')->nullable();            
             $table->foreign('pms_property_id')
             ->references('id')
             ->on('pms_properties')

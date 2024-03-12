@@ -21,7 +21,7 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Expenses <span>| Today</span></h5>
+                      <h5 class="card-title">{{property.name}} Expenses <span>| All Expenses</span></h5>
                       <p class="card-text">
                    
                       <router-link to="/add-pmsexpense" custom v-slot="{ href, navigate, isActive }">
@@ -37,7 +37,7 @@
             
                       </p>
     
-                      <table id="AllPropertiesTable" class="table table-borderless">
+                      <table id="AllExpensesTable" class="table table-borderless">
                         <thead>
                           <tr>
                             <th scope="col">Type</th>
@@ -49,7 +49,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="expense in expenses" :key="expense.id">
+                          <tr v-for="expense in propertyexpenses" :key="expense.id">
                             <td>{{capitalizeFirstLetter(expense.payment_type)}}</td>
                             <td>{{formatNumber(expense.amount_paid)}}</td>
                             <td>{{expense.paid_to}}</td>
@@ -71,12 +71,12 @@
                           </tr>
                           <tr>
                             <td>Total</td>
-                            <td>{{ formatNumber(calculateTotal('balance')) }}</td>
+                            <td>{{ formatNumber(calculateTotal('total')) }}</td>
                             <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
-                          </tr>   
+                          </tr>                          
                         </tbody>
                       </table>
     
@@ -113,11 +113,9 @@
     export default {
       data(){
         return {
-          expenses: [],
-          categories: [],
-          propertytypes: [],
+          propertyexpenses: [],
+          property: [],
           user: [],
-          pmsexpense: []
         }
       },
       methods: {
@@ -225,13 +223,21 @@
         capitalizeFirstLetter(str) {
           return str.charAt(0).toUpperCase() + str.slice(1);
         },
-        loadLists() {
-             axios.get('api/lists').then((response) => {
-
-             this.expenses = response.data.lists.pmsexpenses;
-             console.log("props", response)
+        getProperty()
+        {
+          axios.get('/api/pmsproperty/'+ this.$route.params.id).then((response) => {
+            this.property = response.data.property[0] 
+            console.log("dat", this.property)
+          }).catch(() => {
+              console.log('error')
+          })
+        },
+        getPropertyExpenses() {
+             axios.get('/api/pmspropertyexpenses/'+this.$route.params.id).then((response) => {
+             this.propertyexpenses = response.data.pmspropertyexpenses;
+             console.log("expenses", response)
              setTimeout(() => {
-                  $("#AllPropertiesTable").DataTable();
+                  $("#AllExpensesTable").DataTable();
               }, 10);
     
              });
@@ -241,7 +247,8 @@
           TheMaster,
       },
       mounted(){
-        this.loadLists();
+        this.getProperty();
+        this.getPropertyExpenses();
         this.user = localStorage.getItem('user');
         this.user = JSON.parse(this.user);
 
@@ -251,7 +258,7 @@
       calculateTotal() {
           return (key) => {
             return this.formatNumber(
-              this.expenses.reduce((acc, statement) => acc + parseFloat(statement[key]), 0)
+              this.propertyexpenses.reduce((acc, statement) => acc + parseFloat(statement[key]), 0)
             );
           };
         },

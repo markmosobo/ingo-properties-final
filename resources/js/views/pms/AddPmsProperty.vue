@@ -29,7 +29,7 @@
                     <div class="col-sm-6">
                        <label for="validationCustom04" class="form-label">Number of Units*</label>
                        <div class="col-sm-10">
-                          <input type="text" placeholder="Number of Units" v-model="form.units_no" id="location" name="location" class="form-control"
+                          <input type="number" placeholder="Number of Units" v-model="form.units_no" id="location" name="location" class="form-control"
                              required="" />
                           <div class="invalid-feedback">Please enter location!</div>
                        </div>
@@ -53,15 +53,16 @@
                       <div class="invalid-feedback">Please enter category!</div>
                       </div>
                    </div>                
-<!--                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Media</label>
-                      <div class="col-sm-10">
-                      <Uploader 
-                        server="/api/posts/media/upload"
-                        @change="changeMedia"
-                       />
+                   <div class="col-sm-6">
+                       <label for="validationCustom04" class="form-label"
+                      >Commission*<p><strong>(%)</strong> of commission on rent collected</p></label
+                      >
+                       <div class="col-sm-10">
+                          <input type="number" placeholder="Commission" v-model="form.commission" id="location" name="location" class="form-control"
+                             required="" />
+                          <div class="invalid-feedback">Please enter location!</div>
                        </div>
-                   </div>  -->                 
+                    </div>                  
                 </div>
                 <div class="row mb-3"></div>
                
@@ -117,6 +118,7 @@
           created_by: '',
           media: [],
           property_status: '',
+          commission: '',
           
           },
           message: "",
