@@ -13,27 +13,27 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('pms_expenses', function (Blueprint $table) {
+        Schema::create('pms_statements', function (Blueprint $table) {
             $table->increments('id');
             $table->string('ref_no')->nullable();
             $table->integer('pms_property_id')->unsigned();
-            $table->integer('pms_unit_id')->unsigned();            
-            $table->string('payment_type')->nullable();
-            $table->string('paid_to')->nullable();
-            $table->float('amount_paid')->nullable();
-            $table->integer('checked_by')->unsigned();
+            $table->integer('pms_tenant_id')->unsigned();            
             $table->foreign('pms_property_id')
             ->references('id')
             ->on('pms_properties')
             ->onDelete('cascade');  
-            $table->foreign('pms_unit_id')
+            $table->foreign('pms_tenant_id')
             ->references('id')
-            ->on('pms_units')
-            ->onDelete('cascade');             
-            $table->foreign('checked_by')
-            ->references('id')
-            ->on('users')
-            ->onDelete('cascade');
+            ->on('pms_tenants')
+            ->onDelete('cascade'); 
+            $table->string('details')->nullable(); 
+            $table->string('payment_method')->nullable(); 
+            $table->string('mpesa_code')->nullable(); 
+            $table->integer('status')->nullable();
+            $table->float('total')->nullable();
+            $table->float('paid')->nullable();
+            $table->float('balance')->nullable();
+            $table->decimal('commission', 8, 2)->nullable();            
             $table->timestamps();
         });
     }
@@ -45,6 +45,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pms_expenses');
+        Schema::dropIfExists('pms_statements');
     }
 };

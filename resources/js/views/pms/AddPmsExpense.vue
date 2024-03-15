@@ -50,15 +50,15 @@
                       value="1"
                       class="form-control"
                    />
-                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Payment Type*</label>
+                   <div class="col-sm-6">
+                      <label for="inputPassword" class="form-label">Amount Paid*</label>
                       <div class="col-sm-10">
                         <input
-                            type="text"
-                            placeholder="Payment Type"
+                            type="number"
+                            placeholder="Amount Paid"
                             id="title"
                             name="title"
-                            v-model="form.payment_type"
+                            v-model="form.amount_paid"
                             class="form-control"
                             required=""
                         />
@@ -84,15 +84,16 @@
                 </div>
                 <div class="row mb-3"></div>
                 <div class="form-group row">
+
                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Amount Paid*</label>
+                      <label for="inputPassword" class="form-label">Remarks*</label>
                       <div class="col-sm-10">
                         <input
                             type="text"
-                            placeholder="Amount Paid"
+                            placeholder="e.g Slashing or Repair Works"
                             id="title"
                             name="title"
-                            v-model="form.amount_paid"
+                            v-model="form.payment_type"
                             class="form-control"
                             required=""
                         />
@@ -169,7 +170,7 @@
       async getUnits() {
          try {
            //const propunits = this.units.find(unit => unit.pms_property_id === this.form.pms_property_id);
-           this.propunits = this.units.filter(item => item.pms_property_id === this.form.pms_property_id && item.status === 0);
+           this.propunits = this.units.filter(item => item.pms_property_id === this.form.pms_property_id);
 
            console.log("amoit", this.propunits)
          } catch (error) {

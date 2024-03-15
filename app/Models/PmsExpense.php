@@ -17,7 +17,8 @@ class PmsExpense extends Model
         'payment_type',
         'amount_paid',
         'paid_to',
-        'checked_by'
+        'checked_by',
+        'ref_no',
     ]; 
 
     public function user()

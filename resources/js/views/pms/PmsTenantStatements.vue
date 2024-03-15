@@ -15,7 +15,7 @@
                         </li>
     
                         <li>
-                            <router-link :to="`/pmsmonthpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
+                            <router-link :to="`/pmsmonthtenantstatements/${tenantId}`" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
                                 :class="{ active: isActive }"
@@ -26,7 +26,7 @@
                             </router-link>
                         </li>
                         <li>
-                            <router-link :to="`/pmsyearpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
+                            <router-link :to="`/pmsyeartenantstatements/${tenantId}`" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
                                 :class="{ active: isActive }"
@@ -37,7 +37,7 @@
                             </router-link>
                         </li>
                         <li>
-                            <router-link :to="`/pmsallpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
+                            <router-link :to="`/pmsalltenantstatements/${tenantId}`" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
                                 :class="{ active: isActive }"
@@ -52,7 +52,7 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">{{property.name}} Statement <span>| This Month</span></h5>
+                      <h5 class="card-title">{{tenant.first_name}} {{tenant.last_name}}'s Statement <span>| This Month</span></h5>
                       <p class="card-text">
                    
                           <button @click="generatePDF">Generate PDF</button>
@@ -63,13 +63,13 @@
                         <thead>
                           <tr>
                             <th scope="col">Invoice</th>
+                            <th scope="col">Property</th>                            
                             <th scope="col">Detail</th>
-                            <th scope="col">Due</th>
+                            <th scope="col">Total</th>
                             <th scope="col">Paid</th>
                             <th scope="col">Bal</th>
-                            <th scope="col">Payment Mode</th>
+                            <th scope="col">Transaction On</th>
                             <th scope="col">Status</th>
-                            <th scope="col">Invoiced On</th>
                             <th scope="col">Action</th>
                           </tr>
                         </thead>
@@ -77,15 +77,15 @@
                           <tr v-for="statement in statements" :key="statement.id">
                             <td>{{statement.ref_no}}</td>
                             <td>{{statement.details}}</td>
+                            <td>{{statement.property.name}}</td>                            
                             <td>{{formatNumber(statement.total)}}</td>
                             <td>{{formatNumber(statement.paid)}}</td>
                             <td>{{formatNumber(statement.balance)}}</td>
-                            <td>{{statement.payment_method}}</td>
+                            <td>{{format_date(statement.updated_at)}}</td>
                             <td>
                               <span v-if="statement.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Settled</span>
                               <span v-else class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Not Settled</span>
                             </td>
-                            <td>{{format_date(statement.created_at)}}</td>
                             <td>
                               <div class="btn-group" role="group">
                                   <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -140,61 +140,76 @@
     export default {
       data(){
         return {
-          property: [],
+          tenant: [],
           statements: [],
-          expenses: [],
-          categories: [],
-          propertytypes: [],
           user: [],
-          dueTotal: 0, // Variable to store the sum of the "Due" column
-          propertyId: this.$route.params.id
-
+          tenantId: this.$route.params.id
         }
       },
       methods: {
-        getProperty()
+        getTenant()
         {
-          axios.get('/api/pmsproperty/'+ this.$route.params.id).then((response) => {
-            this.property = response.data.property[0] 
-            console.log("dat", this.property)
+          axios.get('/api/pmstenant/'+ this.$route.params.id).then((response) => {
+            this.tenant = response.data.tenant[0] 
+            console.log("dat", this.tenant)
           }).catch(() => {
               console.log('error')
           })
         },
-        getPropertyStatements() {
-             axios.get('/api/pmspropertystatements/'+this.$route.params.id).then((response) => {
-             this.statements = response.data.pmspropertystatements;
+        navigateTo(location){
+            this.$router.push(location)
+        },
+        settleTenant(id){
+            this.$router.push('/settlestatement/'+id)
+        },
+        formatNumber(value) {
+            // Check if the value is not a number
+            if (isNaN(value)) {
+                return value; // Return as it is
+            }
+            
+            // Convert the value to a string
+            let stringValue = value.toString();
+
+            // Split the string into integer and decimal parts
+            let parts = stringValue.split('.');
+
+            // Format the integer part with commas
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+            // If there's a decimal part, limit it to 2 decimal places
+            if (parts.length > 1) {
+                parts[1] = parts[1].substring(0, 2);
+            } else {
+                parts.push('00'); // If no decimal part exists, append '00'
+            }
+
+            // Join the parts back together with a decimal point
+            return parts.join('.');
+        },
+        format_date(value){
+          if(value){
+            return moment(String(value)).format('lll')
+          }
+        }, 
+        formatMonth(dateString) {
+          // Parse the date string using Moment.js and format it
+           return moment(dateString).format('MMM YYYY');
+        }, 
+        calculateTotal(property) {
+          // Function to calculate total for Total, Paid, and Bal columns
+
+          return this.statements.reduce((total, statement) => total + (statement[property] || 0), 0);
+        },      
+        getTenantStatements() {
+             axios.get('/api/pmstenantstatements/'+this.$route.params.id).then((response) => {
+             this.statements = response.data.pmstenantstatements;
              console.log("props", response)
              setTimeout(() => {
                   $("#AllStatementsTable").DataTable();
               }, 10);
     
              });
-        },
-        getPropertyExpenses()
-        {
-          axios.get('/api/pmspropertyexpenses/'+this.$route.params.id).then((response) => {
-            this.expenses = response.data.pmspropertyexpenses;
-            console.log("expenses", this.expenses)
-            // Calculate the total amount paid
-            this.totalAmountPaid = this.calculateTotalAmountPaid();
-          })
-        },
-        calculateTotalAmountPaid() {
-        if (!this.expenses || this.expenses.length === 0) {
-              return 0; // If expenses data is empty or undefined, return 0
-            }
-
-            // Use reduce to sum up the amount_paid property for all expenses
-            return this.expenses.reduce((total, expense) => total + expense.amount_paid, 0);
-        },
-        calculateTotal(property) {
-          // Function to calculate total for Total, Paid, and Bal columns
-
-          return this.statements.reduce((total, statement) => total + (statement[property] || 0), 0);
-        },
-        settleTenant(id){
-            this.$router.push('/settlestatement/'+id)
         },
         generatePDF() {
             let pdfName = 'Full Statement';
@@ -212,7 +227,8 @@
             doc.text(rightHeaderText, rightheaderX, rightheaderY, { align: 'left' });
 
             // Add top-right header
-            const headerText = 'Generated on: ' + new Date().toLocaleString()+'\n'+this.property.name+'\n'+this.property.units_no + ' Units';
+            const tenantName = this.tenant.first_name + " " + this.tenant.last_name;
+            const headerText = 'Generated on: ' + new Date().toLocaleString()+'\n'+'Tenant: '+tenantName+'\n'+'ID Number: '+this.tenant.id_number + '\n'+'Phone: '+this.tenant.phone_number+'\n'+this.tenant.property.name+'\n'+this.tenant.unit.unit_number;
             const headerFontSize = 12;
             const headerX = doc.internal.pageSize.width - 20; // Adjust the X coordinate
             const headerY = 10;
@@ -231,7 +247,7 @@
             doc.addImage(imageUrl, 'JPEG', imageX, imageY, imageWidth, imageHeight);
 
             // Add title
-            const titleText = (this.property.name+" "+this.formatMonth(new Date)+' Rent Statement').toUpperCase();
+            const titleText = (tenantName+"'s "+this.formatMonth(new Date)+' Rent Statement').toUpperCase();
             const titleFontSize = 18;
             const titleWidth = doc.getStringUnitWidth(titleText) * titleFontSize / doc.internal.scaleFactor;
             const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
@@ -246,15 +262,15 @@
             // doc.setTextColor(52, 73, 94); // Set text color to a slightly lighter shade
             // doc.text('Generated on: ' + new Date().toLocaleString(), 20, imageY + imageHeight + 20);
 
-            const roundedCommission = Math.round(this.property.commission * 100);
-            const commissionTotal = roundedCommission/100*this.totalPaid;
+            // const roundedCommission = Math.round(this.property.commission * 100);
+            // const commissionTotal = roundedCommission/100*this.totalPaid;
 
-            const netRemissionTotal = Math.round(this.totalPaid - (this.totalAmountPaid + commissionTotal));
+            // const netRemissionTotal = Math.round(this.totalPaid - (this.totalAmountPaid + commissionTotal));
 
             // Add content headers
-            doc.setFontSize(14);
-            doc.setTextColor(44, 62, 80);
-            doc.text(roundedCommission +'% Commission: '+ 'KES ' +this.formatNumber(commissionTotal), 20, imageY + imageHeight + 35);
+            // doc.setFontSize(14);
+            // doc.setTextColor(44, 62, 80);
+            // doc.text(roundedCommission +'% Commission: '+ 'KES ' +this.formatNumber(commissionTotal), 20, imageY + imageHeight + 35);
 
 
 
@@ -263,13 +279,13 @@
 
             let textY = imageY + imageHeight + 20; // Initial y-coordinate for the first text
 
-            doc.text('Total Rent Collected: ' + 'KES ' + this.formatNumber(this.totalPaid), 20, textY);
+            doc.text('Total Rent Due: ' + 'KES ' + this.formatNumber(this.totalDue), 20, textY);
             textY += 10; // Increment y-coordinate for the next text
 
-            doc.text('Total Expenses Incurred: '+ 'KES ' +this.formatNumber(this.totalAmountPaid), 20, textY);
+            doc.text('Total Rent Paid: '+ 'KES ' +this.formatNumber(this.totalPaid), 20, textY);
             textY += 10; // Increment y-coordinate for the next text
 
-            doc.text('Net Remission: ' + 'KES ' + this.formatNumber(netRemissionTotal) , 20, textY);
+            doc.text('Total Balance: ' + 'KES ' + this.formatNumber(this.totalBalance) , 20, textY);
             textY += 10; // Increment y-coordinate for the next text
 
             doc.setFontSize(12);
@@ -354,159 +370,36 @@
 
 
             // Call the function to add expenses to the PDF with pagination
-            let totalPages = this.addExpensesToPDF(this.expenses, doc);
+            // let totalPages = this.addExpensesToPDF(this.expenses, doc);
             // Save the PDF
-            // let fileName = 'Full Statement' + '_Page_' + currentPage + '.pdf';
-            let fileName = this.property.name+" "+this.formatMonth(new Date)+' Rent Statement' + '_Total_Pages_' + totalPages + '.pdf';
+            let fileName = tenantName +"'s "+ this.formatMonth(new Date)+' Rent Statement' + '_Page_' + currentPage + '.pdf';
+            // let fileName = this.property.name+" "+this.formatMonth(this.property.created_at)+' Rent Statement' + '_Total_Pages_' + totalPages + '.pdf';
 
             doc.save(fileName);
-        },
-        // Function to add expenses to the PDF with pagination
-        addExpensesToPDF(expenses, doc) {
-            // Add content headers for expenses
-            doc.addPage(); // Add a new page for Expenses
-            doc.setFontSize(14);
-            doc.setTextColor(44, 62, 80);
-            doc.text('Expenses', 20, 20);
-
-            doc.setFontSize(12);
-            doc.setTextColor(0);
-
-            // Draw table headers and borders dynamically based on the HTML structure
-            let expenseHeaderYPos = 30;
-            let expenseCellHeight = 10;
-            let expenseCellPadding = 2;
-            let expenseLineHeight = 5;
-            let expenseColumnWidths = [60, 40, 60, 30, 60];
-
-            // Define column headers for Expenses
-            let expenseColumnHeaders = ['Type', 'Amount(KES)', 'Expended To', 'Checked By', 'Checked On'];
-
-            // Draw headers with borders dynamically based on calculated column widths
-            let expenseXPos = 20;
-            doc.setDrawColor(0);
-            doc.setFillColor(255, 255, 255); // Set header background color to white
-
-            for (let i = 0; i < expenseColumnWidths.length; i++) {
-                doc.setFillColor(255, 255, 255); // Set fill color to white
-                doc.rect(expenseXPos, expenseHeaderYPos, expenseColumnWidths[i], expenseCellHeight, 'F');
-                doc.setTextColor(0); // Set text color to black
-                doc.text(expenseColumnHeaders[i], expenseXPos + expenseCellPadding, expenseHeaderYPos + expenseCellHeight - expenseCellPadding);
-                expenseXPos += expenseColumnWidths[i];
-            }
-
-
-            let currentPage = 1;
-            let currentRow = 0;
-            const maxRowsPerPage = 28; // Adjust this value based on the number of rows you want per page
-
-            // Iterate through expenses and add them to the PDF with dynamic borders
-            expenses.forEach((expense, index) => {
-                if (currentRow >= maxRowsPerPage) {
-                    doc.addPage(); // Add a new page if the maximum rows per page is exceeded
-                    expenseHeaderYPos = 20;
-                    currentRow = 0;
-                    currentPage++;
-                    expenseXPos = 20;
-                    // Draw headers for expenses on new page
-                    for (let i = 0; i < expenseColumnWidths.length; i++) {
-                        doc.rect(expenseXPos, expenseHeaderYPos, expenseColumnWidths[i], expenseCellHeight, 'F');
-                        doc.setTextColor(0); // Set text color to black
-                        doc.text(expenseColumnHeaders[i], expenseXPos + expenseCellPadding, expenseHeaderYPos + expenseCellHeight - expenseCellPadding);
-                        expenseXPos += expenseColumnWidths[i];
-                    }
-                    expenseHeaderYPos += expenseCellHeight;
-                }
-
-                let yPos = expenseHeaderYPos + (currentRow + 1) * expenseLineHeight;
-                expenseXPos = 20;
-                // Add expense data
-                for (let i = 0; i < expenseColumnWidths.length; i++) {
-                    doc.rect(expenseXPos, yPos, expenseColumnWidths[i], expenseCellHeight);
-                    switch (i) {
-                        case 0:
-                            doc.text(this.capitalizeFirstLetter(expense.payment_type), expenseXPos + expenseCellPadding, yPos + expenseCellHeight - expenseCellPadding);
-                            break;
-                        case 1:
-                            doc.text(this.formatNumber(expense.amount_paid), expenseXPos + expenseCellPadding, yPos + expenseCellHeight - expenseCellPadding);
-                            break;
-                        case 2:
-                            doc.text(expense.paid_to, expenseXPos + expenseCellPadding, yPos + expenseCellHeight - expenseCellPadding);
-                            break;
-                        case 3:
-                            doc.text(`${expense.user.first_name} ${expense.user.last_name}`, expenseXPos + expenseCellPadding, yPos + expenseCellHeight - expenseCellPadding);
-                            break;
-                        case 4:
-                            doc.text(this.format_date(expense.created_at), expenseXPos + expenseCellPadding, yPos + expenseCellHeight - expenseCellPadding);
-                            break;
-                    }
-                    expenseXPos += expenseColumnWidths[i];
-                }
-                currentRow++;
-            });
-  
-            doc.setFontSize(10);
-            doc.text('Generated on: ' + new Date().toLocaleString(), 20, doc.internal.pageSize.height - 10);
-              
-            return currentPage; // Return the total number of pages used for expenses
-        },
-        formatMonth(dateString) {
-          // Parse the date string using Moment.js and format it
-           return moment(dateString).format('MMM YYYY');
-        },
-
-        formatNumber(value) {
-          // Check if the value is null or undefined
-          if (value == null) return '';
-
-          // Convert value to string
-          let stringValue = value.toString();
-
-          // Split the string into integer and decimal parts
-          let [integerPart, decimalPart] = stringValue.split('.');
-
-          // Add commas to the integer part
-          integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-          // Add trailing zeros to the decimal part if needed
-          if (decimalPart == null) decimalPart = '00';
-          else if (decimalPart.length === 1) decimalPart += '0';
-
-          // Combine integer and decimal parts with a dot
-          return `${integerPart}.${decimalPart}`;
-        },
-        format_date(value){
-          if(value){
-            return moment(String(value)).format('lll')
-          }
-        },
-        capitalizeFirstLetter(str) {
-          return str.charAt(0).toUpperCase() + str.slice(1);
-        },
-        navigateTo(location){
-            this.$router.push(location)
-        },
-        loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.categories = response.data.lists.categories;
-             this.propertytypes = response.data.lists.propertytypes;
-             this.properties = response.data.lists.pmsproperties;
-             console.log("props", this.properties)
-             setTimeout(() => {
-                  $("#AllPropertiesTable").DataTable();
-              }, 10);
-    
-             });
-          },
+      },
       },
       components : {
           TheMaster,
       },
-      computed:
-      {
-        // Computed property to calculate total due
+      mounted(){
+        this.getTenant();
+        this.getTenantStatements();
+        this.user = localStorage.getItem('user');
+        this.user = JSON.parse(this.user);
+
+      },
+      computed: {
+      // Calculate total based on the provided key ('total', 'paid', 'balance')
+      // calculateTotal() {
+      //     return (key) => {
+      //       return this.formatNumber(
+      //         this.statements.reduce((acc, statement) => acc + parseFloat(statement[key]), 0)
+      //       );
+      //     };
+      //   },
+         // Computed property to calculate total due
         totalDue() {
-          return this.calculateTotal('due');
+          return this.calculateTotal('total');
         },
         // Computed property to calculate total paid
         totalPaid() {
@@ -517,14 +410,6 @@
           return this.calculateTotal('balance');
         }
       },
-      mounted(){
-        this.getProperty();
-        this.getPropertyStatements();
-        this.getPropertyExpenses();
-        this.user = localStorage.getItem('user');
-        this.user = JSON.parse(this.user);
-
-      }
     }
     </script>
     

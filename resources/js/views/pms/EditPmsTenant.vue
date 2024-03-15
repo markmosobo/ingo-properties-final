@@ -198,15 +198,21 @@
  
           });
        }, 
-      async getUnits() {
-         try {
-           //const propunits = this.units.find(unit => unit.pms_property_id === this.form.pms_property_id);
-           this.propunits = this.units.filter(item => item.pms_property_id === this.form.pms_property_id && item.status === 0);
+       getUnits() {
+             axios.get('/api/pmsunits/'+this.form.pms_property_id).then((response) => {
+     
+             this.propunits = response.data.units;
+             console.log("props", response)
+    
+             });         
+         // try {
+         //   //const propunits = this.units.find(unit => unit.pms_property_id === this.form.pms_property_id);
+         //   this.propunits = this.units.filter(item => item.pms_property_id === this.form.pms_property_id && item.status === 0);
 
-           console.log("amoit", this.propunits)
-         } catch (error) {
-           console.error(error);
-         }
+         //   console.log("amoit", this.propunits)
+         // } catch (error) {
+         //   console.error(error);
+         // }
        },                    
        submit(){
           axios.put("/api/pmstenant/"+this.$route.params.id, this.form)

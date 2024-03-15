@@ -15,7 +15,7 @@
                         </li>
     
                         <li>
-                            <router-link :to="`/pmsmonthpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
+                            <router-link :to="`/pmspropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
                                 :class="{ active: isActive }"
@@ -26,25 +26,25 @@
                             </router-link>
                         </li>
                         <li>
-                            <router-link :to="`/pmsyearpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
+                            <router-link :to="`/pmslastmonthpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
                                 :class="{ active: isActive }"
                                 class="dropdown-item"
                                 @click="navigate"
                             >
-                            This Year</a>
+                            Last Month</a>
                             </router-link>
                         </li>
                         <li>
-                            <router-link :to="`/pmsallpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
+                            <router-link :to="`/pmslastninetypropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
                                 :class="{ active: isActive }"
                                 class="dropdown-item"
                                 @click="navigate"
                             >
-                            All Time</a>
+                            Last 90 Days</a>
                             </router-link>
                         </li>
 
@@ -202,7 +202,7 @@
             const maxRowsPerPage = 13; // Adjust this value based on the number of rows you want per page
 
             // Add top-left header
-            const rightHeaderText = 'Ingo Properties\nKakamega-Mumias Rd, Courseyard Business Center\nTel: 0759 509 462\nP. O. Box 2973-50100, Kakamega\nEmail: ingopropertymarketingkk@gmail.com';
+            const rightHeaderText = 'April Properties\nKakamega-Webuye Rd, ACK Building\nTel: 0720 020 401\nP. O. Box 2973-50100, Kakamega\nEmail: propertapril@gmail.com';
             const rightHeaderFontSize = 12;
             const rightheaderX = 20; // Adjust the X coordinate
             const rightheaderY = 10;
@@ -223,7 +223,7 @@
 
 
             // Add image at the top
-            const imageUrl = '/images/ingo-pdf-logo.png'; // Replace with the URL of your image
+            const imageUrl = '/images/apex-logo.png'; // Replace with the URL of your image
             const imageWidth = 50; // Adjust the width of the image as needed
             const imageHeight = 50; // Adjust the height of the image as needed
             const imageX = (doc.internal.pageSize.width - imageWidth) / 2;

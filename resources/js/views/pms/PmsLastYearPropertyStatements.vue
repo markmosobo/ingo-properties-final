@@ -15,17 +15,6 @@
                         </li>
     
                         <li>
-                            <router-link :to="`/pmsmonthpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            This Month</a>
-                            </router-link>
-                        </li>
-                        <li>
                             <router-link :to="`/pmsyearpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
@@ -37,14 +26,25 @@
                             </router-link>
                         </li>
                         <li>
-                            <router-link :to="`/pmsallpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
+                            <router-link :to="`/pmsquarterpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
                                 :class="{ active: isActive }"
                                 class="dropdown-item"
                                 @click="navigate"
                             >
-                            All Time</a>
+                            This Quarter</a>
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link :to="`/pmslastyearpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
+                            <a
+                                :href="href"
+                                :class="{ active: isActive }"
+                                class="dropdown-item"
+                                @click="navigate"
+                            >
+                            Last Year</a>
                             </router-link>
                         </li>
 
@@ -52,7 +52,7 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">{{property.name}} Statement <span>| This Month</span></h5>
+                      <h5 class="card-title">{{property.name}} Statement <span>| Last Year</span></h5>
                       <p class="card-text">
                    
                           <button @click="generatePDF">Generate PDF</button>
@@ -162,8 +162,8 @@
           })
         },
         getPropertyStatements() {
-             axios.get('/api/pmspropertystatements/'+this.$route.params.id).then((response) => {
-             this.statements = response.data.pmspropertystatements;
+             axios.get('/api/pmslastyearpropertystatements/'+this.$route.params.id).then((response) => {
+             this.statements = response.data.pmslastyearpropertystatements;
              console.log("props", response)
              setTimeout(() => {
                   $("#AllStatementsTable").DataTable();
@@ -173,8 +173,8 @@
         },
         getPropertyExpenses()
         {
-          axios.get('/api/pmspropertyexpenses/'+this.$route.params.id).then((response) => {
-            this.expenses = response.data.pmspropertyexpenses;
+          axios.get('/api/pmslastyearpropertyexpenses/'+this.$route.params.id).then((response) => {
+            this.expenses = response.data.pmslastyearpropertyexpenses;
             console.log("expenses", this.expenses)
             // Calculate the total amount paid
             this.totalAmountPaid = this.calculateTotalAmountPaid();
@@ -202,7 +202,7 @@
             const maxRowsPerPage = 13; // Adjust this value based on the number of rows you want per page
 
             // Add top-left header
-            const rightHeaderText = 'Ingo Properties\nKakamega-Mumias Rd, Courseyard Business Center\nTel: 0759 509 462\nP. O. Box 2973-50100, Kakamega\nEmail: ingopropertymarketingkk@gmail.com';
+            const rightHeaderText = 'April Properties\nKakamega-Webuye Rd, ACK Building\nTel: 0720 020 401\nP. O. Box 2973-50100, Kakamega\nEmail: propertapril@gmail.com';
             const rightHeaderFontSize = 12;
             const rightheaderX = 20; // Adjust the X coordinate
             const rightheaderY = 10;
@@ -223,15 +223,17 @@
 
 
             // Add image at the top
-            const imageUrl = '/images/ingo-pdf-logo.png'; // Replace with the URL of your image
+            const imageUrl = '/images/apex-logo.png'; // Replace with the URL of your image
             const imageWidth = 50; // Adjust the width of the image as needed
             const imageHeight = 50; // Adjust the height of the image as needed
             const imageX = (doc.internal.pageSize.width - imageWidth) / 2;
             const imageY = 20;
             doc.addImage(imageUrl, 'JPEG', imageX, imageY, imageWidth, imageHeight);
 
+            const lastYear = (this.formatYear(new Date)) - 1;
+
             // Add title
-            const titleText = (this.property.name+" "+this.formatMonth(new Date)+' Rent Statement').toUpperCase();
+            const titleText = (this.property.name+" "+lastYear+' Rent Statement').toUpperCase();
             const titleFontSize = 18;
             const titleWidth = doc.getStringUnitWidth(titleText) * titleFontSize / doc.internal.scaleFactor;
             const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
@@ -351,13 +353,11 @@
 
 
 
-
-
             // Call the function to add expenses to the PDF with pagination
             let totalPages = this.addExpensesToPDF(this.expenses, doc);
             // Save the PDF
             // let fileName = 'Full Statement' + '_Page_' + currentPage + '.pdf';
-            let fileName = this.property.name+" "+this.formatMonth(new Date)+' Rent Statement' + '_Total_Pages_' + totalPages + '.pdf';
+            let fileName = this.property.name+" "+lastYear+' Rent Statement' + '_Total_Pages_' + totalPages + '.pdf';
 
             doc.save(fileName);
         },
@@ -454,7 +454,10 @@
           // Parse the date string using Moment.js and format it
            return moment(dateString).format('MMM YYYY');
         },
-
+        formatYear(dateString) {
+          // Parse the date string using Moment.js and format it
+           return moment(dateString).format('YYYY');
+        },
         formatNumber(value) {
           // Check if the value is null or undefined
           if (value == null) return '';
