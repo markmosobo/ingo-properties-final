@@ -202,7 +202,7 @@
             const maxRowsPerPage = 13; // Adjust this value based on the number of rows you want per page
 
             // Add top-left header
-            const rightHeaderText = 'April Properties\nKakamega-Webuye Rd, ACK Building\nTel: 0720 020 401\nP. O. Box 2973-50100, Kakamega\nEmail: propertapril@gmail.com';
+            const rightHeaderText = 'Ingo Properties\nKakamega-Mumias Rd, Courseyard Business Center\nTel: 0759 509 462\nP. O. Box 2973-50100, Kakamega\nEmail: ingopropertymarketingkk@gmail.com';
             const rightHeaderFontSize = 12;
             const rightheaderX = 20; // Adjust the X coordinate
             const rightheaderY = 10;
@@ -223,7 +223,7 @@
 
 
             // Add image at the top
-            const imageUrl = '/images/apex-logo.png'; // Replace with the URL of your image
+            const imageUrl = '/images/ingo-pdf-logo.png'; // Replace with the URL of your image
             const imageWidth = 50; // Adjust the width of the image as needed
             const imageHeight = 50; // Adjust the height of the image as needed
             const imageX = (doc.internal.pageSize.width - imageWidth) / 2;
