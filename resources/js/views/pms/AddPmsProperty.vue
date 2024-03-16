@@ -131,32 +131,30 @@
        addLandlord(){
          this.$router.push('/add-pmslandlord')
        },
-       submit(){
-          axios.post("api/pmsproperties", this.form)
-          .then(function (response) {
-             console.log(response);
-             let propdata = response.data.property
-             console.log("data",propdata.id)             
+         submit() {
+             let self = this;
+             axios.post("api/pmsproperties", this.form)
+                 .then((response) => { // Use arrow function here
+                     console.log(response);
+                     let propdata = response.data.property;
+                     self.propertyId = response.data.property.id;
+                     console.log("property", self.propertyId); // Use self instead of this
 
-             toast.fire(
-                'Success!',
-                'Property added!',
-                'success'
-             ) 
+                     console.log("data", propdata.id);
 
-          })
-          .catch(function (error) {
-             console.log(error);
+                     toast.fire(
+                         'Success!',
+                         'Property added!',
+                         'success'
+                     );
 
-             // Swal.fire(
-             //    'error!',
-             //    // phone_error + id_error + pass_number,
-             //    'error'
-             // )
-          });
-
-          this.$router.push('/pmsproperties');              
-       },
+                     // Use self instead of this to access propertyId
+                     self.$router.push('/pmsunits/' + self.propertyId);
+                 })
+                 .catch(function(error) {
+                     console.log(error);
+                 });
+         },
         loadLists() {
              axios.get('api/lists').then((response) => {
              this.landlords = response.data.lists.landlords;
