@@ -122,6 +122,9 @@
                          </select>
  
                          <div class="invalid-feedback">Please select a unit!</div>
+                         <div v-if="showNoUnitsMessage" class="text-danger">No units available for selected property.</div>
+
+
                       </div>
                    </div>                     
                 </div>
@@ -132,7 +135,7 @@
                     <!-- <button @click.prevent="prev()" class="btn btn-dark">Previous</button> -->
                 </div>
                 <div class="col-sm-6 col-lg-6 text-end">
-                    <button type="submit" @click.prevent="next()" class="btn btn-sm btn-primary rounded-pill">Proceed to Invoice</button>
+                    <button type="submit" style="background-color: darkgreen; border-color: darkgreen;" @click.prevent="next()" class="btn btn-sm btn-primary rounded-pill">Proceed to Invoice</button>
                 </div>
             </div>
           </fieldset>
@@ -165,9 +168,9 @@
                         <div class="col-sm-10">
                             <select name="category" v-model="form.payment_method" class="form-select" id="">
                                 <option value="0" disabled>Select Payment</option>
-                                <option value="MPESA" selected>MPESA (Till Number)</option>
-                                <option value="CASH">CASH</option>
-                                <option value="BANK">BANK</option>
+                                <option value="Mpesa" selected>MPESA (Till Number)</option>
+                                <option value="Cash">CASH</option>
+                                <option value="Bank">BANK</option>
 
                             </select>
                           <div class="invalid-feedback">Please enter flight number!</div>
@@ -176,7 +179,7 @@
                     </div>
              
                     <div class="row mb-3"></div>
-                    <div v-if="form.payment_method === 'MPESA'" class="form-group row">
+                    <div v-if="form.payment_method === 'Mpesa'" class="form-group row">
                       <div class="col-sm-12">
                         <label for="inputPassword" class="form-label">Please provide MPESA code</label>
                         <div class="col-sm-10">
@@ -210,7 +213,7 @@
                         <button @click.prevent="prev()" class="btn btn-sm btn-dark rounded-pill">Previous</button>
                         </div>
                         <div class="col-sm-6 col-lg-6 text-end">
-                        <button @click.prevent="printReceipt()" class="btn btn-sm rounded-pill btn-primary">Print Receipt</button>
+                        <button @click.prevent="printReceipt()" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm rounded-pill btn-primary">Print Receipt</button>
                         </div>
                     </div>
                   </form>
@@ -268,6 +271,11 @@
           depositRent: [],
           unitNumber: '',
           tenantId: null, // Initialize tenantId
+          user: [],
+          deposit: '',
+          monthly_rent: '',
+          refNo: '',
+          propertyName: ''
 
        }   
     },
@@ -279,151 +287,165 @@
           this.step++;
           this.submit();          
        },
-      printReceipt() {
-        this.submitStatement();
-        this.$router.push('/pmstenants')
-
-        // Open a new window for printing
-        const printWindow = window.open("", "_blank");
-
-        // Build the content for printing
-        const receiptContent = this.buildReceiptContent();
-
-        // Write the content to the new window
-        printWindow.document.write(receiptContent);
-
-        // Close the document stream
-        printWindow.document.close();
-
-        // Trigger the print dialog
-        printWindow.print();
-      },
-
-      buildReceiptContent() {
+      buildReceiptContent(refNo) {
+        // Determine whether to include the row
+        const showGarbageFeeRow = this.garbage_fee !== 0;
+        const showSecurityFeeRow = this.security_fee !== 0;
+        const showElectricityDepositRow = this.electricity_deposit !== 0;
+        const showWaterDepositRow = this.water_deposit !== 0;
         // Build the HTML content for the receipt
         const receiptHTML = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>INGO PROPERTIES</title>
-          <style>
-            body {
-              font-family: monospace;
-              font-size: 12px;
-              margin: 0;
-            }
-            table, th, td {
-              border-collapse: collapse;
-            }
-            th, td {
-              padding: 5px;
-              text-align: left;
-            }
-            .header {
-              text-align: center;
-            }
-            .footer {
-              text-align: right;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>INGO PROPERTIES</h1>
-            <p>P.O. BOX 1716-50100 KAKAMEGA Opp. Kenya Power Rd.</p>
-            <p>Mob: 0722 844 910</p>
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Receipt Of Payment</title>
+              <style>
+                  body {
+                      font-family: Arial, sans-serif;
+                      margin: 0;
+                      padding: 0;
+                      background-color: #f5f5f5;
+                      color: #333;
+                  }
+                  .container {
+                      max-width: 600px;
+                      margin: 20px auto;
+                      padding: 20px;
+                      background-color: #fff;
+                      border: 2px solid #ccc;
+                      border-radius: 10px;
+                      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                  }
+                  .header {
+                      text-align: center;
+                      margin-bottom: 20px;
+                  }
+                  .header h1 {
+                      margin: 10px 0;
+                      color: #333;
+                  }
+                  .info {
+                      margin-bottom: 20px;
+                  }
+                  .info p {
+                      margin: 5px 0;
+                      color: #555;
+                  }
+                  .table {
+                      width: 100%;
+                      border-collapse: collapse;
+                      margin-bottom: 20px;
+                  }
+                  .table th, .table td {
+                      padding: 8px;
+                      border-bottom: 1px solid #ccc;
+                      text-align: left;
+                  }
+                  .table th {
+                      background-color: #f2f2f2;
+                      color: #333;
+                  }
+                  .table td {
+                      color: #666;
+                  }
+                  .footer {
+                      text-align: center;
+                      margin-top: 20px;
+                      color: #777;
+                  }
+              </style>
+          </head>
+          <body>
+          <div class="container">
+              <div class="header">
+                  <h1>April Properties</h1>
+                  <p>Kakamega-Webuye Rd, ACK Building</p>
+                  <p>Phone: (0720) 020-401 | Email: propertapril@gmail.com</p>
+              </div>
+              <div class="info">
+                  <p><strong>Invoice Number:</strong> ${this.refNo}</p>
+                  <p><strong>Receipt Date:</strong> ${new Date().toLocaleString()}</p>
+                  <p><strong>For:</strong> ${this.details}</p>
+                  <p><strong>Payment Mode:</strong> ${this.form.payment_method}</p>
+                  <p><strong>Property:</strong> ${this.name}</p>
+                  <p><strong>Tenant:</strong> ${this.tenant}</p>
+              </div>
+              <table class="table">
+                  <thead>
+                  <tr>
+                      <th>Description</th>
+                      <th>Amount</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                      <td>Rent Deposit</td>
+                      <td>KES ${this.formatNumber(this.deposit)}</td>
+                  </tr>
+                  <tr>
+                      <td>Monthly Rent</td>
+                      <td>KES ${this.formatNumber(this.monthly_rent)}</td>
+                  </tr>
+                  ${showGarbageFeeRow ? `
+                  <tr>
+                      <td>Garbage Collection Fee</td>
+                      <td>KES ${this.formatNumber(this.garbage_fee)}</td>
+                  </tr>
+                  ` : ''}
+                  ${showSecurityFeeRow ? `
+                  <tr>
+                      <td>Security Fee</td>
+                      <td>KES ${this.formatNumber(this.security_fee)}</td>
+                  </tr>
+                  ` : ''}
+                  ${showElectricityDepositRow ? `
+                  <tr>
+                      <td>Electricity Deposit</td>
+                      <td>KES ${this.formatNumber(this.electricity_deposit)}</td>
+                  </tr>
+                  ` : ''}
+                  ${showWaterDepositRow ? `
+                  <tr>
+                      <td>Water Deposit</td>
+                      <td>KES ${this.formatNumber(this.water_deposit)}</td>
+                  </tr>
+                  ` : ''}
+                  </tbody>
+                  <tfoot>
+                  <tr>
+                      <th>Total Amount Due:</th>
+                      <td>KES ${this.formatNumber(this.depositRent)}</td>
+                  </tr>
+                  <tr>
+                      <th>Amount Paid:</th>
+                      <td>KES ${this.formatNumber(this.form.cash)}</td>
+                  </tr>
+                  <tr>
+                      <th>Balance:</th>
+                      <td>KES ${this.formatNumber(this.payableAmount)}</td>
+                  </tr>
+                  </tfoot>
+              </table>
+              <div class="footer">
+                  <p>You were served by ${this.user.first_name} ${this.user.last_name}. Thank you for your payment.</p>
+                  <p>This receipt acknowledges the payment received for the above property management services.</p>
+              </div>
           </div>
-          <div>
-            <p>VAT: Barware - CHED</p>
-            <p>WAT NO. 0161493R</p>
-            <p>PIN: A0146635900</p>
-            <p>Tel: 0769 08207</p>
-          </div>
-          <div class="header">
-            <h3>FISCAL RECEIPT</h3>
-            <h3>ORIGINAL</h3>
-          </div>
-          <table>
-            <tr>
-              <th>QTY</th>
-              <th>Partic</th>
-              <th>Invoice Nr:</th>
-            </tr>
-            <tr v-for="(item) in cart" :key="productId">
-              <td>0001</td>
-              <td>Operator 01</td>
-              <td>000000000001196</td>
-            </tr>
-            <tr>
-              <td>A</td>
-              <td>00001 Art. 00001</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>Sum</td>
-              <td>1.000 pcs X 40500.00</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>700 7000</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>40500.00 A</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>1350 13500</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>TOTAL</td>
-              <td>40500.00</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>TOTAL A-16.00%</td>
-              <td>40500.00</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>TOTAL TAX A</td>
-              <td>5586.21</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>TUTAL TAX</td>
-              <td>5586.21</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>CASH</td>
-              <td>40500.00</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>ITEMS NUMBER</td>
-              <td>1</td>
-            </tr>
-          </table>
-          <div class="footer">
-            <p>Printed on: ${new Date().toLocaleString()}</p>
-            <p>CU Serial No: FT ANY LIAB</p>
-            <p>CU Invoice N:0110691570000001198</p>
-            <p>EO&E No 4172</p>
-          </div>
-        </body>
-        </html>
+          </body>
+          </html>
+
+
         `;
 
         return receiptHTML;
-      },       
+      }, 
+      formatMonth(value){
+          if(value){
+            return moment(String(value)).format('MMM YYYY');
+          }
+      },      
        //ID upload
        onChangePhoto(e) {
          console.log('loadings');
@@ -437,7 +459,7 @@
          reader.readAsDataURL(file);
        },
        getUnits() {
-             axios.get('/api/pmsunits/'+this.form.pms_property_id).then((response) => {
+             axios.get('/api/pmsvacantunits/'+this.form.pms_property_id).then((response) => {
      
              this.propunits = response.data.units;
              console.log("props", response)
@@ -458,13 +480,15 @@
             axios.get('/api/pmsunit/'+this.form.pms_unit_id).then((response) => {
      
              this.unitinfo = response.data.unit[0];
-               const deposit = parseInt(this.unitinfo.deposit);
-               const monthly_rent = parseInt(this.unitinfo.monthly_rent);
-               const garbage_fee = parseInt(this.unitinfo.garbage_fee);
-               const security_fee = parseInt(this.unitinfo.security_fee);
-             this.depositRent = deposit + monthly_rent + garbage_fee + security_fee;
+               this.deposit = parseInt(this.unitinfo.deposit);
+               this.monthly_rent = parseInt(this.unitinfo.monthly_rent);
+               this.garbage_fee = parseInt(this.unitinfo.garbage_fee);
+               this.security_fee = parseInt(this.unitinfo.security_fee);
+               this.water_deposit = parseInt(this.unitinfo.water_deposit);
+               this.electricity_deposit = parseInt(this.unitinfo.electricity_deposit);
+             this.depositRent = this.deposit + this.monthly_rent + this.garbage_fee + this.security_fee + this.water_deposit + this.electricity_deposit;
              this.unitNumber = this.unitinfo.unit_number;
-             console.log("unitinfo", this.depositRent)
+             console.log("unitinfo", response)
     
              });
        },     
@@ -503,52 +527,132 @@
           // this.$router.push('/pmstenants')
  
        },
-      submitStatement() {
-       let self = this;  // Store the reference to this
-       let payload = {
-          mpesa_code: this.form.mpesa_code,
-          payment_method: this.form.payment_method,
-          paid: this.form.cash,
-          balance: this.payableAmount,
-          total: this.depositRent,
-          pms_property_id: this.form.pms_property_id,
-          unit_number: this.unitNumber,
-          pms_tenant_id: this.tenantId
-       };
+        async submitStatement() {
+          try {
+            const payload = {
+              mpesa_code: this.form.mpesa_code,
+              payment_method: this.form.payment_method,
+              paid: this.form.cash,
+              balance: this.payableAmount,
+              total: this.depositRent,
+              pms_property_id: this.form.pms_property_id,
+              unit_number: this.unitNumber,
+              pms_tenant_id: this.tenantId
+            };
 
-       axios.post("api/pmsstatements", payload)
-          .then(function (response) {
-             console.log(response);
-             // self.step = 1;
-             toast.fire(
-                'Success!',
-                'Invoice saved!',
-                'success'
-             );
-          })
-          .catch(function (error) {
-             console.log(error);
-             // Swal.fire(
-             //    'error!',
-             //    // phone_error + id_error + pass_number,
-             //    'error'
-             // )
-          });
+            const response = await axios.post("api/pmsstatements", payload);
+            console.log(response);
+            this.statement = response.data.pmsstatement;
+            this.refNo = this.statement.ref_no;
+            this.propertyId = this.statement.pms_property_id;
+            await this.getProperty(); // Wait for getProperty to finish
+            await this.getTenant();
+            this.date = this.statement.created_at;
+            this.details = this.statement.details;
+            console.log("tenant-statement", this.propertyId);
+            
+            // toast.fire(
+            //   'Success!',
+            //   'Invoice saved!',
+            //   'success'
+            // );
 
-       this.$router.push('/pmstenants');
+            // Returning statement data to be used in printReceipt method
+            return this.statement;
+          } catch (error) {
+            console.log(error);
+            // Handle error if needed
+            throw error; // Propagate the error
+          }
+        },
+
+        async getProperty() {
+          try {
+            const response = await axios.get('/api/pmsproperty/' + parseInt(this.propertyId));
+            console.log("propertiit", response);
+            this.property = response.data.property[0];
+            this.name = this.property.name;
+            // Further processing of the response data if needed
+          } catch (error) {
+            console.error("Error fetching unit:", error);
+            // Handle error if needed
+          }
+        },
+
+        async getTenant() {
+          try {
+            const response = await axios.get('/api/pmstenant/' + parseInt(this.tenantId));
+            console.log("tenant", response);
+            this.tenant = response.data.tenant[0];
+            this.tenant = this.tenant.first_name + " " + this.tenant.last_name;
+            // Further processing of the response data if needed
+          } catch (error) {
+            console.error("Error fetching unit:", error);
+            // Handle error if needed
+          }
+        },
+ 
+      async printReceipt() {
+        try {
+          // Call submitStatement() method
+          const statement = await this.submitStatement();
+
+          // Navigate to the desired route after successful submission
+          this.$router.push('/pmstenants');
+
+          // Open a new window for printing
+          const printWindow = window.open("", "_blank");
+
+          // Build the content for printing
+          const receiptContent = this.buildReceiptContent(statement);
+
+          // Write the content to the new window
+          printWindow.document.write(receiptContent);
+
+          // Close the document stream
+          printWindow.document.close();
+
+          // Trigger the print dialog
+          printWindow.print();
+          toast.fire(
+              'Success!',
+              'Invoice saved!',
+              'success'
+            );
+        } catch (error) {
+          // Handle any errors that occurred during submission or printing
+          console.error("Error submitting statement or printing receipt:", error);
+          // For example, display an error message to the user
+          // this.errorMessage = "Failed to submit statement or print receipt. Please try again.";
+        }
       },
 
+
       formatNumber(value) {
-        // Use the toLocaleString method to format the number with commas and decimal places
-        return value.toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
-      },       
+          // Check if the value is null or undefined
+          if (value == null) return '';
+
+          // Convert value to string
+          let stringValue = value.toString();
+
+          // Split the string into integer and decimal parts
+          let [integerPart, decimalPart] = stringValue.split('.');
+
+          // Add commas to the integer part
+          integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+          // Add trailing zeros to the decimal part if needed
+          if (decimalPart == null) decimalPart = '00';
+          else if (decimalPart.length === 1) decimalPart += '0';
+
+          // Combine integer and decimal parts with a dot
+          return `${integerPart}.${decimalPart}`;
+        },       
  
     },
     mounted() {
        this.loadLists();
+       this.user = JSON.parse(localStorage.getItem('user'));
     },
     computed: {
         payableAmount() {
@@ -561,6 +665,9 @@
           // }
        
         },
+        showNoUnitsMessage() {
+          return !this.propunits || this.propunits.length === 0;
+        }
     },    
  
  }

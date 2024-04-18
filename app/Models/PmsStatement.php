@@ -23,6 +23,7 @@ class PmsStatement extends Model
         'status',
         'payment_method',
         'mpesa_code',
+        'water_bill'
     ];
 
     public function tenant()

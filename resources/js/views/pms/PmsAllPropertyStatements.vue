@@ -26,7 +26,7 @@
                             </router-link>
                         </li>
                         <li>
-                            <router-link :to="`/yearpmspropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
+                            <router-link :to="`/pmsyearpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
                                 :class="{ active: isActive }"
@@ -37,7 +37,7 @@
                             </router-link>
                         </li>
                         <li>
-                            <router-link :to="`/allpmspropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
+                            <router-link :to="`/pmsallpropertystatements/${propertyId}`" custom v-slot="{ href, navigate, isActive }">
                             <a
                                 :href="href"
                                 :class="{ active: isActive }"
@@ -88,13 +88,13 @@
                             <td>{{format_date(statement.created_at)}}</td>
                             <td>
                               <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  <button id="btnGroupDrop1" type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                   Action
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
                                   <a @click="navigateTo('/viewstatement/'+statement.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                            
-                                  <!-- <a v-if="user.id == 1" @click="navigateTo('/editstatement/'+statement.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a> -->
-                                  <a v-if="statement.status == 0" @click="settleTenant(statement.id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle</a>
+                                  <a v-if="statement.status == 0 && statement.water_bill == null" @click="invoiceTenant(statement.id)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Invoice</a>
+                                  <a v-if="statement.status == 0" @click="settleTenant(statement.id, statement.pms_tenant_id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle</a>
                                   </div>
                               </div>
                             </td>
@@ -193,8 +193,19 @@
 
           return this.statements.reduce((total, statement) => total + (statement[property] || 0), 0);
         },
-        settleTenant(id){
-            this.$router.push('/settlestatement/'+id)
+        invoiceTenant(id){
+            this.$router.push('invoicestatement/'+id)
+        },
+        settleTenant(id, tenantId){
+            // this.$router.push('/settlestatement/'+id)
+            this.$router.push({ 
+              name: 'settlestatement', // Assuming you have named routes
+              params: { 
+                id: id,
+                tenantId: tenantId
+              } 
+            });
+
         },
         generatePDF() {
             let pdfName = 'Full Statement';
@@ -202,7 +213,7 @@
             const maxRowsPerPage = 13; // Adjust this value based on the number of rows you want per page
 
             // Add top-left header
-            const rightHeaderText = 'Ingo Properties\nKakamega-Mumias Rd, Courseyard Business Center\nTel: 0759 509 462\nP. O. Box 2973-50100, Kakamega\nEmail: ingopropertymarketingkk@gmail.com';
+            const rightHeaderText = 'April Properties\nKakamega-Webuye Rd, ACK Building\nTel: 0720 020 401\nP. O. Box 2973-50100, Kakamega\nEmail: propertapril@gmail.com';
             const rightHeaderFontSize = 12;
             const rightheaderX = 20; // Adjust the X coordinate
             const rightheaderY = 10;
@@ -223,7 +234,7 @@
 
 
             // Add image at the top
-            const imageUrl = '/images/ingo-pdf-logo.png'; // Replace with the URL of your image
+            const imageUrl = '/images/apex-logo.png'; // Replace with the URL of your image
             const imageWidth = 50; // Adjust the width of the image as needed
             const imageHeight = 50; // Adjust the height of the image as needed
             const imageX = (doc.internal.pageSize.width - imageWidth) / 2;

@@ -85,7 +85,7 @@
                 <div class="row mb-3"></div>
                 <div class="form-group row">
                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Garbage Collection Fee</label>
+                      <label for="inputPassword" class="form-label">Monthly Garbage Collection Fee</label>
                       <div class="col-sm-10">
                         <input
                             type="number"
@@ -100,7 +100,7 @@
                       </div>
                    </div>
                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Security Fee</label>
+                      <label for="inputPassword" class="form-label">Monthly Security Fee</label>
                       <div class="col-sm-10">
                         <input
                             type="number"
@@ -117,6 +117,40 @@
 
                 </div>
                 <div class="row mb-3"></div>
+                <div class="form-group row">
+                   <div class="col-sm-6">
+                      <label for="inputPassword" class="form-label">Electricity Deposit</label>
+                      <div class="col-sm-10">
+                        <input
+                            type="number"
+                            placeholder="Electricity Deposit"
+                            id="title"
+                            name="title"
+                            v-model="form.electricity_deposit"
+                            class="form-control"
+                            required=""
+                        />
+                        <div class="invalid-feedback">Please enter title!</div>
+                      </div>
+                   </div>
+                   <div class="col-sm-6">
+                      <label for="inputPassword" class="form-label">Water Deposit</label>
+                      <div class="col-sm-10">
+                        <input
+                            type="number"
+                            placeholder="Water Deposit"
+                            id="title"
+                            name="title"
+                            v-model="form.water_deposit"
+                            class="form-control"
+                            required=""
+                        />
+                        <div class="invalid-feedback">Please enter title!</div>
+                      </div>
+                   </div>
+
+                </div>
+                 <div class="row mb-3"></div>
                 <div class="form-group row">
                    <div class="col-sm-6">
                       <label for="inputPassword" class="form-label">Electricity Meter No</label>
@@ -198,8 +232,16 @@
     data () {
        return {
           form: {
-          role_id: '',
-          title: '',
+          unit_number: '',
+          type: '',
+          deposit: '',
+          monthly_rent: '',
+          garbage_fee: '',
+          security_fee: '',
+          electricity_deposit: '',
+          water_deposit: '',
+          electricity_meter: '',
+          water_meter: ''
           
           },
           message: "",

@@ -746,7 +746,7 @@ const routes = [
         beforeEnter : guardMyroute,
     },
     {
-        path:'/settlestatement/:id',
+        path:'/settlestatement/:id/:tenantId',
         name: 'settlestatement',
         component: SettleStatement,
         beforeEnter : guardMyroute,

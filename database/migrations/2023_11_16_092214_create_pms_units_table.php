@@ -22,7 +22,9 @@ return new class extends Migration
             $table->integer('monthly_rent')->nullable();
             $table->string('garbage_fee')->nullable();
             $table->string('security_fee')->nullable();
+            $table->float('water_deposit')->nullable();
             $table->string('water_meter')->nullable();
+            $table->float('electricity_deposit')->nullable();
             $table->string('electricity_meter')->nullable();
             $table->integer('status')->default(0);
             $table->foreign('pms_property_id')

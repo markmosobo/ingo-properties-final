@@ -23,7 +23,9 @@ class PmsUnitController extends Controller
             'garbage_fee' => $request->garbage_fee,
             'security_fee' => $request->security_fee,
             'water_meter' => $request->water_meter,
-            'electricity_meter' => $request->electricity_meter
+            'electricity_meter' => $request->electricity_meter,
+            'water_deposit' => $request->water_deposit,
+            'electricity_deposit' => $request->electricity_deposit
         ]);
 
     }
@@ -38,6 +40,17 @@ class PmsUnitController extends Controller
             'units' => $units
         ], 200);
     }
+
+    public function vacantUnits(Request $request, $id)
+    {
+        $units = PmsUnit::where('pms_property_id', $id)->where('status', 0)->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => "Units",
+            'units' => $units
+        ], 200);
+    }    
 
     public function single(Request $request, $id)
     {
