@@ -278,7 +278,9 @@
                             </div>
                             <div class="col-md-4 col-lg-4">
                                 <div class="single__detail-area-price">
-                                    <h3 class="text-capitalize text-gray">KSH {{property.price}}/{{property.price_period ?? month}}</h3>
+                                    <h3 v-if="property.property_status == 'rent'" class="text-capitalize text-gray">KSH {{formatNumberWithCommas(property.price)}}/{{property.price_period ?? month}}</h3>
+                                    <h3 v-else-if="property.property_status == 'sale'" class="text-capitalize text-gray">KSH {{formatNumberWithCommas(property.price)}}</h3>
+                                    <h3 v-else class="text-capitalize text-gray">KSH {{formatNumberWithCommas(property.price)}}</h3>
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
                                             <a href="#" class="badge badge-success p-2 rounded"><i
@@ -1186,6 +1188,9 @@ export default {
         getPhoto()
         {
             return "/storage/properties/";
+        },
+         formatNumberWithCommas(number) {
+          return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         },
         getData() {
             axios.get('/api/property/'+this.$route.params.id, {

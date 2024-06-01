@@ -34,7 +34,6 @@ return new class extends Migration
             $table->float('paid')->nullable();
             $table->float('water_bill')->nullable();
             $table->float('balance')->nullable();
-            $table->decimal('commission', 8, 2)->nullable();            
             $table->timestamps();
         });
     }

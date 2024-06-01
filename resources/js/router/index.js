@@ -18,8 +18,10 @@ import FeaturedProperties from '../views/properties/FeaturedProperties.vue'
 import MyProperties from '../views/properties/MyProperties.vue'
 import AddProperty from '../views/properties/AddProperty.vue'
 import AddPmsProperty from '../views/pms/AddPmsProperty.vue'
+import EditPmsLandlord from '../views/pms/EditPmsLandlord.vue'
 import AddPmsLandlord from '../views/pms/AddPmsLandlord.vue'
 import AddPmsTenant from '../views/pms/AddPmsTenant.vue'
+import AddPmsCurrentTenant from '../views/pms/AddPmsCurrentTenant.vue'
 import ViewProperty from '../views/properties/ViewProperty.vue'
 import EditProperty from '../views/properties/EditProperty.vue'
 import AllCategories from '../views/categories/AllCategories.vue'
@@ -98,6 +100,7 @@ import PmsAllTenantStatements from '../views/pms/PmsAllTenantStatements.vue'
 import ViewStatement from '../views/pms/ViewStatement.vue'
 import EditStatement from '../views/pms/EditStatement.vue'
 import SettleStatement from '../views/pms/SettleStatement.vue'
+import InvoiceStatement from '../views/pms/InvoiceStatement.vue'
 
 function guardMyroute(to, from, next)
 {
@@ -594,6 +597,12 @@ const routes = [
         name: 'add-pmslandlord',
         component: AddPmsLandlord,
         beforeEnter : guardMyroute,
+    }, 
+    {
+        path:'/edit-pmslandlord/:id',
+        name: 'edit-pmslandlord',
+        component: EditPmsLandlord,
+        beforeEnter : guardMyroute,
     },    
     {
         path:'/pmstenants',
@@ -605,6 +614,12 @@ const routes = [
         path:'/add-pmstenant',
         name: 'add-pmstenant',
         component: AddPmsTenant,
+        beforeEnter : guardMyroute,
+    }, 
+    {
+        path:'/add-pmscurrenttenant',
+        name: 'add-pmscurrenttenant',
+        component: AddPmsCurrentTenant,
         beforeEnter : guardMyroute,
     }, 
     {
@@ -743,6 +758,12 @@ const routes = [
         path:'/editstatement/:id',
         name: 'editstatement',
         component: EditStatement,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/invoicestatement/:id',
+        name: 'invoicestatement',
+        component: InvoiceStatement,
         beforeEnter : guardMyroute,
     },
     {

@@ -18,6 +18,9 @@
         </router-link>
       </li><!-- End Dashboard Nav -->
 
+      <li class="nav-heading">Website Management</li>
+
+
       <li v-show="user.role_id == 1" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-menu-button-wide"></i><span>Manage Properties</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -251,7 +254,7 @@
         </ul>
       </li><!-- End Components Nav --> 
 
-      <li class="nav-heading">Property Management System</li>
+      <li class="nav-heading">Property Management</li>
 
       <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
@@ -303,11 +306,11 @@
             </a>
             </router-link>
           </li>
-          <li>
+<!--           <li>
             <a href="icons-remix.html">
               <i class="bi bi-circle"></i><span>Statements</span>
             </a>
-          </li>
+          </li> -->
           <!--<li>
             <a href="icons-boxicons.html">
               <i class="bi bi-circle"></i><span>Boxicons</span>

@@ -40,4 +40,15 @@ class LandlordController extends Controller
             'message' => "Landlord Deleted successfully!",
         ], 200);
     }
+
+    public function single(Request $request, $id)
+    {
+        $landlord = Landlord::findOrFail($id);
+
+        return response()->json([
+            'status' => true,
+            'message' => "retreived",
+            'landlord' => $landlord
+        ], 200);
+    }
 }

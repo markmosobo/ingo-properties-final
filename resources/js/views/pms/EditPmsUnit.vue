@@ -191,7 +191,16 @@
                     <button @click.prevent="back()" class="btn btn-sm btn-dark rounded-pill">Back</button>
                 </div>
                 <div class="col-sm-6 col-lg-6 text-end">
-                    <button type="submit" style="background-color: darkgreen; border-color: darkgreen;" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Submit</button>
+                    <!-- <button type="submit" style="background-color: darkgreen; border-color: darkgreen;" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Submit</button> -->
+                    <button type="submit" 
+                             style="background-color: darkgreen; border-color: darkgreen;" 
+                             @click.prevent="submit()" 
+                             :class="{ 'btn-success': !submitting, 'btn-secondary': submitting }"
+                             class="btn rounded-pill"
+                             :disabled="submitting">
+                         <span v-if="!submitted">Submit</span>
+                         <span v-else>Submitting...</span>
+                     </button>
                 </div>
             </div>
           </fieldset>
@@ -247,6 +256,8 @@
           loading: false,
           step: 1, 
           roles: [],
+          submitting: false,
+          submitted: false
        }   
     },
     methods: {
@@ -265,12 +276,30 @@
         getUnit() {
              axios.get('/api/pmsunit/'+this.$route.params.id).then((response) => {
      
-             this.form = response.data.unit[0];
+             this.form = response.data.unit;
              console.log("props", this.form)
     
              });
-        },       
-       submit(){
+        }, 
+        async submit() {
+            // Start submitting process
+            this.submitting = true;
+            
+            try {
+                // Simulate asynchronous submission process (you would replace this with your actual submission logic)
+                await this.submitForm();
+
+                // Submission successful
+                this.submitted = true;
+            } catch (error) {
+                // Handle submission error
+                console.error("Submission error:", error);
+            } finally {
+                // End submitting process
+                this.submitting = false;
+            }
+        },      
+       async submitForm(){
           axios.put("/api/pmsunit/"+this.$route.params.id, this.form)
           .then(function (response) {
              console.log(response);

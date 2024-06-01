@@ -104,7 +104,7 @@
                    </div>  
                    <div class="col-sm-6">
                       <label for="validationCustom04" class="form-label"
-                      >Unit*</label
+                      >Unit*<p>Current Unit: <strong>{{unitNumber}}</strong></p></label
                       >
                       <div class="col-sm-10">
                          <select :disabled="!form.pms_property_id" name="unit" v-model="form.pms_unit_id" class="form-select" id="">
@@ -125,7 +125,7 @@
                     <button @click.prevent="back()" class="btn btn-sm btn-dark rounded-pill">Back</button>
                 </div>
                 <div class="col-sm-6 col-lg-6 text-end">
-                    <button type="submit" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Submit</button>
+                    <button type="submit" @click.prevent="submit()" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill">Submit</button>
                 </div>
             </div>
           </fieldset>
@@ -176,7 +176,8 @@
           step: 1, 
           roles: [],
           propunits: [],
-          properties: []
+          properties: [],
+          unitNumber: ''
        }   
     },
     methods: {
@@ -186,8 +187,9 @@
         getTenant() {
              axios.get('/api/pmstenant/'+this.$route.params.id).then((response) => {
      
-             this.form = response.data.tenant[0];
-             console.log("props", this.form)
+             this.form = response.data.tenant;
+             this.unitNumber = response.data.tenant.unit.unit_number;
+             console.log("props", response)
     
              });
         }, 

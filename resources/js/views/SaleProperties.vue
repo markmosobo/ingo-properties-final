@@ -499,7 +499,7 @@
                                                                     <ul class="list-inline my-auto ml-auto price">
                                                                         <li class="list-inline-item ">
 
-                                                                            <h6>KSH{{property.price.toLocaleString()}}</h6>
+                                                                            <h6>KSH{{formatNumberWithCommas(property.price)}}</h6>
                                                                         </li>
 
                                                                     </ul>
@@ -592,7 +592,7 @@
                                                             <ul class="list-inline my-auto ml-auto">
                                                                 <li class="list-inline-item">
 
-                                                                    <h6>KSH{{(property.price).toLocaleString()}}</h6>
+                                                                    <h6>KSH{{formatNumberWithCommas(property.price)}}</h6>
                                                                 </li>
 
                                                             </ul>
@@ -637,6 +637,9 @@ export default {
     methods: {
         viewProperty(id){
             this.$router.push('/properties/'+id)
+        },
+         formatNumberWithCommas(number) {
+          return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         },
         getPhoto()
         {

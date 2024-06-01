@@ -5,7 +5,7 @@
           <!-- General Form Elements -->
           <form @submit.prevent="">
           <fieldset v-if="step == 1">
-             <h5 class="card-title text-center">Add landlord</h5>
+             <h5 class="card-title text-center">Add Landlord</h5>
  
              <div class="row m-auto p-auto justify-content- g-3 needs-validation" novalidate="" autocomplete="off">
                 <div class="row  mb-3"></div>
@@ -86,6 +86,41 @@
 
                 </div>
 
+                <div class="row mb-3"></div>
+                <div class="form-group row">
+                   <div class="col-sm-6">
+                      <label for="inputPassword" class="form-label">Physical Address</label>
+                      <div class="col-sm-10">
+                        <input
+                            type="text"
+                            placeholder="Physical Address"
+                            id="title"
+                            name="title"
+                            v-model="form.address"
+                            class="form-control"
+                            required=""
+                        />
+                        <div class="invalid-feedback">Please enter title!</div>
+                      </div>
+                   </div>
+                   <div class="col-sm-6">
+                      <label for="inputPassword" class="form-label">National ID Number</label>
+                      <div class="col-sm-10">
+                        <input
+                            type="text"
+                            placeholder="National ID Number"
+                            id="title"
+                            name="title"
+                            v-model="form.id_number"
+                            class="form-control"
+                            required=""
+                        />
+                        <div class="invalid-feedback">Please enter title!</div>
+                      </div>
+                   </div>
+
+                </div>
+
              </div>
              <!--  button -->
              <div class="col-lg-12 felx mt-4 row">
@@ -93,7 +128,16 @@
                     <!-- <button @click.prevent="prev()" class="btn btn-dark">Previous</button> -->
                 </div>
                 <div class="col-sm-6 col-lg-6 text-end">
-                    <button type="submit" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Submit</button>
+                    <!-- <button type="submit" style="background-color: darkgreen; border-color: darkgreen;" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Submit</button> -->
+                    <button type="submit" 
+                          style="background-color: darkgreen; border-color: darkgreen;" 
+                          @click.prevent="submit()" 
+                          :class="{ 'btn-success': !submitting, 'btn-secondary': submitting }"
+                          class="btn rounded-pill"
+                          :disabled="submitting">
+                      <span v-if="!submitted">Submit</span>
+                      <span v-else>Submitting...</span>
+                  </button>
                 </div>
             </div>
           </fieldset>
@@ -143,6 +187,8 @@
           loading: false,
           step: 1, 
           roles: [],
+          submitting: false,
+          submitted: false
        }   
     },
     methods: {
@@ -158,7 +204,25 @@
          }
          reader.readAsDataURL(file);
        },
-       submit(){
+       async submit() {
+            // Start submitting process
+            this.submitting = true;
+            
+            try {
+                // Simulate asynchronous submission process (you would replace this with your actual submission logic)
+                await this.submitForm();
+
+                // Submission successful
+                this.submitted = true;
+            } catch (error) {
+                // Handle submission error
+                console.error("Submission error:", error);
+            } finally {
+                // End submitting process
+                this.submitting = false;
+            }
+        },
+       async submitForm(){
           axios.post("api/landlords", this.form)
           .then(function (response) {
              console.log(response);

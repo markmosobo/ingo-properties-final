@@ -53,9 +53,10 @@
                             <th scope="row"><a href="#">
                               <img :src="getPhoto() + blog.image_path" />
                             </a></th>
-                            <td>{{blog.title.substring(0,10)+".."}}</td>
-                            <td>{{blog.category.name}}</td>
-                            <td>{{blog.content.substring(0,10)+".."}}</td>
+                            <td>{{ blog.title ? blog.title.substring(0, 10) + '...' : '' }}</td>
+                            <td>{{ blog.category.name }}</td>
+                            <td>{{ blog.content ? blog.content.substring(0, 10) + '...' : '' }}</td>
+              
                             <td>
                               <span v-if="blog.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Pending</span>   
                               <span v-else-if="blog.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Approved</span>

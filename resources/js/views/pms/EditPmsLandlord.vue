@@ -5,7 +5,7 @@
           <!-- General Form Elements -->
           <form @submit.prevent="">
           <fieldset v-if="step == 1">
-             <h5 class="card-title text-center">Add unit</h5>
+             <h5 class="card-title text-center">Edit Landlord</h5>
  
              <div class="row m-auto p-auto justify-content- g-3 needs-validation" novalidate="" autocomplete="off">
                 <div class="row  mb-3"></div>
@@ -20,14 +20,14 @@
                       class="form-control"
                    />
                     <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Unit Number*</label>
+                      <label for="inputPassword" class="form-label">First Name*</label>
                       <div class="col-sm-10">
                         <input
                             type="text"
-                            placeholder="Unit Number"
+                            placeholder="First Name"
                             id="title"
                             name="title"
-                            v-model="form.unit_number"
+                            v-model="form.first_name"
                             class="form-control"
                             required=""
                         />
@@ -35,30 +35,33 @@
                       </div>
                    </div>
                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Type*</label>
+                      <label for="inputPassword" class="form-label">Last Name*</label>
                       <div class="col-sm-10">
-                         <select name="unit" v-model="form.type" class="form-select" id="">
-                            <option value="0" selected disabled>Select Type</option>
-                            <option value="Residential">Residential</option>
-                            <option value="Commercial">Commercial</option>
+                        <input
+                            type="text"
+                            placeholder="Last Name"
+                            id="title"
+                            name="title"
+                            v-model="form.last_name"
+                            class="form-control"
+                            required=""
+                        />
+                        <div class="invalid-feedback">Please enter title!</div>
+                      </div>
+                   </div>
  
-                         </select>
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
- 
                 </div>
                 <div class="row mb-3"></div>
                 <div class="form-group row">
                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Rent Deposit*</label>
+                      <label for="inputPassword" class="form-label">Email Address</label>
                       <div class="col-sm-10">
                         <input
-                            type="number"
-                            placeholder="Deposit"
+                            type="text"
+                            placeholder="Email Address"
                             id="title"
                             name="title"
-                            v-model="form.deposit"
+                            v-model="form.email"
                             class="form-control"
                             required=""
                         />
@@ -66,14 +69,14 @@
                       </div>
                    </div>
                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Monthly Rent*</label>
+                      <label for="inputPassword" class="form-label">Phone Number</label>
                       <div class="col-sm-10">
                         <input
-                            type="number"
-                            placeholder="Monthly Rent"
+                            type="text"
+                            placeholder="Phone Number"
                             id="title"
                             name="title"
-                            v-model="form.monthly_rent"
+                            v-model="form.phone_no"
                             class="form-control"
                             required=""
                         />
@@ -82,17 +85,18 @@
                    </div>
 
                 </div>
+
                 <div class="row mb-3"></div>
                 <div class="form-group row">
                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Monthly Garbage Collection Fee</label>
+                      <label for="inputPassword" class="form-label">Physical Address</label>
                       <div class="col-sm-10">
                         <input
-                            type="number"
-                            placeholder="Optional e.g 500"
+                            type="text"
+                            placeholder="Physical Address"
                             id="title"
                             name="title"
-                            v-model="form.garbage_fee"
+                            v-model="form.address"
                             class="form-control"
                             required=""
                         />
@@ -100,14 +104,14 @@
                       </div>
                    </div>
                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Monthly Security Fee</label>
+                      <label for="inputPassword" class="form-label">National ID Number</label>
                       <div class="col-sm-10">
                         <input
-                            type="number"
-                            placeholder="Optional e.g 500"
+                            type="text"
+                            placeholder="National ID Number"
                             id="title"
                             name="title"
-                            v-model="form.security_fee"
+                            v-model="form.id_number"
                             class="form-control"
                             required=""
                         />
@@ -116,74 +120,7 @@
                    </div>
 
                 </div>
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Electricity Deposit</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="number"
-                            placeholder="Optional e.g 500"
-                            id="title"
-                            name="title"
-                            v-model="form.electricity_deposit"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Water Deposit</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="number"
-                            placeholder="Optional e.g 500"
-                            id="title"
-                            name="title"
-                            v-model="form.water_deposit"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
 
-                </div>
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Electricity Meter No</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="number"
-                            placeholder="Optional"
-                            id="title"
-                            name="title"
-                            v-model="form.electricity_meter"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Water Meter No</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="number"
-                            placeholder="Optional"
-                            id="title"
-                            name="title"
-                            v-model="form.water_meter"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
-
-                </div>
              </div>
              <!--  button -->
              <div class="col-lg-12 felx mt-4 row">
@@ -191,7 +128,16 @@
                     <!-- <button @click.prevent="prev()" class="btn btn-dark">Previous</button> -->
                 </div>
                 <div class="col-sm-6 col-lg-6 text-end">
-                    <button type="submit" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Submit</button>
+                    <!-- <button type="submit" style="background-color: darkgreen; border-color: darkgreen;" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Submit</button> -->
+                    <button type="submit" 
+                          style="background-color: darkgreen; border-color: darkgreen;" 
+                          @click.prevent="submit()" 
+                          :class="{ 'btn-success': !submitting, 'btn-secondary': submitting }"
+                          class="btn rounded-pill"
+                          :disabled="submitting">
+                      <span v-if="!submitted">Submit</span>
+                      <span v-else>Submitting...</span>
+                  </button>
                 </div>
             </div>
           </fieldset>
@@ -232,14 +178,8 @@
     data () {
        return {
           form: {
-          unit_number: '',
-          type: '',
-          deposit: '',
-          monthly_rent: '',
-          garbage_fee: '0.00',
-          security_fee: '0.00',
-          electricity_deposit: '0.00',
-          water_deposit: '0.00'
+          role_id: '',
+          title: '',
           
           },
           message: "",
@@ -247,6 +187,8 @@
           loading: false,
           step: 1, 
           roles: [],
+          submitting: false,
+          submitted: false
        }   
     },
     methods: {
@@ -262,14 +204,40 @@
          }
          reader.readAsDataURL(file);
        },
-       submit(){
-          axios.post("/api/pmsunits/"+this.$route.params.id, this.form)
+        getLandlord() {
+             axios.get('/api/landlord/'+this.$route.params.id).then((response) => {
+     
+             this.form = response.data.landlord;
+             console.log("props", this.form)
+    
+             });
+        },
+       async submit() {
+            // Start submitting process
+            this.submitting = true;
+            
+            try {
+                // Simulate asynchronous submission process (you would replace this with your actual submission logic)
+                await this.submitForm();
+
+                // Submission successful
+                this.submitted = true;
+            } catch (error) {
+                // Handle submission error
+                console.error("Submission error:", error);
+            } finally {
+                // End submitting process
+                this.submitting = false;
+            }
+        },
+       async submitForm(){
+          axios.put("/api/landlord/"+this.$route.params.id, this.form)
           .then(function (response) {
              console.log(response);
              // this.step = 1;
              toast.fire(
                 'Success!',
-                'Unit added!',
+                'Landlord details updated!',
                 'success'
              )
           })
@@ -281,11 +249,12 @@
              //    'error'
              // )
           });
-          this.$router.push('/pmsunits/'+this.$route.params.id)
+          this.$router.push('/pmslandlords')
        }
  
     },
     mounted() {
+      this.getLandlord();
     }
  
  }

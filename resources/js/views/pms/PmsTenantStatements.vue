@@ -150,7 +150,7 @@
         getTenant()
         {
           axios.get('/api/pmstenant/'+ this.$route.params.id).then((response) => {
-            this.tenant = response.data.tenant[0] 
+            this.tenant = response.data.tenant; 
             console.log("dat", this.tenant)
           }).catch(() => {
               console.log('error')

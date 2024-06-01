@@ -278,7 +278,8 @@
                             </div>
                             <div class="col-md-4 col-lg-4">
                                 <div class="single__detail-area-price">
-                                    <h3 class="text-capitalize text-gray">KSH {{property.price}}/{{property.price_period ? property.price_period : 'Month'}}</h3>
+                                    <h3 v-if="property.property_status == 'rent'" class="text-capitalize text-gray">KES {{formatNumber(property.price)}}/{{property.price_period ? property.price_period : 'Month'}}</h3>
+                                    <h3 v-else class="text-capitalize text-gray">KES {{formatNumber(property.price)}}</h3>
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
                                             <a href="#" class="badge badge-success p-2 rounded"><i
@@ -308,8 +309,13 @@
                             <img class="slider" :src="getPhoto() + currentImage" alt="Image 1">
                             <div class="thumbnail-container">
                                 <div class="slider">
-                                <img v-for="item in property.images" :key="item.id" class="thumbnail" :src="getPhoto() + item.name" alt="Image 1" @click="changeImage(item.id)">
-                                <!-- <img class="thumbnail" :src="getPhoto() + image2" alt="Image 2" @click="changeImage(image2)">
+                                <img v-for="item in property.images"
+                                 :key="item.id" 
+                                 class="thumbnail"
+                                 :src="getPhoto() + item.name"
+                                 alt="Image 1"
+                                 @click="changeImage(item.id)">
+                       <!--          <img class="thumbnail" :src="getPhoto() + image2" alt="Image 2" @click="changeImage(image2)">
                                 <img class="thumbnail" :src="getPhoto() + image3" alt="Image 3" @click="changeImage(image3)"> -->
                                 </div>    
                             </div>
@@ -681,7 +687,7 @@
                                         <div class="col-md-6 col-lg-6">
                                             <ul class="property__detail-info-list list-unstyled">
                                                 <!-- <li><b>Property ID:</b> {{property.id}}</li> -->
-                                                <li><b>Price:</b> KSH {{property.price}}</li>
+                                                <li><b>Price:</b> KES {{formatNumber(property.price)}}</li>
                                                 <li><b>Property Size:</b> {{property.size}} Sq Ft</li>
                                                 <li><b>Bedrooms:</b> {{property.bedrooms}}</li>
                                                 <li><b>Bathrooms:</b> {{property.bathrooms}}</li>
@@ -703,7 +709,7 @@
                                         <div class="col-md-6 col-lg-6">
                                             <ul class="property__detail-info-list list-unstyled">
                                                 <!-- <li><b>Property ID:</b> {{property.id}}</li> -->
-                                                <li><b>Price:</b> KSH {{property.price}}</li>
+                                                <li><b>Price:</b> KES {{property.price}}</li>
                                                 <li><b>Property Size:</b> {{property.size}} Sq Ft</li>
                                                 <li><b>Estate Name:</b> {{property.estate_name}}</li>
                                                 <li v-if="property.negotiable == 1"><b>Negotiable:</b> Yes</li>
@@ -724,8 +730,8 @@
                                         <div class="col-md-6 col-lg-6">
                                             <ul class="property__detail-info-list list-unstyled">
                                                 <!-- <li><b>Property ID:</b> {{property.id}}</li> -->
-                                                <li><b>Price:</b> KSH {{property.price}}</li>
-                                                <li><b>Land Area:</b> {{property.land_area}} Acres</li>
+                                                <li><b>Price:</b> KES {{formatNumber(property.price)}}</li>
+                                                <li><b>Land Area:</b> {{property.land_area}} Acre(s)</li>
                                                 <li><b>Land Type:</b> {{property.land_type}}</li>
                                                 <li v-if="property.negotiable == 1"><b>Negotiable:</b> Yes</li>
                                             </ul>
@@ -1212,6 +1218,7 @@
 <script>
 import Branch from "../components/Branch.vue";
 import axios from 'axios';
+import numeral from 'numeral';
 
 export default {
     data() {
@@ -1268,6 +1275,9 @@ export default {
             axios.get('/api/lists').then((response) => {
                 this.categories = response.data.lists.categories
             })
+        },
+        formatNumber(value) {
+          return numeral(value).format('0,0');
         },
         navigate(id){
             this.$router.push('/categoryproperties/'+id)

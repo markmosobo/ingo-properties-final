@@ -53,16 +53,16 @@
                       <div class="invalid-feedback">Please enter category!</div>
                       </div>
                    </div>                
-                   <div class="col-sm-6">
-                       <label for="validationCustom04" class="form-label">% of Commission*
-                        <p>the percentage to be deducted from the total rent collected</p>
-                       </label>
-                       <div class="col-sm-10">
-                          <input type="text" placeholder="Write in decimal e.g 0.05" v-model="form. commission" id="location" name="location" class="form-control"
-                             required="" />
+                  <div class="col-sm-6">
+                      <label for="validationCustom04" class="form-label">% of Commission*
+                          <p>the percentage to be deducted from the total rent collected. Click <strong @click="showFixed">here</strong> to add fixed amount</p>
+                      </label>
+                      <div class="col-sm-10">
+                          <input v-if="!showFixedCommission" type="text" placeholder="Write in decimal e.g 0.05" v-model="form.commission" id="location" name="location" class="form-control" required />
+                          <input v-else type="text" placeholder="Fixed commission amount" v-model="form.fixed_commission" id="fixedCommission" name="fixedCommission" class="form-control" required />
                           <div class="invalid-feedback">Please enter location!</div>
-                       </div>
-                    </div>               
+                      </div>
+                  </div>             
                    </div>
                    <div class="row mb-3"></div>
                
@@ -73,7 +73,16 @@
                     <!-- <button @click.prevent="prev()" class="btn btn-dark">Previous</button> -->
                 </div>
                 <div class="col-sm-6 col-lg-6 text-end">
-                    <button type="submit" @click.prevent="submit()" class="btn btn-success rounded-pill">Submit</button>
+                    <!-- <button type="submit" @click.prevent="submit()" class="btn btn-success rounded-pill">Submit</button> -->
+                     <button type="submit" 
+                             style="background-color: darkgreen; border-color: darkgreen;" 
+                             @click.prevent="submit()" 
+                             :class="{ 'btn-success': !submitting, 'btn-secondary': submitting }"
+                             class="btn rounded-pill"
+                             :disabled="submitting">
+                         <span v-if="!submitted">Submit</span>
+                         <span v-else>Submitting...</span>
+                     </button>
                 </div>
             </div>
  
@@ -114,24 +123,50 @@
     data () {
        return {
           user: [],
-          form: {         
+          form: { 
+          commission: '',
+          fixed_commission: '',        
           created_by: '',
           media: [],
           property_status: '',
           
           },
+          showFixedCommission: false,
           message: "",
           successMessage: "",
           loading: false,
           step: 1, 
           landlords: [],
+          submitting: false,
+          submitted: false
        }   
     },
     methods: {
        addLandlord(){
          this.$router.push('/add-pmslandlord')
        },
-         submit() {
+        showFixed() {
+           this.showFixedCommission = true;
+       },
+       async submit() {
+            // Start submitting process
+            this.submitting = true;
+            
+            try {
+                // Simulate asynchronous submission process (you would replace this with your actual submission logic)
+                await this.submitForm();
+
+                // Submission successful
+                this.submitted = true;
+            } catch (error) {
+                // Handle submission error
+                console.error("Submission error:", error);
+            } finally {
+                // End submitting process
+                this.submitting = false;
+            }
+        },
+         async submitForm() {
              let self = this;
              axios.post("api/pmsproperties", this.form)
                  .then((response) => { // Use arrow function here

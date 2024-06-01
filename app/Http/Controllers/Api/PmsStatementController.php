@@ -17,14 +17,14 @@ class PmsStatementController extends Controller
             $date = str_replace('-"', '/', $orgDate);
             $newDate = date("YmdHis", strtotime($date));
             $refno = "INV".$newDate." ".$request->unit_number." Rent+Deposit @".$request->total;
-            // if($request->balance > 0)
-            // {
-            //     $paystatus = 0;
-            // }
-            // else
-            // {
-            //     $paystatus = 1;
-            // }
+            if($request->balance <= 0)
+            {
+                $payStatus = 1;
+            }
+            else
+            {
+                $payStatus = 0;
+            } // }
             $pmsstatement = PmsStatement::create([
                 'ref_no' => $refno,
                 'pms_property_id' => $request->pms_property_id,
@@ -35,6 +35,7 @@ class PmsStatementController extends Controller
                 'balance' => $request->balance,
                 'status' => 0,
                 'payment_method' => $request->payment_method,
+                'water_bill' => 0                              
             ]);
 
             return response()->json([
@@ -105,6 +106,27 @@ class PmsStatementController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => "Statement Settled successfully!",
+                'statement' => $pmsstatement
+            ], 200);
+        }
+    }
+
+        public function invoice(Request $request, $id)
+    {
+        $pmsstatement = PmsStatement::findOrFail($id);
+
+        if ($pmsstatement) {
+
+            $pmsstatement->update([
+                'water_bill' => $request->water_bill,
+                'total' => $request->water_bill + $pmsstatement->total,
+                'status' => 0,
+            ]);
+                
+
+            return response()->json([
+                'status' => true,
+                'message' => "Statement Invoiced successfully!",
                 'statement' => $pmsstatement
             ], 200);
         }

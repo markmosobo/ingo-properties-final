@@ -419,9 +419,9 @@ export default{
         <body>
           <div class="receipt">
             <div class="receipt-header">
-              <h1>April Properties</h1>
-              <p>Kakamega-Webuye Rd, ACK Building</p>
-              <p>Phone: (0720) 020-401 | Email: propertapril@gmail.com</p>
+              <h1>INGO PROPERTIES</h1>
+              <p>Cosyard Business Centre-Kakamega Mumias Rd, Kakamega</p>
+              <p>Phone: (254) 759509462 | Email: ingoproperties@gmail.com</p>
             </div>
             <div class="receipt-info">
               <p><strong>Invoice Number:</strong> ${this.refNo}</p>
@@ -517,7 +517,7 @@ export default{
       getUnit(unitNumber) {
           axios.get('/api/pmsunit/' + parseInt(unitNumber))
               .then((response) => {
-                this.unit = response.data.unit[0];
+                this.unit = response.data.unit;
                 this.unitName = this.unit.unit_number;
                 this.unitRent = this.unit.monthly_rent;
                 this.unitSecurityFee = this.unit.security_fee;
