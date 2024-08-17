@@ -83,8 +83,50 @@
                       </div>
                 </div>
                 </div>
+
+                 <div class="row mb-3">
+                    <div class="col-12">
+                      <label for="mediaPreview" class="form-label">Uploaded Media</label>
+                      <div class="d-flex flex-wrap" id="mediaPreview">
+                        <div
+                          v-for="(media, index) in form.images"
+                          :key="media.id"
+                          class="position-relative m-2"
+                        >
+                          <img
+                            :src="getImageUrl(media.name)"
+                            class="img-thumbnail"
+                            :alt="'media-' + index"
+                            style="width: 150px; height: 100px; object-fit: cover;"
+                          />
+                          <button
+                            type="button"
+                            class="btn btn-danger btn-sm position-absolute top-0 end-0"
+                            @click="removeImage(media)"
+                          >
+                            X
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+                  <!-- Add New Media Checkbox -->
+                  <div class="row mb-3"></div>
+                    <div class="form-group row">
+                    <div class="col-sm-6">
+                      <input
+                        type="checkbox"
+                        id="addNewMedia"
+                        v-model="form.addNewMedia"
+                        class="form-check-input me-2"
+                      />
+                      <label for="addNewMedia" class="form-check-label">Add New Media</label>
+                    </div>
+                  </div>
+
                 <div class="row mb-3"></div>
-                <div class="form-group row">
+                <div v-if="form.addNewMedia" class="form-group row">
                     <div class="col-sm-6">
                       <label for="inputPassword" class="form-label">Media</label>
                         <Uploader
@@ -555,6 +597,7 @@
                 tv: '',
                 wardrobe: '',
                 wifi: '',
+                addNewMedia: false,
                 media: {
                     list: [], //all media (savedMedia + addedAdded)
                     saved: [],
@@ -591,6 +634,19 @@
         },
         removeMedia(removedImage, removedMedia){
             this.form.media.removed = removedMedia
+        },
+        getImageUrl(fileName) {
+          const baseUrl = '/storage/properties/'; // Replace with your base URL
+          return baseUrl + fileName;
+        },
+        removeImage(media) {
+          console.log(media);
+          axios.delete('/api/propertyimage/'+media.id)
+            .then((response) => {
+                console.log(response)
+                this.getData();
+                // window.location.reload();
+            })
         },
         loadLists() {
              axios.get('/api/lists').then((response) => {

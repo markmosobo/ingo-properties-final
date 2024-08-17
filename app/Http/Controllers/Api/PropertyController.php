@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Property;
+use App\Models\Image;
 use App\Http\Requests\StorePropertyRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -120,31 +121,67 @@ class PropertyController extends Controller
      * @param  \App\Models\Property  $property
      * @return \Illuminate\Http\Response
      */
+    // public function update(Request $request, $id)
+    // {
+    //     $property = Property::findOrFail($id);
+    //     if(isset($request->media)){
+    //         foreach($request->media as $image){
+    //             $from = storage_path('app/public/tmp/uploads/' . $image['name']);
+    //             $to = storage_path('app/public/properties/' . $image['name']);
+    
+    //             File::move($from, $to);
+    //             $property->images()->create([
+    //                 'name' => $image['name'],
+    //             ]);
+    //         }
+    //     }
+    //     else{
+    //         $property->update($request->all());
+    //     }
+    //     // $property->update($request->all());
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => "Property Updated successfully!",
+    //         'property' => $property
+    //     ], 200);
+    // }
+
     public function update(Request $request, $id)
     {
         $property = Property::findOrFail($id);
-        if(isset($request->media)){
-            foreach($request->media as $image){
-                $from = storage_path('app/public/tmp/uploads/' . $image['name']);
-                $to = storage_path('app/public/properties/' . $image['name']);
-    
-                File::move($from, $to);
-                $property->images()->create([
-                    'name' => $image['name'],
-                ]);
+
+        // Check if the 'list' or 'added' arrays are present and not empty
+        if (isset($request->list) && is_array($request->list && $request->addNewMedia == 'true')) {
+            foreach ($request->list as $image) {
+                // Ensure 'name' exists in each image
+                if (isset($image['name'])) {
+                    $from = storage_path('app/public/tmp/uploads/' . $image['name']);
+                    $to = storage_path('app/public/properties/' . $image['name']);
+
+                    File::move($from, $to);
+                    $property->images()->create([
+                        'name' => $image['name'],
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Image data missing 'name' key.",
+                    ], 400);
+                }
             }
-        }
-        else{
+        } else {
+            // Handle the update for cases where there are no new images to process
             $property->update($request->all());
         }
-        // $property->update($request->all());
 
         return response()->json([
             'status' => true,
             'message' => "Property Updated successfully!",
-            'property' => $property
+            'property' => $request
         ], 200);
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -161,6 +198,19 @@ class PropertyController extends Controller
         return response()->json([
             'status' => true,
             'message' => "Property Deleted successfully!",
+        ], 200);
+        }
+    }
+
+    public function destroyImage(Request $request, $id)
+    {
+        $property = Image::findOrFail($id);
+        if($property){
+        $property->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => "Property Image Deleted successfully!",
         ], 200);
         }
     }

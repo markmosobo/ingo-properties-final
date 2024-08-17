@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\PmsUnitController;
 use App\Http\Controllers\Api\PmsTenantController;
 use App\Http\Controllers\Api\PmsExpenseController;
 use App\Http\Controllers\Api\PmsStatementController;
+use App\Http\Controllers\Api\PmsInvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -112,6 +113,7 @@ Route::get('pmsstatement/{id}', [PmsStatementController::class, 'single']);
 //property statements
 Route::get('pmspropertystatements/{id}', [PmsStatementController::class, 'propertyStatements']);
 Route::get('pmslastmonthpropertystatements/{id}', [PmsStatementController::class, 'propertyLastMonthStatements']);
+Route::get('pmsinvoicethrostatement/{id}', [PmsStatementController::class, 'singleInvoice']);
 Route::get('pmslastninetypropertystatements/{id}', [PmsStatementController::class, 'propertyLastNinetyStatements']);
 Route::get('pmsyearpropertystatements/{id}', [PmsStatementController::class, 'propertyYearStatements']);
 Route::get('pmsquarterpropertystatements/{id}', [PmsStatementController::class, 'propertyQuarterStatements']);
@@ -125,6 +127,10 @@ Route::get('pmsyearpropertyexpenses/{id}', [PmsExpenseController::class, 'proper
 Route::get('pmsquarterpropertyexpenses/{id}', [PmsExpenseController::class, 'propertyQuarterExpenses']);
 Route::get('pmslastyearpropertyexpenses/{id}', [PmsExpenseController::class, 'propertyLastYearExpenses']);
 Route::get('pmsallpropertyexpenses/{id}', [PmsExpenseController::class, 'propertyAllExpenses']);
+
+//landlord statements
+Route::get('pmslandlordstatements/{id}', [PmsStatementController::class, 'landlordStatements']);
+
 //tenant statements
 Route::get('pmstenantstatements/{id}', [PmsStatementController::class, 'tenantStatements']);
 Route::get('pmslastmonthtenantstatements/{id}', [PmsStatementController::class, 'tenantLastMonthStatements']);
@@ -133,6 +139,22 @@ Route::get('pmsyeartenantstatements/{id}', [PmsStatementController::class, 'tena
 Route::get('pmsquartertenantstatements/{id}', [PmsStatementController::class, 'tenantQuarterStatements']);
 Route::get('pmslastyeartenantstatements/{id}', [PmsStatementController::class, 'tenantLastYearStatements']);
 Route::get('pmsalltenantstatements/{id}', [PmsStatementController::class, 'tenantAllStatements']);
+
+//tenant invoices
+Route::get('pmstenantinvoices/{id}', [PmsInvoiceController::class, 'tenantInvoices']);
+
+//property invoices
+Route::get('propertyawaitinginvoicing/{id}', [PmsInvoiceController::class, 'propAwaitingInvoicing']);
+Route::get('propertyinvoicestosettle/{id}', [PmsInvoiceController::class, 'propInvoicestoSettle']);
+
+Route::get('propertysettledinvoices/{id}', [PmsInvoiceController::class, 'propSettledInvoices']);
+Route::get('propertylastmonthsettledinvoices/{id}', [PmsInvoiceController::class, 'propLastMonthSettledInvoices']);
+Route::get('propertylastninetysettledinvoices/{id}', [PmsInvoiceController::class, 'propLastNinetySettledInvoices']);
+Route::get('propertyyearsettledinvoices/{id}', [PmsInvoiceController::class, 'propYearSettledInvoices']);
+Route::get('propertyquartersettledinvoices/{id}', [PmsInvoiceController::class, 'propQuarterSettledInvoices']);
+Route::get('propertylastyearsettledinvoices/{id}', [PmsInvoiceController::class, 'propLastYearSettledInvoices']);
+Route::get('propertyallsettledinvoices/{id}', [PmsInvoiceController::class, 'propAllSettledInvoices']);
+
 
 Route::put('property/{id}', [PropertyController::class, 'update']);
 Route::put('category/{id}', [CategoryController::class, 'update']);
@@ -157,8 +179,12 @@ Route::put('pmsexpense/{id}', [PmsExpenseController::class, 'update']);
 Route::put('pmsstatement/{id}', [PmsStatementController::class, 'update']);
 Route::put('pmsinvoicestatement/{id}', [PmsStatementController::class, 'invoice']);
 Route::put('pmssettlestatement/{id}', [PmsStatementController::class, 'settle']);
-Route::put('pmsinvoicestatement/{id}', [PmsStatementController::class, 'invoice']);
+//create invoice
+Route::post('pmsinvoicestatement', [PmsStatementController::class, 'createInvoice']);
+
 Route::put('pmslastmonthtenantstatement/{id}', [PmsStatementController::class, 'updateTenantLastMonthStatement']);
+
+Route::put('defaultpassword', [ListController::class, 'updateDefaultPassword']);
 
 Route::delete('property/{id}', [PropertyController::class, 'destroy']);
 Route::delete('category/{id}', [CategoryController::class, 'destroy']);
@@ -170,6 +196,7 @@ Route::delete('condition/{id}', [ConditionController::class, 'destroy']);
 Route::delete('furnishing/{id}', [FurnishingController::class, 'destroy']);
 Route::delete('location/{id}', [LocationController::class, 'destroy']);
 Route::delete('propertytype/{id}', [PropertyTypeController::class, 'destroy']);
+Route::delete('propertyimage/{id}', [PropertyController::class, 'destroyImage']);
 Route::delete('about/{id}', [AboutController::class, 'destroy']);
 Route::delete('service/{id}', [ServiceController::class, 'destroy']);
 Route::delete('contact/{id}', [ContactController::class, 'destroy']);
@@ -222,3 +249,12 @@ Route::put('activateuser/{id}',[UserController::class,'activate']);
 Route::put('deactivateuser/{id}',[UserController::class,'deactivate']);
 
 Route::post('/posts/media/upload', [PropertyController::class, 'storePropertyPic'])->name('posts.media.upload');
+
+//send sms
+Route::post('sendsms', [SearchController::class, 'sendSms'])->name('sendsms');
+Route::post('sendtenantsms', [SearchController::class, 'sendTenantSms'])->name('sendTenantsms');
+Route::post('sendlandlordsms', [SearchController::class, 'sendLandlordSms'])->name('sendLandlordsms');
+
+//generate invoices
+Route::post('/generate-monthly-statements', [PmsStatementController::class, 'generateMonthlyStatements']);
+

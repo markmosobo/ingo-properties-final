@@ -10,6 +10,10 @@
                   <strong>Type:</strong> {{form.type}} <br>
                   <strong>Deposit:</strong> KES. {{form.deposit}} <br>
                   <strong>Rent:</strong> KES. {{form.monthly_rent}}<br>
+                  <strong>Security:</strong> KES. {{form.security_fee}}<br>
+                  <strong>Garbage:</strong> KES. {{form.garbage_fee}}<br>
+                  <strong>Water Deposit:</strong> KES. {{form.water_deposit}}<br>
+                  <strong>Electricity Deposit:</strong> KES. {{form.electricity_deposit}}<br>
                   <strong>Status: </strong>
                   <span v-if="form.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Vacant</span>   
                   <span v-else-if="form.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Occupied</span>
@@ -23,8 +27,8 @@
             <div class="card-body">
               <h5 class="card-title">Meter Numbers</h5>
                <p class="card-text">
-                  <strong>Electricity:</strong> {{form.electricity_meter}} <br>
-                  <strong>Water:</strong> {{form.water_meter}} <br>
+                  <strong>Electricity:</strong> {{form.electricity_meter ?? 'N/A'}} <br>
+                  <strong>Water:</strong> {{form.water_meter ?? 'N/A'}} <br>
   
                </p>              
             </div>
@@ -89,7 +93,7 @@
         getUnit() {
              axios.get('/api/pmsunit/'+this.$route.params.id).then((response) => {
      
-             this.form = response.data.unit[0];
+             this.form = response.data.unit;
              console.log("props", this.form)
     
              });

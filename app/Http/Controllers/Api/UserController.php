@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -41,7 +42,15 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $user = User::create($request->all());
+        $hashedPassword = Hash::make($request->default_password);
+        $user = User::create([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'role_id' => $request->role_id,
+            'phone_number' => $request->phone_number,
+            'password' => $hashedPassword,
+        ]);
 
         return response()->json([
             'status' => true,
@@ -79,15 +88,31 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id)
     {
-        $user->update($request->all());
+        $user = User::findOrFail($id);
+        if ($user) {
+        // Update the user
+        $user->update([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'phone_number' => $request->phone_number,
+            'role_id' => $request->role_id,
+        ]);
 
         return response()->json([
             'status' => true,
             'message' => "User Updated successfully!",
             'user' => $user
         ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "No user record found!"
+            ], 404);
+        }
+
     }
 
     /**

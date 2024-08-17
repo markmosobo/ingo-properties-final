@@ -350,6 +350,50 @@
       </li><!-- End Expenses Nav -->
 
       <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#invoices-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-file-earmark-text"></i><span>Manage Invoices</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="invoices-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <router-link to="/awaitinginvoicing" custom v-slot="{ href, navigate, isActive }">
+              <a
+                :href="href"
+                :class="{ active: isActive }"
+                class="nav-link"
+                @click="navigate"
+              >          
+              <i class="bi bi-circle"></i><span>Awaiting Invoicing</span>
+            </a>
+            </router-link>
+          </li>
+         <li>
+            <router-link to="/invoicestosettle" custom v-slot="{ href, navigate, isActive }">
+              <a
+                :href="href"
+                :class="{ active: isActive }"
+                class="nav-link"
+                @click="navigate"
+              >          
+              <i class="bi bi-circle"></i><span>Invoices to Settle</span>
+            </a>
+            </router-link>
+          </li> 
+         <li>
+            <router-link to="/settledinvoices" custom v-slot="{ href, navigate, isActive }">
+              <a
+                :href="href"
+                :class="{ active: isActive }"
+                class="nav-link"
+                @click="navigate"
+              >          
+              <i class="bi bi-circle"></i><span>Settled Invoices</span>
+            </a>
+            </router-link>
+          </li>    
+        </ul>
+      </li>
+
+ <!--      <li class="nav-item">
         <router-link to="/statements" custom v-slot="{ href, navigate, isActive }">
                   <a
                     :href="href"
@@ -361,7 +405,7 @@
           <span>Statements</span>
         </a>
         </router-link>
-      </li>
+      </li> -->
 
     </ul>
 

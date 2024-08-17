@@ -69,7 +69,9 @@
                                   Action
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a @click="navigateTo('/viewuser/'+user.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                            
+                                  <a @click="navigateTo('/viewuser/'+user.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>     
+                                  <a @click="navigateTo('/edituser/'+user.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a> 
+                                  <a @click="resetPassword(user)" class="dropdown-item" href="#"><i class="ri-lock-fill mr-2"></i>Reset Password</a>                                            
                                   <a v-if="user.status == 2" @click="activateUser(user.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Activate</a>
                                   <a v-if="user.status == 1" @click="deactivateUser(user.id)" class="dropdown-item" href="#"><i class="ri-refresh-fill mr-2"></i>Deactivate</a>
                                   </div>
@@ -80,6 +82,34 @@
                       </table>
     
                     </div>
+
+                   <div class="modal fade" id="settleTenantModal" tabindex="-1" aria-labelledby="settleTenantModalLabel" aria-hidden="true">
+                   <div class="modal-dialog">
+                     <div class="modal-content">
+                       <div class="modal-header">
+                         <h5 class="modal-title" id="settleTenantModalLabel">Reset Password</h5>
+                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                       </div>
+                       <div class="modal-body">
+                         <p>
+                           <div class="row">
+                             <div class="col-sm-12">
+                               <strong>{{user.first_name}} {{user.last_name}}</strong>
+                               <p>Are you sure you want to reset password?The new password to login shall be: <strong>{{defaultPassword}}</strong></p>
+                             </div>
+                           </div>    
+                         </p>
+
+                         
+
+                       </div>
+                       <div class="modal-footer">
+                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                         <button type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-primary" @click.prevent="confirmResetPassword">Yes</button>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
     
                   </div>
                 </div><!-- End Top Selling -->
@@ -112,7 +142,8 @@
       data(){
         return {
           users: [],
-          user: []
+          user: [],
+          defaultPassword: ''
         }
       },
       methods: {
@@ -120,6 +151,15 @@
           if(value){
             return moment(String(value)).format('MMM Do YYYY')
           }
+        },
+        resetPassword(user)
+        {
+          const modal = new bootstrap.Modal(document.getElementById('settleTenantModal'));
+            modal.show();
+        },
+        confirmResetPassword()
+        {
+
         },
         getPhoto()
         {
@@ -155,6 +195,7 @@
         loadLists() {
              axios.get('api/lists').then((response) => {
              this.users = response.data.lists.users;
+             this.defaultPassword = response.data.lists.defaultPassword.default_password;
              console.log(this.users)
              setTimeout(() => {
                   $("#AllUsersTable").DataTable();

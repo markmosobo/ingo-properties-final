@@ -547,7 +547,7 @@ export default{
             axios.get('api/lists').then((response) => {
                 this.isLoading = true; // Set isLoading to true before making the API call
 
-                this.blogs = response.data.lists.blogs
+                this.blogs = response.data.lists.ourblogs
                 this.blogcategories = response.data.lists.blogcategories
                 // Set isLoading to false once data is loaded
                 this.isLoading = false;

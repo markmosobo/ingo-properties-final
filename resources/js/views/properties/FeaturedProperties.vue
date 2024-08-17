@@ -23,7 +23,7 @@
                         <tbody>
                           <tr v-for="property in featuredproperties" :key="property.id">
                             <th scope="row"><a href="#">
-                              <img :src="getPhoto() + property.image_path" />
+                              <img :src="getPhoto() + property.images[0].name" />
                             </a></th>
                             <td>{{property.title.substring(0,20)+".."}}</td>
                             <td>{{(property.price).toLocaleString()}}</td>

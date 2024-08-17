@@ -34,7 +34,7 @@ class AuthController extends Controller
         } else { 
           return response()->json([
             'status' => 'error',
-            'data' => 'Unauthorized Access'
+            'data' => 'Unauthorized Access. Please contact admin.'
           ]); 
         } 
     }
@@ -57,6 +57,7 @@ class AuthController extends Controller
      
       $postArray['password'] = bcrypt($postArray['password']); 
       $postArray['role_id'] = 2;
+      $postArray['status'] = 2;
       $user = User::create($postArray); 
       
       $success['token'] = $this->apiToken;  

@@ -262,7 +262,8 @@
                             <h6 class="text-uppercase text-success mb-3">because You are worth it</h6>
                             <h2 class="text-capitalize">{{about.title}} </h2>
                             <p>
-                                {{about.description}}
+                                <!-- {{about.description}} -->
+                                <div v-html="formatDescription(about.description)"></div>
 
                             </p>
 
@@ -577,6 +578,13 @@ export default {
             console.log(error)
         })
     },
+    formatDescription(description) {
+    return description
+        .split('\n')
+        .map(paragraph => `<p>${paragraph.replace(/\s+/g, ' ')}</p>`)
+        .join('');
+},
+
     getServices(){
         axios.get('api/lists').then((response) => {
             this.homeservices = response.data.lists.homeservices

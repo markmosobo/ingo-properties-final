@@ -25,13 +25,13 @@
                         <input
                             type="text"
                             placeholder="First Name"
-                            id="title"
-                            name="title"
+                            id="first_name"
+                            name="first_name"
                             v-model="form.first_name"
                             class="form-control"
                             required=""
                         />
-                        <div class="invalid-feedback">Please enter title!</div>
+                        <div class="invalid-feedback" v-if="!form.first_name">Please enter first name!</div>
                       </div>
                    </div>
                    <div class="col-sm-6">
@@ -40,13 +40,13 @@
                         <input
                             type="text"
                             placeholder="Last Name"
-                            id="title"
-                            name="title"
+                            id="last_name"
+                            name="last_name"
                             v-model="form.last_name"
                             class="form-control"
                             required=""
                         />
-                        <div class="invalid-feedback">Please enter title!</div>
+                        <div class="invalid-feedback" v-if="!form.last_name">Please enter last name!</div>
                       </div>
                    </div>
  
@@ -59,13 +59,13 @@
                         <input
                             type="text"
                             placeholder="Email Address"
-                            id="title"
-                            name="title"
+                            id="email"
+                            name="email"
                             v-model="form.email"
                             class="form-control"
                             required=""
                         />
-                        <div class="invalid-feedback">Please enter title!</div>
+                        <div class="invalid-feedback" v-if="!form.email">Please enter email address!</div>
                       </div>
                    </div>
                    <div class="col-sm-6">
@@ -73,32 +73,85 @@
                       >Role</label
                       >
                       <div class="col-sm-10">
-                         <select name="role" v-model="form.role_id" class="form-select" id="">
+                         <select name="role" v-model="form.role_id" class="form-select" id="role">
                             <option value="0" selected>Select Role</option>
                             <option v-for="role in roles" :value="role.id"
                             :selected="role.id == form.role_id" :key="role.id">{{ role.name}}</option>
  
                          </select>
  
-                      <div class="invalid-feedback">Please enter role!</div>
+                        <div class="invalid-feedback" v-if="!form.role_id">Please select role!</div>
+                      </div>
+                   </div>
+
+                </div>
+                <div class="row mb-3"></div>
+                <div class="form-group row">
+                   <div class="col-sm-6">
+                      <label for="inputPassword" class="form-label">Phone Number</label>
+                      <div class="col-sm-10">
+                        <input
+                            type="text"
+                            placeholder="Phone Number"
+                            id="phone_number"
+                            name="phone_number"
+                            v-model="form.phone_number"
+                            class="form-control"
+                            required=""
+                        />
+                        <div class="invalid-feedback" v-if="!form.phone_number">Please enter phone number!</div>
                       </div>
                    </div>
 
                 </div>
 
              </div>
+
+          <p class="mt-3">Users should change it after first time login. The default password is: <strong>{{defaultPassword}}</strong></p>
+          <p>To change default password click<h7 @click="changeDefaultPassword"> here</h7></p>
+
              <!--  button -->
              <div class="col-lg-12 felx mt-4 row">
                 <div class="col-sm-6 col-lg-6">
                     <!-- <button @click.prevent="prev()" class="btn btn-dark">Previous</button> -->
                 </div>
                 <div class="col-sm-6 col-lg-6 text-end">
-                    <button type="submit" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Submit</button>
+                    <button type="submit" @click.prevent="submit()" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill">Submit</button>
                 </div>
             </div>
           </fieldset>
  
           </form>
+
+          <!-- Modal -->
+           <div class="modal fade" id="settleTenantModal" tabindex="-1" aria-labelledby="settleTenantModalLabel" aria-hidden="true">
+             <div class="modal-dialog">
+               <div class="modal-content">
+                 <div class="modal-header">
+                   <h5 class="modal-title" id="settleTenantModalLabel">Change Default Password</h5>
+                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                 </div>
+                 <div class="modal-body">
+                   <p>
+                     <div class="row">
+                       <div class="col-sm-12">
+                         <strong>Default Password:</strong>
+                         <input type="text" name="default_password" v-model="form.default_password" class="form-control">
+                         <div v-if="errors.password" class="text-danger">{{ errors.password }}</div>
+                       </div>
+                     </div>    
+                   </p>
+
+                   
+
+                 </div>
+                 <div class="modal-footer">
+                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                   <button type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-primary" @click.prevent="confirmChangePassword">Update</button>
+                 </div>
+               </div>
+             </div>
+           </div>
  
  
           <!-- End General Form Elements -->
@@ -136,9 +189,14 @@
           form: {
           role_id: '',
           title: '',
-          password: 'IngoProperties'
+          default_password: ''
           
           },
+          defaultPassword: '',
+          errors: {
+            password: '',
+          },
+          loading: false,
           message: "",
           successMessage: "",
           loading: false,
@@ -162,10 +220,85 @@
        loadLists() {
           axios.get('api/lists').then((response) => {
           this.roles = response.data.lists.roles;
+          this.defaultPassword = response.data.lists.defaultPassword.default_password;
+          this.form.default_password = this.defaultPassword;
  
           });
        },
+       changeDefaultPassword()
+       {
+         const modal = new bootstrap.Modal(document.getElementById('settleTenantModal'));
+            modal.show();
+       },
+       confirmChangePassword() {
+           // Validate amount
+          if (!this.form.default_password) {
+            this.errors.password = 'Password field is required.';
+            return;
+          }
+          if (this.form.default_password) {
+            // Implement your logic to invoice the tenant here
+             axios.put("api/defaultpassword", this.form)
+             .then(function (response) {
+                console.log(response);
+                // this.step = 1;
+                toast.fire(
+                   'Success!',
+                   'Default password updated!',
+                   'success'
+                )
+             })
+             .catch(function (error) {
+                console.log(error);
+                // Swal.fire(
+                //    'error!',
+                //    // phone_error + id_error + pass_number,
+                //    'error'
+                // )
+             });
+            // Close the modal after invoicing
+            const modal = bootstrap.Modal.getInstance(document.getElementById('settleTenantModal'));
+            modal.hide();
+            //reset form
+            this.loadLists()
+          }
+        },
+       validateForm() {
+          let isValid = true;
+          if (!this.form.first_name) {
+              isValid = false;
+              document.getElementById('first_name').classList.add('is-invalid');
+          } else {
+              document.getElementById('first_name').classList.remove('is-invalid');
+          }
+          if (!this.form.last_name) {
+              isValid = false;
+              document.getElementById('last_name').classList.add('is-invalid');
+          } else {
+              document.getElementById('last_name').classList.remove('is-invalid');
+          }
+          if (!this.form.phone_number) {
+              isValid = false;
+              document.getElementById('phone_number').classList.add('is-invalid');
+          } else {
+              document.getElementById('phone_number').classList.remove('is-invalid');
+          }
+          if (!this.form.email) {
+              isValid = false;
+              document.getElementById('email').classList.add('is-invalid');
+          } else {
+              document.getElementById('email').classList.remove('is-invalid');
+          }
+          if (!this.form.role_id) {
+              isValid = false;
+              document.getElementById('role').classList.add('is-invalid');
+          } else {
+              document.getElementById('role').classList.remove('is-invalid');
+          }
+          return isValid;
+       },
        submit(){
+        if (this.validateForm()) {                         
           axios.post("api/users", this.form)
           .then(function (response) {
              console.log(response);
@@ -185,6 +318,7 @@
              // )
           });
           this.$router.push('/all-users')
+         }
        }
  
     },

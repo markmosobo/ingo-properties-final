@@ -63,6 +63,7 @@ import Profile from '../views/Profile.vue'
 import AllUsers from '../views/users/AllUsers.vue'
 import AddUser from '../views/users/AddUser.vue'
 import ViewUser from '../views/users/ViewUser.vue'
+import EditUser from '../views/users/EditUser.vue'
 import OurServices from '../views/OurServices.vue'
 import Service from '../views/Service.vue'
 import SearchResultPage from '../views/SearchResultPage.vue'
@@ -97,10 +98,44 @@ import PmsYearTenantStatements from '../views/pms/PmsYearTenantStatements.vue'
 import PmsQuarterTenantStatements from '../views/pms/PmsQuarterTenantStatements.vue'
 import PmsLastYearTenantStatements from '../views/pms/PmsLastYearTenantStatements.vue'
 import PmsAllTenantStatements from '../views/pms/PmsAllTenantStatements.vue'
+import PmsLandlordStatements from '../views/pms/PmsLandlordStatements.vue'
+import PmsLandlordProperties from '../views/pms/PmsLandlordProperties.vue'
 import ViewStatement from '../views/pms/ViewStatement.vue'
 import EditStatement from '../views/pms/EditStatement.vue'
 import SettleStatement from '../views/pms/SettleStatement.vue'
 import InvoiceStatement from '../views/pms/InvoiceStatement.vue'
+
+import AwaitingInvoicing from '../views/pms/AwaitingInvoicing.vue'
+import LastMonthAwaitingInvoicing from '../views/pms/LastMonthAwaitingInvoicing.vue'
+import LastNinetyAwaitingInvoicing from '../views/pms/LastNinetyAwaitingInvoicing.vue'
+import QuarterAwaitingInvoicing from '../views/pms/QuarterAwaitingInvoicing.vue'
+import YearAwaitingInvoicing from '../views/pms/YearAwaitingInvoicing.vue'
+import LastYearAwaitingInvoicing from '../views/pms/LastYearAwaitingInvoicing.vue'
+import AllAwaitingInvoicing from '../views/pms/AllAwaitingInvoicing.vue'
+import InvoicestoSettle from '../views/pms/InvoicestoSettle.vue'
+import SettledInvoices from '../views/pms/SettledInvoices.vue'
+import PmsInvoices from '../views/pms/PmsInvoices.vue'
+import ViewInvoice from '../views/pms/ViewInvoice.vue'
+//tenant invoices
+import PmsTenantInvoices from '../views/pms/PmsTenantInvoices.vue'
+import PmsLastMonthTenantInvoices from '../views/pms/PmsLastMonthTenantInvoices.vue'
+import PmsLastNinetyTenantInvoices from '../views/pms/PmsLastNinetyTenantInvoices.vue'
+import PmsYearTenantInvoices from '../views/pms/PmsYearTenantInvoices.vue'
+import PmsQuarterTenantInvoices from '../views/pms/PmsQuarterTenantInvoices.vue'
+import PmsLastYearTenantInvoices from '../views/pms/PmsLastYearTenantInvoices.vue'
+import PmsAllTenantInvoices from '../views/pms/PmsAllTenantInvoices.vue'
+
+import PropertyAwaitingInvoicing from '../views/pms/PropertyAwaitingInvoicing.vue'
+import PropertyInvoicesToSettle from '../views/pms/PropertyInvoicesToSettle.vue'
+//settled invoices
+import PropertySettledInvoices from '../views/pms/PropertySettledInvoices.vue'
+import PropertyLastMonthSettledInvoices from '../views/pms/PropertyLastMonthSettledInvoices.vue'
+import PropertyLastNinetySettledInvoices from '../views/pms/PropertyLastNinetySettledInvoices.vue'
+import PropertyYearSettledInvoices from '../views/pms/PropertyYearSettledInvoices.vue'
+import PropertyQuarterSettledInvoices from '../views/pms/PropertyQuarterSettledInvoices.vue'
+import PropertyLastYearSettledInvoices from '../views/pms/PropertyLastYearSettledInvoices.vue'
+import PropertyAllSettledInvoices from '../views/pms/PropertyAllSettledInvoices.vue'
+
 
 function guardMyroute(to, from, next)
 {
@@ -498,6 +533,13 @@ const routes = [
 
     },
     {
+        path: '/edituser/:id',
+        name: 'edituser',
+        component: EditUser,
+        beforeEnter : guardMyroute,
+
+    },
+    {
         path:'/add-blogcategory',
         name: 'add-blogcategory',
         component: AddBlogCategory,
@@ -740,6 +782,180 @@ const routes = [
         path:'/pmsalltenantstatements/:id',
         name: 'pmsalltenantstatements',
         component: PmsAllTenantStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/awaitinginvoicing',
+        name: 'awaitinginvoicing',
+        component: AwaitingInvoicing,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/lastmonthawaitinginvoicing',
+        name: 'lastmonthawaitinginvoicing',
+        component: LastMonthAwaitingInvoicing,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/lastninetyawaitinginvoicing',
+        name: 'lastninetyawaitinginvoicing',
+        component: LastNinetyAwaitingInvoicing,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/quarterawaitinginvoicing',
+        name: 'quarterawaitinginvoicing',
+        component: QuarterAwaitingInvoicing,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/yearawaitinginvoicing',
+        name: 'yearawaitinginvoicing',
+        component: YearAwaitingInvoicing,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/lastyearawaitinginvoicing',
+        name: 'lastyearawaitinginvoicing',
+        component: LastYearAwaitingInvoicing,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/allawaitinginvoicing',
+        name: 'allawaitinginvoicing',
+        component: AllAwaitingInvoicing,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/invoicestosettle',
+        name: 'invoicestosettle',
+        component: InvoicestoSettle,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/settledinvoices',
+        name: 'settledinvoices',
+        component: SettledInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/propertyawaitinginvoicing/:id',
+        name: 'propertyawaitinginvoicing',
+        component: PropertyAwaitingInvoicing,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/propertyinvoicestosettle/:id',
+        name: 'propertyinvoicestosettle',
+        component: PropertyInvoicesToSettle,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/propertysettledinvoices/:id',
+        name: 'propertysettledinvoices',
+        component: PropertySettledInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/propertylastmonthsettledinvoices/:id',
+        name: 'propertylastmonthsettledinvoices',
+        component: PropertyLastMonthSettledInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/propertylastninetysettledinvoices/:id',
+        name: 'propertylastninetysettledinvoices',
+        component: PropertyLastNinetySettledInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/propertyyearsettledinvoices/:id',
+        name: 'propertyyearsettledinvoices',
+        component: PropertyYearSettledInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/propertyquartersettledinvoices/:id',
+        name: 'propertyquartersettledinvoices',
+        component: PropertyQuarterSettledInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/propertylastyearsettledinvoices/:id',
+        name: 'propertylastyearsettledinvoices',
+        component: PropertyLastYearSettledInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/propertyallsettledinvoices/:id',
+        name: 'propertyallsettledinvoices',
+        component: PropertyAllSettledInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/invoices',
+        name: 'invoices',
+        component: PmsInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/viewinvoice/:id',
+        name: 'viewinvoice',
+        component: ViewInvoice,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/pmslandlordstatements/:id',
+        name: 'pmslandlordstatements',
+        component: PmsLandlordStatements,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/pmslandlordproperties/:id',
+        name: 'pmslandlordproperties',
+        component: PmsLandlordProperties,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/pmstenantinvoices/:id',
+        name: 'pmstenantinvoices',
+        component: PmsTenantInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/pmslastmonthtenantinvoices/:id',
+        name: 'pmslastmonthtenantinvoices',
+        component: PmsLastMonthTenantInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/pmslastninetytenantinvoices/:id',
+        name: 'pmslastninetytenantinvoices',
+        component: PmsLastNinetyTenantInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/pmsyeartenantinvoices/:id',
+        name: 'pmsyeartenantinvoices',
+        component: PmsYearTenantInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/pmsquartertenantinvoices/:id',
+        name: 'pmsquartertenantinvoices',
+        component: PmsQuarterTenantInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/pmslastyeartenantinvoices/:id',
+        name: 'pmslastyeartenantinvoices',
+        component: PmsLastYearTenantInvoices,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/pmsalltenantinvoices/:id',
+        name: 'pmsalltenantinvoices',
+        component: PmsAllTenantInvoices,
         beforeEnter : guardMyroute,
     },
     {

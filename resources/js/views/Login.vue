@@ -135,8 +135,8 @@
           if(response["data"]["status"] == "error")
          {
            Swal.fire({
-            title: 'Oops',
-            text:   "error",
+            title: 'Oops!',
+            text:   response.data.data,
             icon: 'warning',
           
           });

@@ -213,7 +213,7 @@
             const maxRowsPerPage = 13; // Adjust this value based on the number of rows you want per page
 
             // Add top-left header
-            const rightHeaderText = 'April Properties\nKakamega-Webuye Rd, ACK Building\nTel: 0720 020 401\nP. O. Box 2973-50100, Kakamega\nEmail: propertapril@gmail.com';
+            const rightHeaderText = 'Ingo Properties\nKakamega-Webuye Rd, ACK Building\nTel: 0720 020 401\nP. O. Box 2973-50100, Kakamega\nEmail: propertIngo@gmail.com';
             const rightHeaderFontSize = 12;
             const rightheaderX = 20; // Adjust the X coordinate
             const rightheaderY = 10;

@@ -488,8 +488,8 @@
                                                                     <ul class="list-inline my-auto">
                                                                         <li class="list-inline-item name">
                                                                             <a href="#">
-                                                                                <span v-if="property.status == 1" class="text-success">Offer : open</span>
-                                                                                <span v-else class="text-dark">Offer : closed</span>
+                                                                                <span v-if="property.status == 1" class="text-success">open</span>
+                                                                                <span v-else class="text-dark">closed</span>
                                                                             </a>
 
                                                                         </li>
@@ -499,7 +499,7 @@
                                                                     <ul class="list-inline my-auto ml-auto price">
                                                                         <li class="list-inline-item ">
 
-                                                                            <h6>KSH{{formatNumberWithCommas(property.price)}}</h6>
+                                                                            <h6>KES {{formatNumberWithCommas(property.price)}}</h6>
                                                                         </li>
 
                                                                     </ul>
@@ -577,8 +577,8 @@
                                                             <ul class="list-inline my-auto">
                                                                 <li class="list-inline-item ">
                                                                     <a href="#">
-                                                                        <span v-if="property.status == 1" class="text-success">Offer : open</span>
-                                                                        <span v-else class="text-dark">Offer : closed</span>
+                                                                        <span v-if="property.status == 1" class="text-success">open</span>
+                                                                        <span v-else class="text-dark">closed</span>
                                                                     </a>
 
                                                                 </li>
@@ -587,7 +587,7 @@
                                                             <ul class="list-inline my-auto ml-auto">
                                                                 <li class="list-inline-item">
 
-                                                                    <h6>KSH{{formatNumberWithCommas(property.price)}}</h6>
+                                                                    <h6>KES {{formatNumberWithCommas(property.price)}}</h6>
                                                                 </li>
 
                                                             </ul>
@@ -637,8 +637,9 @@ export default {
         {
             return "/storage/properties/";
         },
-         formatNumberWithCommas(number) {
-          return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        formatNumberWithCommas(number) {
+            // Convert the number to a string, remove .00 if present, and then add commas
+            return number.toString().replace(/\.00$/, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         },
         loadLists() {
              axios.get('api/lists').then((response) => {

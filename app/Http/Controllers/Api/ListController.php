@@ -26,6 +26,9 @@ use App\Models\PmsUnit;
 use App\Models\PmsTenant;
 use App\Models\PmsExpense;
 use App\Models\PmsStatement;
+use App\Models\Invoice;
+use App\Models\DefaultPassword;
+use Carbon\Carbon;
 
 class ListController extends Controller
 {
@@ -44,6 +47,7 @@ class ListController extends Controller
         $furnishings = Furnishing::all();
         $locations = Location::all();
         $blogs = Blog::with('category')->get();
+        $ourblogs = Blog::with('category')->where('status',1)->get();
         $featuredblogs = Blog::latest()->where('featured',1)->where('status',1)->get();
         $blogcategories = BlogCategory::all();
         $abouts = About::latest()->take(1)->get();
@@ -62,11 +66,31 @@ class ListController extends Controller
         $messages = Message::latest()->where('status',0)->with('user')->get();
         $displaymessages = Message::latest()->with('user')->where('status',0)->limit(3)->get();
         $projects = Project::all();
-        $homeprojects = Project::where('featured',0)->limit(4)->get();
+        $homeprojects = Project::where('featured',0)->limit(4)->where('status', 1)->orWhere('status', 0)->get();
         $homeservices = Service::latest()->limit(6)->get();
-        $featuredproject = Project::latest()->where('featured',1)->limit(1)->get();
+        $featuredproject = Project::latest()->where('featured',1)->where('status', 1)->limit(1)->get();
         $openproperties = Property::latest()->with('type','images')->where('status',1)->get();
         $closedproperties = Property::latest()->with('type','images')->where('status',2)->get();
+
+        //invoices
+        $awaitinginvoicing = PmsStatement::latest()->where('water_bill', null)->where('status',0)->with('property','tenant','unit')->whereMonth('created_at', Carbon::now()->month)->get();
+        $lastmonthawaitinginvoicing = PmsStatement::latest()->where('water_bill', null)->where('status',0)->with('property','tenant','unit')->whereBetween('created_at',
+        [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])->get();
+        $lastninetyawaitinginvoicing = PmsStatement::latest()->where('water_bill', null)->where('status',0)->with('property','tenant','unit')->whereBetween('created_at',
+        [Carbon::now()->subDays(89)->startOfDay(), Carbon::now()->endOfDay()])->get();
+        $quarterawaitinginvoicing = PmsStatement::latest()->where('water_bill', null)->where('status',0)->with('property','tenant','unit')->whereBetween('created_at',
+        [Carbon::now()->startOfQuarter(), Carbon::now()->endOfDay()])->get();
+        $yearawaitinginvoicing = PmsStatement::latest()->where('water_bill', null)->where('status',0)->with('property','tenant','unit')->whereBetween('created_at',
+        [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()])->get();
+        $lastyearawaitinginvoicing = PmsStatement::latest()->where('water_bill', null)->where('status',0)->with('property','tenant','unit')->whereBetween('created_at',
+        [Carbon::now()->subYear()->startOfYear(), Carbon::now()->subYear()->endOfYear()])->get();
+        $allawaitinginvoicing = PmsStatement::latest()->where('water_bill', null)->where('status',0)->with('property','tenant','unit')->get();
+        $invoicestosettle = PmsStatement::latest()->whereNotNull('water_bill')->where('status',0)->with('property','tenant','unit')->get();
+        $invoicestosettlesmsnotsent = PmsStatement::latest()->whereNotNull('water_bill')->where('status',0)->where('sms_status', 0)->with('property','tenant','unit')->get();
+        $invoicestosettlesmssent = PmsStatement::latest()->whereNotNull('water_bill')->where('status',0)->where('sms_status', 1)->with('property','tenant','unit')->get();
+        $settledinvoices = PmsStatement::latest()->whereNotNull('water_bill')->where('status',1)->with('property','tenant','unit')->get();
+
+        $defaultPassword = DefaultPassword::latest()->first();
 
 
         return response()->json([
@@ -80,6 +104,7 @@ class ListController extends Controller
                 'furnishings' => $furnishings,
                 'locations' => $locations,
                 'blogs' => $blogs,
+                'ourblogs' => $ourblogs,
                 'blogcategories' => $blogcategories,
                 'abouts' => $abouts,
                 'services' => $services,
@@ -105,11 +130,53 @@ class ListController extends Controller
                 'units' => $units,
                 'pmstenants' => $pmstenants,
                 'pmsexpenses' => $pmsexpenses,
-                'statements' => $statements
+                'statements' => $statements,
+                // 'pmsinvoices' => $pmsinvoices,
+                'awaitinginvoicing' => $awaitinginvoicing,
+                'lastmonthawaitinginvoicing' => $lastmonthawaitinginvoicing,
+                'lastninetyawaitinginvoicing' => $lastninetyawaitinginvoicing,
+                'quarterawaitinginvoicing' => $quarterawaitinginvoicing,
+                'yearawaitinginvoicing' => $yearawaitinginvoicing,
+                'lastyearawaitinginvoicing' => $lastyearawaitinginvoicing,
+                'allawaitinginvoicing' => $allawaitinginvoicing,
+                'invoicestosettle' => $invoicestosettle,
+                'invoicestosettlesmsnotsent' => $invoicestosettlesmsnotsent,
+                'invoicestosettlesmssent' => $invoicestosettlesmssent,
+                'settledinvoices' => $settledinvoices,
+
+                'defaultPassword' => $defaultPassword
 
                 
             ]
         ]);
 
+    }
+
+    public function updateDefaultPassword(Request $request)
+    {
+        $password = DefaultPassword::latest()->first();
+        if ($password) {
+        // Update the default_password field
+        $password->update([
+            'default_password' => $request->default_password
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => "Password Updated successfully!",
+            'password' => $password
+        ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "No DefaultPassword record found!"
+            ], 404);
+        }
+
+         return response()->json([
+            'status' => true,
+            'message' => "Password Updated successfully!",
+            'password' => $password
+        ], 200);
     }
 }

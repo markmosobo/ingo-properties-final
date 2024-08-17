@@ -23,18 +23,34 @@
                     <div class="card-body pb-0">
                       <h5 class="card-title">All Managed Properties <span>| Today</span></h5>
                       <p class="card-text">
-                   
-                      <router-link to="/add-pmsproperty" custom v-slot="{ href, navigate, isActive }">
-                          <a
-                            :href="href"
-                            :class="{ active: isActive }"
-                            class="btn btn-sm btn-primary rounded-pill"
-                            style="background-color: darkgreen; border-color: darkgreen;"
-                            @click="navigate"
-                          >
-                            Add Property
-                          </a>
-                      </router-link>
+                        <div class="row">
+                          <div class="col d-flex">
+                         
+                            <router-link to="/add-pmsproperty" custom v-slot="{ href, navigate, isActive }">
+                                <a
+                                  :href="href"
+                                  :class="{ active: isActive }"
+                                  class="btn btn-sm btn-primary rounded-pill"
+                                  style="background-color: darkgreen; border-color: darkgreen;"
+                                  @click="navigate"
+                                >
+                                  Add Property
+                                </a>
+                            </router-link>
+                            </div>
+                          <div class="col-auto d-flex justify-content-end">
+                          <div class="btn-group" role="group">
+                              <button id="btnGroupDrop1" type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="ri-add-line"></i>
+                              </button>
+                              <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                     <a @click="navigateTo('/pmsproperties' )" class="dropdown-item" href="#"><i class="ri-building-fill mr-2"></i>Properties</a>
+                                     <a @click="navigateTo('/pmstenants' )" class="dropdown-item" href="#"><i class="ri-user-fill mr-2"></i>Tenants</a>
+                                    <a @click="navigateTo('/pmslandlords' )" class="dropdown-item" href="#"><i class="ri-user-fill mr-2"></i>Landlords</a>
+                                </div>
+                              </div>
+                            </div>
+                        </div>  
             
                       </p>
     
@@ -63,9 +79,20 @@
                                   Action
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <!-- <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a> -->                                            
+                                  <a @click="navigateTo('/pmsproperties/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                            
                                   <a @click="navigateTo('/pmsunits/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Units</a>
-                                  <a @click="navigateTo('/pmspropertystatements/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Statements</a>  
+                                  <a @click="navigateTo('/pmspropertystatements/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Invoices</a>
+                                  <a @click="navigateTo('/propertyawaitinginvoicing/'+property.id)" class="dropdown-item" href="#">
+                                    <i class="ri-file-list-2-fill mr-2"></i>Awaiting Invoicing
+                                  </a>
+                                  <a @click="navigateTo('/propertyinvoicestosettle/'+property.id)" class="dropdown-item" href="#">
+                                    <i class="ri-file-edit-fill mr-2"></i>Invoices to Settle
+                                  </a>
+                                  <a @click="navigateTo('/propertysettledinvoices/'+property.id)" class="dropdown-item" href="#">
+                                    <i class="ri-bank-card-fill mr-2"></i>Settled Invoices
+                                  </a>
+ 
+                                  <a @click="navigateTo('/edit-pmsproperty/'+property.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
                                   <a @click="deleteProperty(property.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
                                  
                                   </div>
@@ -202,8 +229,6 @@
         },
         loadLists() {
              axios.get('api/lists').then((response) => {
-             this.categories = response.data.lists.categories;
-             this.propertytypes = response.data.lists.propertytypes;
              this.properties = response.data.lists.pmsproperties;
              console.log("props", this.properties)
              setTimeout(() => {
