@@ -73,6 +73,7 @@ import AddRole from '../views/roles/AddRole.vue'
 import Project from '../views/Project.vue'
 import PmsLandlords from '../views/pms/PmsLandlords.vue'
 import PmsTenants from '../views/pms/PmsTenants.vue'
+import PmsTenant from '../views/pms/PmsTenant.vue'
 import PmsExpenses from '../views/pms/PmsExpenses.vue'
 import PmsUnits from '../views/pms/PmsUnits.vue'
 import AddPmsUnit from '../views/pms/AddPmsUnit.vue'
@@ -650,6 +651,12 @@ const routes = [
         path:'/pmstenants',
         name: 'pmstenants',
         component: PmsTenants,
+        beforeEnter : guardMyroute,
+    }, 
+    {
+        path:'/pmstenant/:id',
+        name: 'pmstenant',
+        component: PmsTenant,
         beforeEnter : guardMyroute,
     },    
     {
