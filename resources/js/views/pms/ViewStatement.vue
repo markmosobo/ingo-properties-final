@@ -17,7 +17,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
+<!--                             <div class="row mb-3">
                                 <div class="col-lg-12">
                                     <div class="d-flex justify-content-between">
                                         <div>Invoice Date</div>
@@ -25,7 +25,7 @@
                                         <div v-else><strong>N/A</strong></div>
                                     </div>
                                 </div>
-                            </div>                            
+                            </div>  -->                           
 
                              <div class="row mb-3">
                                 <div class="col-lg-12">
@@ -142,7 +142,7 @@
 
                                 <div class="row mt-4">
                                     <div class="col-sm-6">
-                                        <button @click.prevent="cancel()" class="btn btn-dark w-100">Cancel</button>
+                                        <button @click.prevent="cancel()" class="btn btn-dark w-100">Back</button>
                                     </div>
                                     <div class="col-sm-6 text-end">
                                         <button @click.prevent="settleTenant()" type="submit" v-if="status == 0 && waterBill !== null" class="btn btn-primary w-100" style="background-color: darkgreen; border-color: darkgreen;">Settle</button>
@@ -195,7 +195,9 @@ export default {
             unitGarbageFee: '',
             unitName: '',
             invoice: '',
-            user: []
+            user: [],
+            invoiceTenantPermission: '',
+            settleInvoicePermission: ''
         }
     },
     components: {
@@ -304,11 +306,11 @@ export default {
                     // )
                 });
 
-            this.$router.push('/statements');
+            this.$router.push('/settledinvoices');
         },
         printReceipt() {
             // this.submit();
-            this.$router.push('/statements')
+            this.$router.push('/settledinvoices')
 
             // Open a new window for printing
             const printWindow = window.open("", "_blank");
@@ -394,17 +396,16 @@ export default {
                 <body>
                   <div class="receipt">
                     <div class="receipt-header">
-                      <h1>Ingo Properties</h1>
-                      <p>Cosyard Business Center, Kakamega Mumias Road, Kakamega.</p>
-                      <p>Phone: (0759) 509-462 | Email: ingoproperties@gmail.com</p>
+                      <h1>April Properties</h1>
+                      <p>Kakamega-Webuye Rd, ACK Building</p>
+                      <p>Phone: (0720) 020-401 | Email: propertapril@gmail.com</p>
                     </div>
                     <div class="receipt-info">
                       <p><strong>Invoice Number:</strong> ${this.refNo}</p>
-                      <p><strong>Receipt Date:</strong> ${new Date().toLocaleString()}</p>
-                      <p><strong>Rent Month:</strong> ${this.formatMonth(this.date)}</p>
+                      <p><strong>Receipt Date:</strong> ${this.formattedTodayDate}</p>
+                      <p><strong>Details:</strong> ${this.details}</p>
                       <p><strong>Tenant:</strong> ${this.tenant}</p>
-                      <p><strong>Property:</strong> ${this.name} - ${this.unitName}</p>
-                      <p><strong>Payment Mode:</strong> ${this.payment}</p>
+                      <p><strong>Property:</strong> ${this.name}</p>
                     </div>
                     <table class="receipt-table">
                       <thead>
@@ -474,7 +475,18 @@ export default {
     mounted() {
         this.getStatement();
         this.getInvoiceDate();
-        this.user = JSON.parse(localStorage.getItem('user'));
+        this.user = localStorage.getItem('user');
+        this.user = JSON.parse(this.user);
+        this.userId = this.user.id;
+        // Get the current date
+        const todayDate = new Date();
+
+        // Convert to desired format dd/mm/yy
+        this.formattedTodayDate = todayDate.toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: '2-digit',
+          year: '2-digit'
+        });
     }
 }
 </script>

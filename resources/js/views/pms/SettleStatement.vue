@@ -40,21 +40,18 @@
                     <tr>
                       <th scope="col">Status</th>
                       <th scope="col">Paid</th>
-                      <th scope="col">Reference</th>
                       <th scope="col">Balance</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td v-if="status == 1" scope="row"><span style="color: green;">Paid</span></td>
-                      <td v-else scope="row"><span style="color: red;">Unpaid</span></td>
+                      <td v-if="status == 1" scope="row"><span style="color: green;">Settled</span></td>
+                      <td v-else scope="row"><span style="color: red;">Unsettled</span></td>
                       <td>{{formatNumber(paid)}}</td>
-                      <td>{{refNo}}</td>
                       <td>{{formatNumber(balance)}}</td>
                     </tr>
                     <tr>
-                      <th scope="row">Rate</th>
-                      <td></td>
+                      <th scope="row">Due</th>
                       <td></td>
                       <td>KES. {{formatNumber(total)}}</td>
                     </tr> 
@@ -85,7 +82,7 @@
                       </label>
 
                       <label v-if="lastmonthstatement.balance > 0" for="validationCustom04" class="form-label"
-                        ><span style="color: red;">Previous Month Arrears: <strong>KES {{lastmonthstatement.balance}}</strong></span><br><a href="#" @click="lastMonthArrears">Settle previous month arrears</a></label
+                        ><span style="color: red;">Last Month Arrears: <strong>KES {{lastmonthstatement.balance}}</strong></span></label
                       >
                       <div class="col-sm-12">
                         <label for="validationCustom04" class="form-label"
@@ -94,7 +91,7 @@
                         <div class="col-sm-10">
                             <select name="category" v-model="form.payment_method" class="form-select" id="">
                                 <option value="0" disabled>Select Payment</option>
-                                <option value="Mpesa" selected>MPESA (Till Number)</option>
+                                <option value="Mpesa" selected>MPESA (Paybill Number)</option>
                                 <option value="Cash">CASH</option>
                                 <option value="Bank">BANK</option>
 
@@ -138,12 +135,13 @@
                     <div class="row mb-3"></div>
                     <div class="col-lg-12 felx mt-4 row">
                         <div class="col-sm-6 col-lg-6">
-                        <button @click.prevent="cancel()" class="btn btn-dark">Cancel</button>
+                        <button @click.prevent="cancel()" class="btn btn-dark">Back</button>
                         </div>
                        <div class="col-sm-6 col-lg-6 text-end">
-                        <button @click.prevent="settleReceipt" type="submit" v-if="status == 0 && paid>0" class="btn btn-primary">Print Receipt</button>
-                        <button @click="printReceipt" v-else class="btn btn-primary">Print Receipt</button>
+                            <button @click.prevent="settleReceipt" type="submit" v-if="status == 0 && paid > 0" class="btn btn-darkgreen">Settle</button>
+                            <button @click="printReceipt" v-else class="btn btn-orange">Print Receipt</button>
                         </div>
+
                     </div>
                   </form>
                 
@@ -210,7 +208,8 @@ export default{
           await this.settleTenant();
 
           // Proceed with the rest of the function after settleTenant completes
-          this.$router.push('/statements');
+              this.$router.push('/invoicestosettle')
+              // this.$router.go(-1);
 
           // Open a new window for printing
           const printWindow = window.open("", "_blank");
@@ -232,27 +231,37 @@ export default{
               'success'
           );
       },
-      lastMonthArrears()
-      {
-        this.$router.push('/pmslastmonthtenantstatements/'+this.$route.params.tenantId)
+      getCurrentTimestamp() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
       },
       settleTenant() {
           return new Promise((resolve, reject) => {
               let payload; // Define payload variable outside the if-else blocks
+              this.paid_at = this.getCurrentTimestamp();
 
               if (this.lastmonthBalance >= 0) {
                   payload = {
                       mpesa_code: this.form.mpesa_code,
                       payment_method: this.form.payment_method,
                       paid: this.paid + this.form.cash,
-                      balance: this.payableAmount
+                      balance: this.payableAmount,
+                      paid_at: this.paid_at
                   };
               } else {
                   payload = {
                       mpesa_code: this.form.mpesa_code,
                       payment_method: this.form.payment_method,
                       paid: this.paid,
-                      balance: this.payableOverAmount
+                      balance: this.payableOverAmount,
+                      paid_at: this.paid_at
                   };
               }
 
@@ -284,42 +293,45 @@ export default{
 
 
       submit() {
-    return new Promise((resolve, reject) => {
-        let self = this;  // Store the reference to this
-        let payload = {
-            mpesa_code: this.form.mpesa_code,
-            payment_method: this.form.payment_method,
-            paid: this.form.cash,
-            balance: this.payableAmount
-        };
+        return new Promise((resolve, reject) => {
+            let self = this;  // Store the reference to this
+            this.paid_at = this.getCurrentTimestamp();
+            let payload = {
+                mpesa_code: this.form.mpesa_code,
+                payment_method: this.form.payment_method,
+                paid: this.form.cash,
+                balance: this.payableAmount,
+                paid_at: this.paid_at
+            };
 
-        axios.put("/api/pmssettlestatement/" + this.$route.params.id, payload)
-            .then(function (response) {
-                console.log(response);
-                self.statement = response.data.statement;
-                self.amountPaid = self.statement.paid;
-                self.balAmount = self.statement.balance;
-                // self.step = 1;
-                // toast.fire(
-                //     'Success!',
-                //     'Invoice updated!',
-                //     'success'
-                // );
-                resolve(); // Resolve the promise once submission is successful
-            })
-            .catch(function (error) {
-                console.log(error);
-                reject(error); // Reject the promise if there's an error during submission
-            });
+            axios.put("/api/pmssettlestatement/" + this.$route.params.id, payload)
+                .then(function (response) {
+                    console.log(response);
+                    self.statement = response.data.statement;
+                    self.amountPaid = self.statement.paid;
+                    self.balAmount = self.statement.balance;
+                    // self.step = 1;
+                    // toast.fire(
+                    //     'Success!',
+                    //     'Invoice updated!',
+                    //     'success'
+                    // );
+                    resolve(); // Resolve the promise once submission is successful
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    reject(error); // Reject the promise if there's an error during submission
+                });
 
-        this.$router.push('/statements'); // Move this line into the promise chain
-    });
+                this.$router.go(-1);
+        });
       },
 
       printReceipt() {
           this.submit().then(() => {
               // Continue with the rest of the function after submit completes
-              this.$router.push('/statements');
+              // this.$router.push('/statements');
+              this.$router.go(-1);
 
               // Open a new window for printing
               const printWindow = window.open("", "_blank");
@@ -417,11 +429,13 @@ export default{
           </style>
         </head>
         <body>
+          <img src="@/assets/img/apex-logo.png" alt="Company Logo" style="display: block; margin: 0 auto; max-width: 100%;">
+
           <div class="receipt">
             <div class="receipt-header">
-              <h1>INGO PROPERTIES</h1>
-              <p>Cosyard Business Centre-Kakamega Mumias Rd, Kakamega</p>
-              <p>Phone: (254) 759509462 | Email: ingoproperties@gmail.com</p>
+              <h1>Ingo Properties</h1>
+              <p>Cosyard Business Center Kakamega-Mumias Rd, Kakameg</p>
+              <p>Phone: (0759) 509-462 | Email: ingoproperties@gmail.com</p>
             </div>
             <div class="receipt-info">
               <p><strong>Invoice Number:</strong> ${this.refNo}</p>
@@ -532,7 +546,8 @@ export default{
       },
       cancel()
       {
-        this.$router.push('/statements')
+        this.$router.go(-1);
+        // this.$router.push('/statements')
       },
 
       checkLastMonthStatement() {
@@ -618,3 +633,46 @@ export default{
     },
 }
 </script>
+
+<style>
+  .btn-darkgreen {
+    background-color: darkgreen;
+    border-color: darkgreen;
+    color: #fff; /* Set text color to white */
+}
+
+.btn-orange {
+    background-color: orange;
+    border-color: orange;
+    color: #fff; /* Set text color to white */
+}
+.section {
+    padding: 20px;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+}
+
+.label {
+    font-weight: bold;
+    color: #333;
+}
+
+.row.mb-3 {
+    margin-bottom: 1rem;
+}
+
+.row.mt-4 {
+    margin-top: 1rem;
+}
+
+.text-end {
+    text-align: right;
+}
+
+</style>

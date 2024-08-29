@@ -18,6 +18,7 @@ import FeaturedProperties from '../views/properties/FeaturedProperties.vue'
 import MyProperties from '../views/properties/MyProperties.vue'
 import AddProperty from '../views/properties/AddProperty.vue'
 import AddPmsProperty from '../views/pms/AddPmsProperty.vue'
+import EditPmsProperty from '../views/pms/EditPmsProperty.vue'
 import EditPmsLandlord from '../views/pms/EditPmsLandlord.vue'
 import AddPmsLandlord from '../views/pms/AddPmsLandlord.vue'
 import AddPmsTenant from '../views/pms/AddPmsTenant.vue'
@@ -629,6 +630,12 @@ const routes = [
         component: AddPmsProperty,
         beforeEnter : guardMyroute,
     },
+    {
+        path:'/edit-pmsproperty/:id',
+        name: 'edit-pmsproperty',
+        component: EditPmsProperty,
+        beforeEnter : guardMyroute,
+    },    
     {
         path:'/pmslandlords',
         name: 'pmslandlords',

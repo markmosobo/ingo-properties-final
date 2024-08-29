@@ -11,7 +11,7 @@
                   <strong>ID Number:</strong> {{form.id_number}} <br>
                   <strong>Phone:</strong> {{form.phone_number}}<br>
                   <strong>Property:</strong> {{property}}<br>
-                  <strong>Unit:</strong> KES. {{unit}}<br>
+                  <strong>Unit:</strong> {{unit}}<br>
                   <strong>Status: </strong>
                   <span v-if="form.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Vacated</span>   
                   <span v-else-if="form.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Renting</span>

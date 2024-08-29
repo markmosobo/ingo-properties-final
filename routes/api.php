@@ -173,12 +173,15 @@ Route::put('sociallink/{id}', [SocialLinkController::class, 'update']);
 Route::put('message/{id}', [MessageController::class, 'update']);
 Route::put('project/{id}', [ProjectController::class, 'update']);
 Route::put('landlord/{id}', [LandlordController::class, 'update']);
+Route::put('pmsproperty/{id}', [PmsPropertyController::class, 'update']);
 Route::put('pmsunit/{id}', [PmsUnitController::class, 'update']);
 Route::put('pmstenant/{id}', [PmsTenantController::class, 'update']);
 Route::put('pmsexpense/{id}', [PmsExpenseController::class, 'update']);
 Route::put('pmsstatement/{id}', [PmsStatementController::class, 'update']);
 Route::put('pmsinvoicestatement/{id}', [PmsStatementController::class, 'invoice']);
 Route::put('pmssettlestatement/{id}', [PmsStatementController::class, 'settle']);
+Route::put('edit-statement/{id}', [PmsStatementController::class, 'editStatement']);
+
 //create invoice
 Route::post('pmsinvoicestatement', [PmsStatementController::class, 'createInvoice']);
 
@@ -207,6 +210,7 @@ Route::delete('landlord/{id}', [LandlordController::class, 'destroy']);
 Route::delete('pmstenant/{id}', [PmsTenantController::class, 'destroy']);
 Route::delete('pmsunit/{id}', [PmsUnitController::class, 'destroy']);
 Route::delete('pmsexpense/{id}', [PmsExpenseController::class, 'destroy']);
+Route::delete('pmsstatement/{id}', [PmsStatementController::class, 'destroy']);
 
 Route::put('vacatetenant/{id}',[PmsTenantController::class,'vacate']);
 Route::put('vacateunit/{id}',[PmsUnitController::class,'vacate']);
