@@ -24,22 +24,7 @@
  
                       <div class="invalid-feedback">Please enter category!</div>
                       </div>
-                   </div>  
-                   <div class="col-sm-6">
-                      <label for="validationCustom04" class="form-label"
-                      >Unit*</label
-                      >
-                      <div class="col-sm-10">
-                         <select :disabled="!form.pms_property_id" name="unit" v-model="form.pms_unit_id" class="form-select" id="">
-                            <option value="0" selected disabled>Select Unit</option>
-                            <option v-for="unit in propunits" :value="unit.id"
-                            :selected="unit.id == form.unit_id" :key="unit.id">{{ unit.unit_number}}</option>
- 
-                         </select>
- 
-                      <div class="invalid-feedback">Please enter category!</div>
-                      </div>
-                   </div>                     
+                   </div>                      
                 </div>
                 <div class="row mb-3"></div>
                 <div class="form-group row">

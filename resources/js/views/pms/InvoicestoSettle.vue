@@ -183,9 +183,6 @@
                                 <div class="col-sm-6">
                                  <strong>Amount Due:</strong> {{ formatNumber(selectedStatement.total) }}
                                 </div>
-                                <div class="col-sm-6">
-                                 <strong>Amount Paid:</strong> {{ formatNumber(selectedStatement.paid) }}
-                                </div>
                               </div>   
                             </p>
                             <p v-else>
@@ -262,10 +259,6 @@
                                 <div class="col-sm-6">
                                   <strong>Amount Due(Inclusive of Water Bill):</strong> 
                                  <input type="text" name="total" v-model="form.total" class="form-control">
-                                </div>
-                                <div class="col-sm-6">
-                                 <strong>Amount Paid:</strong>
-                                 <input type="text" name="paid" v-model="form.paid" class="form-control">
                                 </div>
                               </div>   
                             </p>
@@ -352,6 +345,7 @@
           paid: '',
           balance: '',
           total: '',
+          amountPaid: '',
           isAmountValid: true,
           lastmonthstatement: [],
           lastmonthBalance: '',
@@ -570,7 +564,7 @@
                     payload = {
                         mpesa_code: this.form.mpesa_code,
                         payment_method: this.form.payment_method,
-                        paid: this.paid + this.form.cash,
+                        paid: Number(this.paid) + Number(this.form.cash),
                         balance: this.payableAmount,
                         paid_at: this.paid_at
                     };
@@ -578,7 +572,7 @@
                     payload = {
                         mpesa_code: this.form.mpesa_code,
                         payment_method: this.form.payment_method,
-                        paid: this.paid,
+                        paid: Number(this.paid),
                         balance: this.payableOverAmount,
                         paid_at: this.paid_at
                     };
@@ -805,7 +799,7 @@
                 <div class="receipt-info">
                   <p><strong>#${this.refNo}</strong></p>
                   <p><strong>Invoice Date:</strong> ${this.format_date(this.invoiceDate ?? 'N/A')}</p>
-                  <p><strong>Due Date:</strong>  ${this.format_date(this.dueDate ?? 'N/A')}</p>
+                  <p><strong>Due Date:</strong>  ${this.convertDate(this.dueDate ?? 'N/A')}</p>
                   
                 </div>
                 <div class="additional-info">
@@ -1036,6 +1030,14 @@
                 .catch((error) => {
                     console.error("Error fetching last month tenant statements:", error);
                 });
+        },
+         convertDate(dateStr) {
+          const date = new Date(dateStr);
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const year = date.getFullYear();
+
+          return `${day}/${month}/${year}`;
         },
         applyOverPayment()
         {

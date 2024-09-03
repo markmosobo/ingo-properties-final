@@ -173,14 +173,14 @@
 
           // Table Rows
           // pdf.setFontType("normal");
-          pdf.text(this.pmsexpense.property.name+" - "+this.pmsexpense.unit.unit_number, 20, 130);
+          pdf.text(this.pmsexpense.property.name, 20, 130);
           pdf.text(this.pmsexpense.payment_type, 80, 130);
           pdf.text("KES "+this.pmsexpense.amount_paid.toFixed(2), 160, 130);
 
 
           // Total
           // pdf.setFontType("bold");
-          pdf.text("Total: KES " + this.pmsexpense.amount_paid.toFixed(2), 160, 160);
+          pdf.text("Total: KES " + this.pmsexpense.amount_paid, 160, 160);
           pdf.text("Balance: KES " + "0.00", 160, 170);
           pdf.setFontSize(10);
           pdf.text("Because you are worth it!", 100, 190, { align: "center" });

@@ -3,10 +3,17 @@
     <header id="header" class="header fixed-top d-flex align-items-center">
   
       <div class="d-flex align-items-center justify-content-between">
-        <a href="#" class="logo d-flex align-items-center">
+      <router-link to="/" custom v-slot="{ href, navigate, isActive }">
+                <a
+                  :href="href"
+                  :class="{ active: isActive }"
+                  class="logo d-flex align-items-center"
+                  @click="navigate"
+                >
           <img src="assets/img/logo.png" alt="">
           <span class="d-none d-lg-block">Ingo Properties</span>
         </a>
+        </router-link>
         <i class="bi bi-list toggle-sidebar-btn" @click="handleSidebar"></i>
       </div><!-- End Logo -->
   
