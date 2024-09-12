@@ -127,6 +127,38 @@
       }
     },
     methods: {
+        deleteInvoice(id){
+          Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#006400',
+            cancelButtonColor: '#FFA500',
+            confirmButtonText: 'Yes, delete it!'
+          }).then((result) => {
+            if (result.isConfirmed) { 
+            //send request to the server
+            axios.delete('/api/pmsstatement/'+id).then(() => {
+            toast.fire(
+              'Deleted!',
+              'Invoice has been deleted.',
+              'success'
+            )
+            this.loadLists();
+            }).catch(() => {
+              Swal.fire(
+              'Failed!',
+              'There was something wrong.',
+              'warning'
+            )
+            }); 
+            }else if(result.isDenied) {
+              console.log('cancelled')
+            }
+                             
+          })
+        },
       login_user(){
         axios.post('api/login', this.form).then((response) => {
           console.log(response);

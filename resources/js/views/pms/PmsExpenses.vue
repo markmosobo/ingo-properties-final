@@ -175,7 +175,7 @@
           // pdf.setFontType("normal");
           pdf.text(this.pmsexpense.property.name, 20, 130);
           pdf.text(this.pmsexpense.payment_type, 80, 130);
-          pdf.text("KES "+this.pmsexpense.amount_paid.toFixed(2), 160, 130);
+          pdf.text("KES "+this.pmsexpense.amount_paid, 160, 130);
 
 
           // Total
