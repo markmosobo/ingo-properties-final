@@ -328,6 +328,9 @@ export default {
             printWindow.print();
         },
         buildReceiptContent(refNo) {
+            // Determine whether to include the row
+            const showGarbageFeeRow = this.unitGarbageFee !== 0;
+            const showSecurityFeeRow = this.unitSecurityFee !== 0;
             // Build the HTML content for the receipt
             const receiptHTML = `
                 <!DOCTYPE html>
@@ -396,12 +399,12 @@ export default {
                 <body>
                   <div class="receipt">
                     <div class="receipt-header">
-                      <h1>April Properties</h1>
-                      <p>Kakamega-Webuye Rd, ACK Building</p>
-                      <p>Phone: (0720) 020-401 | Email: propertapril@gmail.com</p>
+                      <h1>Ingo Properties</h1>
+                     <p>Cosyard Business Center Kakamega-Mumias Rd, Kakamega</p>
+                     <p>Phone: (0759) 509-462 | Email: ingoproperties@gmail.com</p>
                     </div>
                     <div class="receipt-info">
-                      <p><strong>Invoice Number:</strong> ${this.refNo}</p>
+                      <p><strong>#${this.refNo}</strong></p>
                       <p><strong>Receipt Date:</strong> ${this.formattedTodayDate}</p>
                       <p><strong>Details:</strong> ${this.details}</p>
                       <p><strong>Tenant:</strong> ${this.tenant}</p>
@@ -419,22 +422,29 @@ export default {
                           <td>Rent Payment</td>
                           <td>KES ${this.formatNumber(this.unitRent)}</td>
                         </tr>
-                        <tr>
-                          <td>Garbage Collection Fee</td>
-                          <td>KES ${this.formatNumber(this.unitGarbageFee)}</td>
-                        </tr>
-                        <tr>
-                          <td>Security Fee</td>
-                          <td>KES ${this.formatNumber(this.unitSecurityFee)}</td>
-                        </tr>
+                        <!-- Conditionally include garbage collection fee row -->
+                          ${showGarbageFeeRow ? `
+                          <tr>
+                            <td>Garbage Collection Fee</td>
+                            <td>KES ${this.formatNumber(this.unitGarbageFee)}</td>
+                          </tr>
+                          ` : ''}
+                          </tr>
+                          <!-- Conditionally include security fee row -->
+                          ${showSecurityFeeRow ? `
+                          <tr>
+                            <td>Security Fee</td>
+                            <td>KES ${this.formatNumber(this.unitSecurityFee)}</td>
+                          </tr>
+                          ` : ''}
                       </tbody>
                       <tfoot>
                         <tr>
-                          <th>Total:</th>
+                          <th>Total Amount Due:</th>
                           <td>KES ${this.formatNumber(this.total)}</td>
                         </tr>
                         <tr>
-                          <th>Paid:</th>
+                          <th>Amount Paid:</th>
                           <td>KES ${this.formatNumber(this.paid)}</td>
                         </tr>
                         <tr>

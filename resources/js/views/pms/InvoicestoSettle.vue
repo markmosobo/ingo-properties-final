@@ -642,7 +642,7 @@
             let payDate = new Date(this.payDate);
 
             // Create a new Date object for dueDate based on payDate
-            this.dueDate = statement.due_date;
+            this.dueDate = statement.rent_month;
             console.log("stevo", this.dueDate)
 
             this.total = statement.total;
@@ -674,14 +674,33 @@
             // Close the document stream
             printWindow.document.close();
 
-            // Trigger the print dialog
-            printWindow.print();
+           // Wait for the content to be fully loaded
+            printWindow.onload = function() {
+                // Find the logo image element
+                const logoImage = printWindow.document.querySelector('img');
+
+                if (logoImage) {
+                    // Ensure the image is loaded
+                    logoImage.onload = function() {
+                        // Trigger the print dialog after the image has loaded
+                        printWindow.print();
+                    };
+
+                    // Handle case where the image might already be cached
+                    if (logoImage.complete) {
+                        logoImage.onload();  // Manually trigger onload if image is already loaded
+                    }
+                } else {
+                    // If there's no image, just print immediately
+                    printWindow.print();
+                }
+            };
         },
         buildPrintContent() {
           // Determine whether to include the row
           const showExpensesDeductionRow = this.expenses !== 0;
           const logoBase64 = this.logoBase64;
-          const watermarkText = this.paymentMethod;
+          const watermarkText = 'INVOICE';
           // Build the HTML content for the receipt
           const receiptHTML = `
             <!DOCTYPE html>
@@ -834,7 +853,7 @@
                 </table>
                 <div class="payment-info">
                   <p><strong>Payment Options:</strong></p>
-                  <p>Mobile Money(MPESA) : Till Number - 8788932 }</p>
+                  <p>Pay via MPESA : Till Number - 8788932 </p>
                 </div>
                 <div class="receipt-footer">
                   <p>Generated on ${new Date().toLocaleString()}</p>
@@ -881,6 +900,7 @@
          // Determine whether to include the row
           const showGarbageFeeRow = this.unitGarbageFee !== 0;
           const showSecurityFeeRow = this.unitSecurityFee !== 0;
+          const showWaterBillRow = this.waterBillAmount !== 0;
           // Build the HTML content for the receipt
           const receiptHTML = `
           <!DOCTYPE html>
@@ -956,8 +976,8 @@
                 <p>Phone: (0759) 509-462 | Email: ingoproperties@gmail.com</p>
               </div>
               <div class="receipt-info">
-                <p><strong>Invoice Number:</strong> ${this.refNo}</p>
-                <p><strong>Receipt Date:</strong> ${new Date().toLocaleString()}</p>
+                <p><strong>#${this.refNo}</strong> </p>
+                <p><strong>Receipt Date:</strong> ${new Date().toLocaleString('en-GB')}</p>
                 <p><strong>Rent Month:</strong> ${this.formatMonth(this.date)}</p>
                 <p><strong>Tenant:</strong> ${this.tenant}</p>
                 <p><strong>Payment Mode:</strong> ${this.form.payment_method}</p>
@@ -974,10 +994,13 @@
                     <td>Rent Payment</td>
                     <td>KES ${this.formatNumber(this.unitRent)}</td>
                   </tr>
+                  <!-- Conditionally include water bill row -->
+                  ${showWaterBillRow ? `
                   <tr>
                     <td>Water Bill</td>
                     <td>KES ${this.formatNumber(this.waterBillAmount)}</td>
                   </tr>
+                  ` : ''}
                   <!-- Conditionally include garbage collection fee row -->
                   ${showGarbageFeeRow ? `
                   <tr>
