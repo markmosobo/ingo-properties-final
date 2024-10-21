@@ -155,6 +155,7 @@ Route::get('propertyquartersettledinvoices/{id}', [PmsInvoiceController::class, 
 Route::get('propertylastyearsettledinvoices/{id}', [PmsInvoiceController::class, 'propLastYearSettledInvoices']);
 Route::get('propertyallsettledinvoices/{id}', [PmsInvoiceController::class, 'propAllSettledInvoices']);
 
+Route::get('landlordproperty/{id}', [LandlordController::class, 'landlordProperty']);
 
 Route::put('property/{id}', [PropertyController::class, 'update']);
 Route::put('category/{id}', [CategoryController::class, 'update']);

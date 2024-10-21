@@ -155,55 +155,6 @@
         navigateTo(location){
             this.$router.push(location)
         },
-
-        featureProperty(id){
-          axios.put('api/featureproperty/'+ id).then(() => {
-            toast.fire(
-              'Successful',
-              'Property has been featured',
-              'success'
-            ); 
-            this.loadLists();                    
-          }).catch(() => {
-              console.log('error')
-          })
-        },
-        unfeatureProperty(id){
-          axios.put('api/unfeatureproperty/'+ id).then(() => {
-            toast.fire(
-              'Successful',
-              'Property has been unfeatured',
-              'success'
-            ); 
-            this.loadLists();                    
-          }).catch(() => {
-              console.log('error')
-          })
-        },
-        closeProperty(id){
-          axios.put('api/closeproperty/'+ id).then(() => {
-            toast.fire(
-              'Successful',
-              'Property has been closed',
-              'success'
-            ); 
-            this.loadLists();                    
-          }).catch(() => {
-              console.log('error')
-          })
-        },
-        reopenProperty(id){
-          axios.put('api/reopenproperty/'+ id).then(() => {
-            toast.fire(
-              'Successful',
-              'Property has been reopened',
-              'success'
-            ); 
-            this.loadLists();                    
-          }).catch(() => {
-              console.log('error')
-          })
-        },
         deleteProperty(id){
                 Swal.fire({
                   title: 'Are you sure?',

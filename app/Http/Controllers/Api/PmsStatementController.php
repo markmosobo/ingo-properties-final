@@ -102,6 +102,9 @@ class PmsStatementController extends Controller
             {
                 $pmsstatement->update([
                     'paid' => $request->paid,
+                    'paid_at' => $request->paid_at,
+                    'payment_method' => $request->payment_method,
+                    'mpesa_code' => $request->mpesa_code,
                     'balance' => $request->balance,
                     'status' => 0,
                 ]);

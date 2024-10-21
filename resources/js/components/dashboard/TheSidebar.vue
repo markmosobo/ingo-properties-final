@@ -257,6 +257,27 @@
       <li class="nav-heading">Property Management</li>
 
       <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#facts-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-gem"></i><span>Manage Landlords</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="facts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+              <router-link to="/pmslandlords" custom v-slot="{ href, navigate, isActive }">
+                <a
+                  :href="href"
+                  :class="{ active: isActive }"
+                  class="nav-link"
+                  @click="navigate"
+                >
+                <i class="bi bi-circle"></i><span>Landlords</span>
+                </a>
+              </router-link>
+          </li>
+        </ul>
+      </li>
+      <!-- End Icons Nav -->
+
+      <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-gem"></i><span>Manage Properties</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
@@ -273,20 +294,9 @@
                 </a>
               </router-link>
           </li>
-          <li>
-              <router-link to="/pmslandlords" custom v-slot="{ href, navigate, isActive }">
-                <a
-                  :href="href"
-                  :class="{ active: isActive }"
-                  class="nav-link"
-                  @click="navigate"
-                >
-                <i class="bi bi-circle"></i><span>Landlords</span>
-                </a>
-              </router-link>
-          </li>
         </ul>
-      </li><!-- End Icons Nav -->
+      </li>
+      <!-- End Icons Nav -->
 
 
       <li class="nav-item">

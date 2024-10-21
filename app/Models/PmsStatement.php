@@ -31,7 +31,7 @@ class PmsStatement extends Model
         'sms_status',
         'paid_at',
         'due_date',
-        'rent_month'
+        'rent_month'        
 
     ];
 

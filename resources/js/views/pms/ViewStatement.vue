@@ -218,6 +218,7 @@ export default {
                 this.refNo = this.statement.ref_no;
                 this.details = this.statement.details;
                 this.date = this.statement.created_at;
+                this.rentMonth = this.statement.rent_month;
                 this.status = this.statement.status;
                 this.paid = this.statement.paid;
                 this.balance = this.statement.balance;
@@ -225,6 +226,7 @@ export default {
                 this.payment = this.statement.payment_method;
                 this.statementId = this.statement.id;
                 this.waterBill = this.statement.water_bill;
+                this.paymentMethod = this.statement.payment_method;
                 console.log("statement", this.statement)
             })
         },
@@ -331,6 +333,8 @@ export default {
             // Determine whether to include the row
             const showGarbageFeeRow = this.unitGarbageFee !== 0;
             const showSecurityFeeRow = this.unitSecurityFee !== 0;
+            const showWaterBillRow = this.waterBill !== 0;
+            const showPaymentMethod = this.paymentMethod !== null;
             // Build the HTML content for the receipt
             const receiptHTML = `
                 <!DOCTYPE html>
@@ -405,10 +409,14 @@ export default {
                     </div>
                     <div class="receipt-info">
                       <p><strong>#${this.refNo}</strong></p>
-                      <p><strong>Receipt Date:</strong> ${this.formattedTodayDate}</p>
+                      <p><strong>Receipt Date:</strong> ${new Date().toLocaleString('en-GB')}</p>
                       <p><strong>Details:</strong> ${this.details}</p>
+                      <p><strong>Rent Month:</strong> ${this.rentMonth}</p>
                       <p><strong>Tenant:</strong> ${this.tenant}</p>
-                      <p><strong>Property:</strong> ${this.name}</p>
+                      <!-- Conditionally include water bill row -->
+                       ${showPaymentMethod ? `
+                      <p><strong>Payment Mode:</strong> ${this.paymentMethod}</p>
+                       ` : ''}                      
                     </div>
                     <table class="receipt-table">
                       <thead>
@@ -422,6 +430,14 @@ export default {
                           <td>Rent Payment</td>
                           <td>KES ${this.formatNumber(this.unitRent)}</td>
                         </tr>
+                        <!-- Conditionally include water bill row -->
+                          ${showWaterBillRow ? `
+                          <tr>
+                            <td>Water Bill</td>
+                            <td>KES ${this.formatNumber(this.waterBill)}</td>
+                          </tr>
+                          ` : ''}
+
                         <!-- Conditionally include garbage collection fee row -->
                           ${showGarbageFeeRow ? `
                           <tr>

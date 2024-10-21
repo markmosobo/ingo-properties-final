@@ -60,26 +60,7 @@
                      <!--        <button v-if="invoicestosettlesmsnotsent.length !== 0" class="me-2" @click="sendSms">Send Bulk SMS ({{invoicestosettlesmsnotsent.length}} Pending)
                             </button> -->
                      
-                            <router-link to="#" custom v-slot="{ href, navigate, isActive }">
-                                <a
-                                  :href="href"
-                                  :class="{ active: isActive }"
-                                  class="btn btn-sm btn-primary rounded-pill me-2"
-                                  style="background-color: orange; border-color: orange;"
-                                >
-                                  Pending SMS ({{invoicestosettlesmsnotsent.length}}/{{statements.length + awaitinginvoicing.length}})
-                                </a>
-                            </router-link>
-                            <router-link to="#" custom v-slot="{ href, navigate, isActive }">
-                              <a
-                              :href="href"
-                              :class="{ active: isActive }"
-                              class="btn btn-sm btn-primary rounded-pill"
-                              style="background-color: darkgreen; border-color: darkgreen;"                        
-                              >
-                              Sent SMS ({{invoicestosettlesmssent.length}}/{{statements.length + awaitinginvoicing.length}})
-                              </a>
-                            </router-link>                        
+                        
                           <!-- <button v-if="statements.length !== 0" @click="generatePDF">Generate PDF</button> -->
                           </div>
                           <div class="col-auto d-flex justify-content-end">
@@ -142,12 +123,12 @@
                                   Action
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a @click="navigateTo('/viewstatement/'+statement.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                            
+                                  <a @click="navigateTo('/viewstatement/'+statement.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Invoice</a>                                            
                                   <a v-if="statement.status == 0 && statement.water_bill == null" @click="invoiceTenant(statement.id)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Invoice</a>
-                                  <a v-if="statement.status == 0 && statement.water_bill !== null" @click="settleTenant(statement)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle</a>
-                                  <a @click="print(statement)" class="dropdown-item" href="#"><i class="ri-printer-line mr-2"></i>Print</a> 
-                                  <a @click="editInvoice(statement)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a> 
-                                  <a @click="deleteInvoice(statement.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>                                 
+                                  <a v-if="statement.status == 0 && statement.water_bill !== null" @click="settleTenant(statement)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle Invoice</a>
+                                  <a @click="print(statement)" class="dropdown-item" href="#"><i class="ri-printer-line mr-2"></i>Print Invoice</a> 
+                                  <a @click="editInvoice(statement)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit Invoice</a> 
+                                  <a @click="deleteInvoice(statement.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete Invoice</a>                                 
                                   </div>
                               </div>
                             </td>
@@ -482,7 +463,7 @@
             this.firstName = this.selectedStatement.tenant.first_name;
             this.lastName = this.selectedStatement.tenant.last_name;
             this.tenant = this.firstName + " " + this.lastName;
-            this.date = this.selectedStatement.created_at;
+            this.rentMonth = this.selectedStatement.rent_month;
             this.waterBillAmount = this.selectedStatement.water_bill;
 
             // Fetch last month's statement asynchronously
@@ -584,7 +565,7 @@
 
                 axios.put("/api/pmssettlestatement/" + this.selectedStatement.id, payload)
                     .then(response => {
-                        console.log(response);
+                        // console.log("bitch don't", response);
                         this.statement = response.data.statement;
                         this.amountPaid = this.statement.paid;
                         this.balAmount = this.statement.balance;
@@ -638,6 +619,7 @@
             this.balance = statement.total - statement.paid;
             this.invoiceDate = statement.updated_at;
             this.payDate = statement.created_at;
+            this.rentInvoiceMonth = statement.rent_month;
             // Assuming this.payDate is already assigned with statement.created_at
             let payDate = new Date(this.payDate);
 
@@ -817,6 +799,7 @@
                 </div>
                 <div class="receipt-info">
                   <p><strong>#${this.refNo}</strong></p>
+                  <p><strong>Rent Month:</strong> ${this.rentInvoiceMonth}</p>
                   <p><strong>Invoice Date:</strong> ${this.format_date(this.invoiceDate ?? 'N/A')}</p>
                   <p><strong>Due Date:</strong>  ${this.convertDate(this.dueDate ?? 'N/A')}</p>
                   
@@ -900,7 +883,7 @@
          // Determine whether to include the row
           const showGarbageFeeRow = this.unitGarbageFee !== 0;
           const showSecurityFeeRow = this.unitSecurityFee !== 0;
-          const showWaterBillRow = this.waterBillAmount !== 0;
+          const showWaterBillRow = this.waterBillAmount > 0;
           // Build the HTML content for the receipt
           const receiptHTML = `
           <!DOCTYPE html>
@@ -978,7 +961,6 @@
               <div class="receipt-info">
                 <p><strong>#${this.refNo}</strong> </p>
                 <p><strong>Receipt Date:</strong> ${new Date().toLocaleString('en-GB')}</p>
-                <p><strong>Rent Month:</strong> ${this.formatMonth(this.date)}</p>
                 <p><strong>Tenant:</strong> ${this.tenant}</p>
                 <p><strong>Payment Mode:</strong> ${this.form.payment_method}</p>
               </div>

@@ -8,7 +8,7 @@
                   <div class="card top-selling overflow-auto">
     
                     <div class="filter">
-<!--                       <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                      <!--                       <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                       <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                         <li class="dropdown-header text-start">
                           <h6>Filter</h6>
@@ -107,7 +107,7 @@
                             <td>{{formatNumber(statement.total)}}</td>
                             <td>{{formatNumber(statement.paid)}}</td>
                             <td>{{formatNumber(statement.balance)}}</td>
-                            <td>{{format_date(statement.paid_at)}}</td>                            
+                            <td>{{format_date(statement.paid_at) ?? 'N/A'}}</td>                            
                             <td>
                               <span v-if="statement.status == 1" class="badge bg-success"><i class="bi bi-clipboard2-check"></i> Settled</span>
                               <span v-else-if="statement.status == 0" class="badge bg-warning text-dark"><i class="bi bi-clipboard2-x"></i> Not Settled</span>
@@ -119,11 +119,12 @@
                                   Action
                                   </button>
                                   <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a @click="navigateTo('/viewstatement/'+statement.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                            
+                                  <a @click="navigateTo('/viewstatement/'+statement.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Invoice</a>                                            
                                   <a v-if="statement.status == 0 && statement.water_bill == null" @click="invoiceTenant(statement.id)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Invoice</a>
-                                  <a v-if="statement.status == 0 && statement.water_bill !== null" @click="settleTenant(statement.id, statement.pms_tenant_id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle</a>
-                                  <a @click="print(statement)" class="dropdown-item" href="#"><i class="ri-printer-line mr-2"></i>Print</a>
-                                  <a @click="deleteInvoice(statement.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a> 
+                                  <a v-if="statement.status == 0 && statement.water_bill !== null" @click="settleTenant(statement.id, statement.pms_tenant_id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle Invoice</a>
+                                  <a @click="print(statement)" class="dropdown-item" href="#"><i class="ri-printer-line mr-2"></i>Print Invoice</a>
+                                  <a @click="editInvoice(statement)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit Invoice</a>
+                                  <a @click="deleteInvoice(statement.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete Invoice</a> 
                                   </div>
                               </div>
                             </td>
@@ -136,6 +137,53 @@
                         Bal: {{ formatNumber(calculateTotal('balance')) }}
                       </strong>
                       </div>     
+                    </div>
+
+                    <!--Edit Invoice Modal -->
+                    <div class="modal fade" id="EditInvoiceModal" tabindex="-1" aria-labelledby="EditInvoiceModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="EditInvoiceModalLabel">Edit Invoice</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <p>#{{selectedStatement.ref_no}}</p>
+                            <p>{{ tenant}}</p>
+                            <p v-if="selectedStatement">
+                              <div class="row">
+                                <div class="col-sm-6">
+                                  <strong>Amount Due(Inclusive of Water Bill):</strong> 
+                                 <input type="text" name="total" v-model="form.total" class="form-control">
+                                </div>
+                                <div class="col-sm-6">
+                                 <strong>Amount Paid:</strong>
+                                 <input type="text" name="paid" v-model="form.paid" class="form-control">
+                                </div>
+                              </div>   
+                            </p>
+                            <p v-if="selectedStatement">
+                              <div class="row">
+                                <div class="col-sm-6">
+                                  <strong>Balance:</strong> 
+                                 <input type="text" name="balance" v-model="form.balance" class="form-control">
+                                </div>
+                                <div class="col-sm-6">
+                                 <strong>Water Bill:</strong>
+                                 <input type="text" name="water_bill" v-model="form.water_bill" class="form-control">
+                                </div>
+                              </div>   
+                            </p>
+
+                            
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-primary" @click.prevent="confirmEditInvoice">Save changes</button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
     
                   </div>
@@ -181,6 +229,16 @@
           paymentMethod: '',
           accountNo: '',
           paybillNo: '',
+          form: {
+            payment_method: '',
+            cash: '',
+            total: '',
+            paid: '',
+            mpesa_code: '',
+            balance: '',
+            amountPaid: '',
+            balAmount: ''
+          },
         }
       },
       methods: {
@@ -285,6 +343,60 @@
               console.error('Error converting image to base64:', error);
             });
         },
+        editInvoice(statement)
+        {
+          this.selectedStatement = statement;
+          this.form.paid = this.selectedStatement.paid;
+          this.form.balance = this.selectedStatement.balance;
+          this.form.total = this.selectedStatement.total;
+          this.form.water_bill = this.selectedStatement.water_bill;
+          this.firstName = this.selectedStatement.tenant.first_name;
+          this.lastName = this.selectedStatement.tenant.last_name;
+          this.tenant = this.firstName + " " + this.lastName;
+          // Show the modal after fetching data
+            const modal = new bootstrap.Modal(document.getElementById('EditInvoiceModal'));
+            modal.show();
+        },
+        async confirmEditInvoice() {
+          if (this.selectedStatement && this.selectedStatement.id) {
+            // Implement your logic to invoice the tenant here
+            console.log("Editing invoice with statement ID:", this.selectedStatement.id);
+            await this.saveEditInvoice();
+
+            // Close the modal after invoicing
+            const modal = bootstrap.Modal.getInstance(document.getElementById('EditInvoiceModal'));
+            modal.hide();
+            this.loadLists()
+          }
+        },
+        saveEditInvoice() {
+            return new Promise((resolve, reject) => {
+                let payload; // Define payload variable outside the if-else blocks
+
+                  payload = {
+                      total: this.form.total,
+                      paid: this.form.paid,
+                      balance: this.form.balance,
+                      water_bill: this.form.water_bill,
+                  };
+               
+
+                axios.put("/api/edit-statement/" + this.selectedStatement.id, payload)
+                    .then(response => {
+                        console.log(response);
+                         toast.fire(
+                              'Success!',
+                              'Invoice updated!',
+                              'success'
+                          );
+                        resolve(); // Resolve the promise when settleTenant completes successfully
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        reject(error); // Reject the promise if there's an error
+                    });
+            });
+        },
         print(statement) {
             console.log("merc",statement);
             this.name = statement.property.name;
@@ -302,6 +414,7 @@
             this.status = statement.status;
             this.paid = statement.paid;
             this.balance = statement.balance;
+            this.rentMonth = statement.rent_month;
             this.invoiceDate = statement.updated_at;
             this.payDate = statement.paid_at;
             this.total = statement.total;
@@ -315,11 +428,11 @@
                 this.paymentMethod = 'NOT SETTLED'
              }
             //unit info
-            this.unitName = statement.unit.unit_number;
-            this.unitRent = statement.unit.monthly_rent;
-            this.unitSecurityFee = statement.unit.security_fee;
-            this.unitGarbageFee = statement.unit.garbage_fee;
-            this.unitType = statement.unit.type;
+            // this.unitName = statement.unit.unit_number;
+            // this.unitRent = statement.unit.monthly_rent;
+            // this.unitSecurityFee = statement.unit.security_fee;
+            // this.unitGarbageFee = statement.unit.garbage_fee;
+            // this.unitType = statement.unit.type;
 
             // Open a new window for printing
             const printWindow = window.open("", "_blank");
@@ -333,14 +446,33 @@
             // Close the document stream
             printWindow.document.close();
 
-            // Trigger the print dialog
-            printWindow.print();
+           // Wait for the content to be fully loaded
+            printWindow.onload = function() {
+                // Find the logo image element
+                const logoImage = printWindow.document.querySelector('img');
+
+                if (logoImage) {
+                    // Ensure the image is loaded
+                    logoImage.onload = function() {
+                        // Trigger the print dialog after the image has loaded
+                        printWindow.print();
+                    };
+
+                    // Handle case where the image might already be cached
+                    if (logoImage.complete) {
+                        logoImage.onload();  // Manually trigger onload if image is already loaded
+                    }
+                } else {
+                    // If there's no image, just print immediately
+                    printWindow.print();
+                }
+            };
         },
         buildPrintContent() {
           // Determine whether to include the row
           const showExpensesDeductionRow = this.expenses !== 0;
           const logoBase64 = this.logoBase64;
-          const watermarkText = this.paymentMethod;
+          const watermarkText = 'INVOICE';
           // Build the HTML content for the receipt
           const receiptHTML = `
             <!DOCTYPE html>
@@ -451,12 +583,13 @@
                   <div class="company-info">
                     <p>Cosyard Business Center, Kakamega Mumias Road, Kakamega.</p>
                     <p>Phone: (0720) 020-401 </p>
-                    <p> Email: propertIngo@gmail.com</p>
-                    <p> Website: www.Ingoproperties.co.ke</p>
+                    <p> Email: propertingo@gmail.com</p>
+                    <p> Website: www.ingoproperties.co.ke</p>
                   </div>
                 </div>
                 <div class="receipt-info">
                   <p><strong>#${this.refNo}</strong></p>
+                  <p><strong>Rent Month:</strong> ${this.rentMonth}</p>
                   <p><strong>Invoice Date:</strong> ${this.format_date(this.invoiceDate ?? 'N/A')}</p>
                   <p><strong>Payment Date:</strong>  ${this.format_date(this.payDate ?? 'N/A')}</p>
                   <p><strong>Payment Mode:</strong> ${this.payment ?? 'N/A'}</p>
@@ -465,7 +598,7 @@
                 <div class="additional-info">
                     <p><strong>Invoiced To</strong></p>
                     <p><strong></strong> ${this.tenant}</p>
-                    <p><strong></strong> ${this.name} - ${this.unitName}</p>
+                    <p><strong></strong> ${this.name}</p>
                     <p><strong></strong> ${this.details}</p>
                 </div>
                 <table class="receipt-table">
@@ -494,8 +627,7 @@
                 </table>
                 <div class="payment-info">
                   <p><strong>Payment Options:</strong></p>
-                  <p>Bank Transfer: Account Number 123456789</p>
-                  <p>Mobile Money: Paybill - ${this.paybillNo ?? 'N/A'} Account Number - ${this.accountNo ?? 'N/A'}</p>
+                  <p>MPESA: Till Number - 8788932</p>
                 </div>
                 <div class="receipt-footer">
                   <p>Generated on ${new Date().toLocaleString()}</p>
