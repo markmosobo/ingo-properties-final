@@ -231,7 +231,29 @@
             </router-link>
           </li>                
         </ul>
-      </li><!-- End Components Nav --> 
+      </li>
+      <!-- End Components Nav -->
+
+      <li v-show="user.role_id == 1" class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#testimonials-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-menu-button-wide"></i><span>Testimonials</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="testimonials-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <router-link to="/all-testimonials" custom v-slot="{ href, navigate, isActive }">
+                <a
+                  :href="href"
+                  :class="{ active: isActive }"
+                  class="nav-link"
+                  @click="navigate"
+                >
+              <i class="bi bi-circle"></i><span>Testimonials</span>
+              </a>
+            </router-link>
+          </li>                
+        </ul>
+      </li>
+      <!-- End Components Nav --> 
 
       <!-- agents menu-->
       <li v-show="user.role_id == 2" class="nav-item">

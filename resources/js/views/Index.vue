@@ -573,6 +573,99 @@
     </section>
     <!-- END ABOUT -->
 
+    <!-- TESTIMONIAL -->
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-lg-6 mx-auto">
+                    <div class="title__head">
+                        <h2 class="text-center text-capitalize">
+                            testimonials
+                        </h2>
+                        <p class="text-center text-capitalize">what people say about ingo properties.</p>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="testimonial owl-carousel owl-theme">
+                <!-- TESTIMONIAL -->
+                <div class="item testimonial__block">
+                    <div class="testimonial__block-card bg-reviews">
+                        <p>
+                            {{hometestimonial1.body}}
+                        </p>
+                    </div>
+                    <div class="testimonial__block-users">
+                        <div class="testimonial__block-users-img">
+                            <!-- <img src="images/profile-blog.jpg" alt="" class="img-fluid"> -->
+                        </div>
+                        <div class="testimonial__block-users-name">
+                            {{hometestimonial1.full_name}} <br>
+                            <span>{{hometestimonial1.label}}</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- END TESTIMONIAL -->
+                <!-- TESTIMONIAL -->
+                <div class="item testimonial__block">
+                    <div class="testimonial__block-card bg-reviews">
+                        <p>
+                            {{hometestimonial2.body}}
+                        </p>
+                    </div>
+                    <div class="testimonial__block-users">
+                        <div class="testimonial__block-users-img">
+                            <!-- <img src="images/client.png" alt="" class="img-fluid"> -->
+                        </div>
+                        <div class="testimonial__block-users-name">
+                            {{hometestimonial2.full_name}} <br>
+                            <span>{{hometestimonial2.label}}</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- END TESTIMONIAL -->
+                <!-- TESTIMONIAL -->
+                <div v-if="hometestimonial3" class="item testimonial__block">
+                    <div class="testimonial__block-card bg-reviews">
+                        <p>
+                            {{hometestimonial3.body}}
+                        </p>
+                    </div>
+                    <div class="testimonial__block-users">
+                        <div class="testimonial__block-users-img">
+                            <!-- <img src="images/profile-blog.jpg" alt="" class="img-fluid"> -->
+                        </div>
+                        <div class="testimonial__block-users-name">
+                            {{hometestimonial3.full_name}} <br>
+                            <span>{{hometestimonial3.label}}</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- END TESTIMONIAL -->
+                <!-- TESTIMONIAL -->
+                <div v-if="hometestimonial4" class="item testimonial__block">
+                    <div class="testimonial__block-card bg-reviews">
+                        <p>
+                            {{hometestimonial4.body}}
+                        </p>
+                    </div>
+                    <div class="testimonial__block-users">
+                        <div class="testimonial__block-users-img">
+                            <!-- <img src="images/client.png" alt="" class="img-fluid"> -->
+                        </div>
+                        <div class="testimonial__block-users-name">
+                            {{hometestimonial4.full_name}} <br>
+                            <span>{{hometestimonial4.label}}</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- END TESTIMONIAL -->
+
+            </div>
+        </div>
+    </section>
+    <!-- END TESTIMONIAL -->
+
     <!-- BLOG -->
     <section class="blog__home bg-light">
         <div class="container">
@@ -668,6 +761,11 @@ export default {
             recentblogs: [],
             abouts: [],
             homeprojects: [],
+            hometestimonials: [],
+            hometestimonial1: '',
+            hometestimonial2: '',
+            hometestimonial3: '',
+            hometestimonial4: '',
             featuredproject: [],
             user: [],
             form: {
@@ -740,8 +838,16 @@ export default {
             this.recentblogs = response.data.lists.recentblogs;
             this.abouts = response.data.lists.abouts;
             this.homeprojects = response.data.lists.homeprojects;
+            this.hometestimonials = response.data.lists.hometestimonials;
+
+            // Assign each testimonial only if it exists
+            this.hometestimonial1 = this.hometestimonials[0] || null;
+            this.hometestimonial2 = this.hometestimonials[1] || null;
+            this.hometestimonial3 = this.hometestimonials[2] || null;
+            this.hometestimonial4 = this.hometestimonials[3] || null;
+
             this.featuredproject = response.data.lists.featuredproject;
-            console.log("home 1" ,this.featuredproject)
+            console.log("home 1" ,this.hometestimonial3)
             console.log("home 2" ,this.homeprojects)
 
             });

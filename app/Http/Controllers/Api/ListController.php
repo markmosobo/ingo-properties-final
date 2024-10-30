@@ -27,6 +27,7 @@ use App\Models\PmsTenant;
 use App\Models\PmsExpense;
 use App\Models\PmsStatement;
 use App\Models\Invoice;
+use App\Models\Testimonial;
 use App\Models\DefaultPassword;
 use Carbon\Carbon;
 
@@ -67,6 +68,8 @@ class ListController extends Controller
         $displaymessages = Message::latest()->with('user')->where('status',0)->limit(3)->get();
         $projects = Project::all();
         $homeprojects = Project::where('featured',0)->limit(4)->where('status', 1)->orWhere('status', 0)->get();
+        $testimonials = Testimonial::latest()->get();
+        $hometestimonials = Testimonial::where('status', 1)->limit(4)->get();
         $homeservices = Service::latest()->limit(6)->get();
         $featuredproject = Project::latest()->where('featured',1)->where('status', 1)->limit(1)->get();
         $openproperties = Property::latest()->with('type','images')->where('status',1)->get();
@@ -122,6 +125,8 @@ class ListController extends Controller
                 'displaymessages' => $displaymessages,
                 'projects' => $projects,
                 'homeprojects' => $homeprojects,
+                'testimonials' => $testimonials,
+                'hometestimonials' => $hometestimonials,
                 'featuredproject' => $featuredproject,
                 'closedproperties' => $closedproperties,
                 'openproperties' => $openproperties,
@@ -150,6 +155,75 @@ class ListController extends Controller
             ]
         ]);
 
+    }
+
+    public function storeTestimonial(Request $request)
+    {
+        $testimonial = Testimonial::create([
+            'full_name' => $request->full_name,
+            'body' => $request->body,
+            'label' => $request->label,
+        ]);
+        $testimonial->save();
+
+         return response()->json([
+            'status' => true,
+            'message' => "Testimonial Created successfully!",
+            'testimonial' => $testimonial
+        ], 200);
+    }
+
+    public function updateTestimonial(Request $request, $id)
+    {
+       $testimonial = Testimonial::findOrFail($id);
+        $testimonial->update([
+            'full_name' => $request->full_name,
+            'body' => $request->body,
+            'label' => $request->label,
+        ]);        
+        return response()->json([
+            'status' => true,
+            'message' => "Testimonial Updated successfully!",
+            'testimonial' => $testimonial
+        ], 200);
+    }
+
+     public function destroyTestimonial(Request $request, $id)
+    {
+        $testimonial = Testimonial::findOrFail($id);
+        if($testimonial){
+        $testimonial->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => "Testimonial Deleted successfully!",
+        ], 200);
+        }
+    }    
+
+    public function approveTestimonial(Request $request, $id)
+    {
+        $testimonial = Testimonial::findOrFail($id);
+
+        if($testimonial){
+            $testimonial->update(array('status' => 1));
+            $testimonial->save();
+        }
+    }
+
+    public function editTestimonial(Request $request, $id)
+    {
+        $testimonial = Testimonial::findOrFail($id);
+
+        if($testimonial){
+            $testimonial->update($request->all());
+        }
+
+         return response()->json([
+            'status' => true,
+            'message' => "Testimonial Updated successfully!",
+            'testimonial' => $testimonial
+        ], 200);
     }
 
     public function updateDefaultPassword(Request $request)

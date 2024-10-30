@@ -52,6 +52,7 @@ import FeaturedBlogs from '../views/blogs/FeaturedBlogs.vue'
 import AddBlog from '../views/blogs/AddBlog.vue'
 import EditBlog from '../views/blogs/EditBlog.vue'
 import ViewBlog from '../views/blogs/ViewBlog.vue'
+import AllTestimonials from '../views/about/AllTestimonials.vue'
 import AllAbouts from '../views/about/AllAbouts.vue'
 import AddAbout from '../views/about/AddAbout.vue'
 import EditAbout from '../views/about/EditAbout.vue'
@@ -330,6 +331,12 @@ const routes = [
         path:'/all-abouts',
         name: 'all-abouts',
         component: AllAbouts,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/all-testimonials',
+        name: 'all-testimonials',
+        component: AllTestimonials,
         beforeEnter : guardMyroute,
     },
     {

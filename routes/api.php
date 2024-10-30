@@ -65,6 +65,7 @@ Route::post('landlords', [LandlordController::class, 'store']);
 Route::post('tenants', [PmsTenantController::class, 'store']);
 Route::post('pmsexpenses', [PmsExpenseController::class, 'store']);
 Route::post('pmsstatements', [PmsStatementController::class, 'store']);
+Route::post('testimonial', [ListController::class, 'storeTestimonial']);
 Route::post('pmsunits/{id}', [PmsUnitController::class, 'store']);
 
 Route::get('users', [UserController::class, 'index']);
@@ -174,6 +175,7 @@ Route::put('sociallink/{id}', [SocialLinkController::class, 'update']);
 Route::put('message/{id}', [MessageController::class, 'update']);
 Route::put('project/{id}', [ProjectController::class, 'update']);
 Route::put('landlord/{id}', [LandlordController::class, 'update']);
+Route::put('testimonial/{id}', [ListController::class, 'updateTestimonial']);
 Route::put('pmsproperty/{id}', [PmsPropertyController::class, 'update']);
 Route::put('pmsunit/{id}', [PmsUnitController::class, 'update']);
 Route::put('pmstenant/{id}', [PmsTenantController::class, 'update']);
@@ -204,6 +206,7 @@ Route::delete('propertyimage/{id}', [PropertyController::class, 'destroyImage'])
 Route::delete('about/{id}', [AboutController::class, 'destroy']);
 Route::delete('service/{id}', [ServiceController::class, 'destroy']);
 Route::delete('contact/{id}', [ContactController::class, 'destroy']);
+Route::delete('testimonial/{id}', [ListController::class, 'destroyTestimonial']);
 Route::delete('sociallink/{id}', [SocialLinkController::class, 'destroy']);
 Route::delete('message/{id}', [MessageController::class, 'destroy']);
 Route::delete('project/{id}', [ProjectController::class, 'destroy']);
@@ -215,6 +218,9 @@ Route::delete('pmsstatement/{id}', [PmsStatementController::class, 'destroy']);
 
 Route::put('vacatetenant/{id}',[PmsTenantController::class,'vacate']);
 Route::put('vacateunit/{id}',[PmsUnitController::class,'vacate']);
+
+Route::put('approvetestimonial/{id}',[ListController::class,'approveTestimonial']);
+Route::put('edit-testimonial/{id}',[ListController::class,'editTestimonial']);
 
 
 Route::put('approveproperty/{id}',[PropertyController::class,'approve']);
