@@ -353,7 +353,7 @@
 
       <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#expenses-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Manage Expenses</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-gem"></i><span>Manage Payments</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="expenses-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
@@ -368,11 +368,18 @@
             </a>
             </router-link>
           </li>
-<!--           <li>
-            <a href="icons-remix.html">
-              <i class="bi bi-circle"></i><span>Statements</span>
+          <li>
+            <router-link to="/payments" custom v-slot="{ href, navigate, isActive }">
+              <a
+                :href="href"
+                :class="{ active: isActive }"
+                class="nav-link"
+                @click="navigate"
+              >          
+              <i class="bi bi-circle"></i><span>Payment Methods</span>
             </a>
-          </li> -->
+            </router-link>
+          </li>
           <!--<li>
             <a href="icons-boxicons.html">
               <i class="bi bi-circle"></i><span>Boxicons</span>

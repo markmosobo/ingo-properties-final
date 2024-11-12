@@ -35,6 +35,32 @@
                       </div>
                    </div>
                    <div class="col-sm-6">
+                      <label for="inputPassword" class="form-label">Middle Name</label>
+                      <div class="col-sm-10">
+                        <input
+                            type="text"
+                            placeholder="Middle Name"
+                            id="title"
+                            name="title"
+                            v-model="form.middle_name"
+                            class="form-control"
+                            required=""
+                        />
+                        <div class="invalid-feedback">Please enter last name!</div>
+                      </div>
+                   </div>
+ 
+                </div>
+                <div class="row mb-3"></div>
+                <div class="form-group row">
+                   <input
+                      type="hidden"
+                      id="user_id"
+                      name="user_id"
+                      value="1"
+                      class="form-control"
+                   />
+                   <div class="col-sm-6">
                       <label for="inputPassword" class="form-label">Last Name*</label>
                       <div class="col-sm-10">
                         <input
@@ -43,6 +69,21 @@
                             id="title"
                             name="title"
                             v-model="form.last_name"
+                            class="form-control"
+                            required=""
+                        />
+                        <div class="invalid-feedback">Please enter first name!</div>
+                      </div>
+                   </div>
+                   <div class="col-sm-6">
+                      <label for="inputPassword" class="form-label">Email Address*</label>
+                      <div class="col-sm-10">
+                        <input
+                            type="text"
+                            placeholder="Email Address"
+                            id="title"
+                            name="title"
+                            v-model="form.email_address"
                             class="form-control"
                             required=""
                         />

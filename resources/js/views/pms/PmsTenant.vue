@@ -10,6 +10,7 @@
                   <strong>Full Name:</strong> {{form.first_name}} {{form.last_name}} <br>
                   <strong>ID Number:</strong> {{form.id_number}} <br>
                   <strong>Phone:</strong> {{form.phone_number}}<br>
+                  <strong v-if="form.email_address">Email:</strong> {{form.email_address}}<br>
                   <strong>Property:</strong> {{property}}<br>
                   <strong>Unit:</strong> {{unit}}<br>
                   <strong>Status: </strong>

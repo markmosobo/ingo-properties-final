@@ -14,7 +14,9 @@ class PmsTenantController extends Controller
         $tenant = PmsTenant::create(
         [
             'first_name' => $request->first_name,
+            'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,
+            'email_address' => $request->email_address,
             'id_number' => $request->id_number,
             'phone_number' => $request->phone_number,
             'pms_property_id' => $request->pms_property_id,

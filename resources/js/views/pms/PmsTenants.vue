@@ -8,7 +8,7 @@
                   <div class="card top-selling overflow-auto">
     
                     <div class="filter">
-<!--                       <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                      <!--                       <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                       <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                         <li class="dropdown-header text-start">
                           <h6>Filter</h6>
@@ -30,15 +30,15 @@
                                 <a
                                   :href="href"
                                   :class="{ active: isActive }"
-                                  class="btn btn-sm btn-primary rounded-pill"
+                                  class="btn btn-sm btn-primary rounded-pill mr-2"
                                   style="background-color: darkgreen; border-color: darkgreen;"
                                   @click="navigate"
                                 >
-                                  Add Tenant
+                                  Add Tenant & Invoice
                                 </a>
                             </router-link>
 
-                 <!--            <router-link to="/add-pmscurrenttenant" custom v-slot="{ href, navigate, isActive }">
+                          <router-link to="/add-pmscurrenttenant" custom v-slot="{ href, navigate, isActive }">
                                 <a
                                   :href="href"
                                   :class="{ active: isActive }"
@@ -46,9 +46,9 @@
                                   style="background-color: orange; border-color: orange;"
                                   @click="navigate"
                                 >
-                                  Add Renting Tenant
+                                  Add Tenant
                                 </a>
-                            </router-link> -->
+                            </router-link>
                             </div>
                           <div class="col-auto d-flex justify-content-end">
                           <div class="btn-group" role="group">

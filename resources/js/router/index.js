@@ -107,6 +107,9 @@ import ViewStatement from '../views/pms/ViewStatement.vue'
 import EditStatement from '../views/pms/EditStatement.vue'
 import SettleStatement from '../views/pms/SettleStatement.vue'
 import InvoiceStatement from '../views/pms/InvoiceStatement.vue'
+import Payments from '../views/pms/Payments.vue'
+import AddPayment from '../views/pms/AddPayment.vue'
+import EditPayment from '../views/pms/EditPayment.vue'
 
 import AwaitingInvoicing from '../views/pms/AwaitingInvoicing.vue'
 import LastMonthAwaitingInvoicing from '../views/pms/LastMonthAwaitingInvoicing.vue'
@@ -1008,7 +1011,25 @@ const routes = [
         name: 'settlestatement',
         component: SettleStatement,
         beforeEnter : guardMyroute,
-    },                              
+    },
+    {
+        path:'/payments',
+        name: 'payments',
+        component: Payments,
+        beforeEnter : guardMyroute,
+    },  
+    {
+        path:'/add-payment',
+        name: 'add-payment',
+        component: AddPayment,
+        beforeEnter : guardMyroute,
+    },
+    {
+        path:'/edit-payment/:id',
+        name: 'edit-payment',
+        component: EditPayment,
+        beforeEnter : guardMyroute,
+    },                            
                
 ];
 

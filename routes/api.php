@@ -269,3 +269,8 @@ Route::post('sendlandlordsms', [SearchController::class, 'sendLandlordSms'])->na
 //generate invoices
 Route::post('/generate-monthly-statements', [PmsStatementController::class, 'generateMonthlyStatements']);
 
+
+//send emails
+Route::post('/send-landlordinvoice', [PmsInvoiceController::class, 'sendLandlordInvoice']);
+Route::post('/send-tenantinvoice', [PmsInvoiceController::class, 'sendTenantInvoice']);
+Route::post('/send-custom-mail', [PmsInvoiceController::class, 'sendCustomMail']);

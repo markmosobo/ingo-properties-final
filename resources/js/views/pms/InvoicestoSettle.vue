@@ -8,7 +8,7 @@
                   <div class="card top-selling overflow-auto">
     
                     <div class="filter">
-<!--                       <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                      <!--                       <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                       <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                         <li class="dropdown-header text-start">
                           <h6>Filter</h6>
@@ -90,51 +90,71 @@
                       </p>
     
                       <table id="AllStatementsTable" class="table table-borderless">
-                        <thead>
-                          <tr>
-                            <th scope="col">Tenant</th>
-                            <th scope="col">Property</th>
-                            <th scope="col">Detail</th>
-                            <th scope="col">Due</th>
-                            <th scope="col">Paid</th>
-                            <th scope="col">Bal</th>
-                            <th scope="col">Transaction On</th>                            
-                            <th scope="col">Status</th>
-                            <th scope="col">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr v-for="statement in statements" :key="statement.id">
-                            <td>{{ statement.tenant ? statement.tenant.first_name + ' ' + statement.tenant.last_name : 'N/A' }}</td>
-                            <td>{{statement.property.name}}</td>                            
-                            <td>{{statement.details}}</td>
-                            <td>{{formatNumber(statement.total)}}</td>
-                            <td>{{formatNumber(statement.paid)}}</td>
-                            <td>{{formatNumber(statement.balance)}}</td>
-                            <td>{{format_date(statement.created_at)}}</td>                            
-                            <td>
-                              <span v-if="statement.status == 1" class="badge bg-success"><i class="bi bi-clipboard2-check"></i> Settled</span>
-                              <span v-else-if="statement.status == 0" class="badge bg-warning text-dark"><i class="bi bi-clipboard2-x"></i> Not Settled</span>
-                              <span v-else class="badge bg-info text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Vacant</span>
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a @click="navigateTo('/viewstatement/'+statement.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Invoice</a>                                            
-                                  <a v-if="statement.status == 0 && statement.water_bill == null" @click="invoiceTenant(statement.id)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Invoice</a>
-                                  <a v-if="statement.status == 0 && statement.water_bill !== null" @click="settleTenant(statement)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle Invoice</a>
-                                  <a @click="print(statement)" class="dropdown-item" href="#"><i class="ri-printer-line mr-2"></i>Print Invoice</a> 
-                                  <a @click="editInvoice(statement)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit Invoice</a> 
-                                  <a @click="deleteInvoice(statement.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete Invoice</a>                                 
-                                  </div>
+                      <thead>
+                        <tr>
+                          <th scope="col">Tenant</th>
+                          <th scope="col">Property</th>
+                          <th scope="col">Detail</th>
+                          <th scope="col">Due</th>
+                          <th scope="col">Paid</th>
+                          <th scope="col">Bal</th>
+                          <th scope="col">Invoiced</th>                            
+                          <th scope="col">Status</th>
+                          <th scope="col">Remind</th>
+                          <th scope="col">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="statement in statements" :key="statement.id">
+                          <td>{{ statement.tenant ? statement.tenant.first_name + ' ' + statement.tenant.last_name : 'N/A' }}</td>
+                          <td>{{statement.property.name}}</td>                            
+                          <td>{{statement.details}}</td>
+                          <td>{{formatNumber(statement.total)}}</td>
+                          <td>{{formatNumber(statement.paid)}}</td>
+                          <td>{{formatNumber(statement.balance)}}</td>
+                          <td>{{format_date(statement.created_at)}}</td>                            
+                          <td>
+                            <span v-if="statement.status == 1" class="badge bg-success"><i class="bi bi-clipboard2-check"></i> Settled</span>
+                            <span v-else-if="statement.status == 0" class="badge bg-warning text-dark"><i class="bi bi-clipboard2-x"></i> Not Settled</span>
+                            <span v-else class="badge bg-info text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Vacant</span>
+                          </td>
+                          <td>
+                             <button
+                              @click="sendEmailReminder(statement)"
+                              class="btn btn-sm btn-light"
+                              title="Send Email Reminder"
+                              :disabled="statement.isLoadingEmail"
+                            >
+                              <span v-if="statement.isLoadingEmail">
+                                <i class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></i>
+                              </span>
+                              <span v-else>
+                                <i class="ri-mail-send-line" style="color: #007bff;"></i>
+                              </span>
+                            </button>
+                            <button @click="sendWhatsAppReminder(statement, $event)" class="btn btn-sm btn-light" title="Send WhatsApp Reminder">
+                              <i class="ri-whatsapp-line" style="color: #25D366;"></i>
+                            </button>
+                          </td>
+                          <td>
+                            <div class="btn-group" role="group">
+                              <button id="btnGroupDrop1" type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Action
+                              </button>
+                              <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <a @click="navigateTo('/viewstatement/'+statement.id)" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Invoice</a>                                            
+                                <a v-if="statement.status == 0 && statement.water_bill == null" @click="invoiceTenant(statement.id)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Invoice</a>
+                                <a v-if="statement.status == 0 && statement.water_bill !== null" @click="settleTenant(statement)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle Invoice</a>
+                                <a @click="print(statement)" class="dropdown-item" href="#"><i class="ri-printer-line mr-2"></i>Print Invoice</a> 
+                                <a @click="editInvoice(statement)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit Invoice</a> 
+                                <a @click="deleteInvoice(statement.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete Invoice</a>                                 
                               </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+
                       <div><strong>Total: 
                         Due: {{ formatNumber(calculateTotal('total')) }},
                         Paid: {{ formatNumber(calculateTotal('paid')) }},
@@ -340,6 +360,7 @@
             amountPaid: '',
             balAmount: ''
           },
+          isLoadingEmail: false,
           errors: {
             cash: '',
             mpesa_code: ''
@@ -353,6 +374,319 @@
          invoiceTenant(id){
             this.$router.push('invoicestatement/'+id)
         },
+        async sendEmailReminder(statement) {
+          // Set the loading state for this specific statement
+          statement.isLoadingEmail = true; // Start spinner for the specific row
+
+          this.dueAmount = statement.total;
+          this.dueWater = statement.water_bill;
+          this.tenantId = statement.pms_tenant_id;
+          this.rentMonth = statement.rent_month;
+          this.details = statement.details;
+          this.refNo = statement.ref_no;
+          this.createdAt = statement.created_at;
+          this.invoicedAt = statement.updated_at;
+          this.propertyId = statement.pms_property_id;
+          this.unitId = statement.pms_unit_id;
+          this.waterBillAmount = statement.water_bill;
+          this.water = this.waterBillAmount === 0 ? '' : '(Incl. Water Bill)';
+
+          // Check if tenantEmail is provided
+          if (!statement.tenant.email_address) {
+            statement.isLoadingEmail = false; // Stop loading on error
+            Swal.fire({
+              title: 'Error sending email',
+              text: 'Please ensure ' + statement.tenant.first_name + ' ' + statement.tenant.last_name + ' has a valid email address. To update, click on View Tenant on the Action button',
+              icon: 'warning',
+            });
+            return;
+          }
+
+          // Calculate the due date (5th of the rent month)
+          this.dueDate = this.calculateDueDate(statement.rent_month);
+
+          // Check the property ID and get the relevant info
+          if (statement.pms_property_id === 5) {
+            this.accountNo = statement.unit.account_number;
+            this.paybillNo = statement.unit.paybill_number;
+          } else {
+            this.accountNo = statement.property.account_number;
+            this.paybillNo = statement.property.paybill_number;
+          }
+
+          // Generate the invoice content and create a Blob
+          const invoiceContent = this.buildInvoiceContent();
+          const blob = new Blob([invoiceContent], { type: 'text/html' });
+          const file = new File([blob], 'invoice.html', { type: 'text/html' });
+
+          // Prepare form data to send the email request to the backend
+          const formData = new FormData();
+          formData.append('name', statement.tenant.first_name + ' ' + statement.tenant.last_name);
+          formData.append('email', statement.tenant.email_address);
+          formData.append('due_water', this.dueWater);
+          formData.append('due_amount', this.dueAmount);
+          formData.append('account_no', this.accountNo);
+          formData.append('paybill_no', this.paybillNo);
+          formData.append('subject', this.rentMonth + ' Invoice Payment Reminder');
+          formData.append('message', `Dear ${statement.tenant.first_name} ${statement.tenant.last_name}, this is a kind reminder that your invoice no. ${this.refNo} generated on ${this.format_date(this.createdAt)} is due on ${this.dueDate}. To service this invoice, pay via M-Pesa paybill number: ${this.paybillNo} account number: ${this.accountNo} amount: ${this.dueAmount}`);
+          formData.append('invoice', file);
+
+          try {
+            await axios.post('/api/send-tenantinvoice', formData, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            toast.fire(`To: ${statement.tenant.email_address}`, 'Email has been sent successfully.', 'success');
+          } catch (error) {
+            Swal.fire({
+              title: 'Error sending email',
+              text: error.response?.data?.message || error.message,
+              icon: 'warning',
+            });
+          } finally {
+            statement.isLoadingEmail = false; // Stop spinner for this specific row
+          }
+        },
+
+        buildInvoiceContent() {
+          // Determine whether to include the row
+          const logoBase64 = this.logoBase64 || ''; // Fallback if no logo is provided
+          const watermarkText = 'INVOICE';
+          // Build the HTML content for the receipt
+          const receiptHTML = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Invoice Of Payment - ${this.refNo}</title>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  margin: 0;
+                  padding: 0;
+                  background-color: #f5f5f5;
+                }
+                .receipt {
+                  max-width: 600px;
+                  margin: 20px auto;
+                  padding: 20px;
+                  background-color: #fff;
+                  border: 2px solid #ccc;
+                  display: flex;
+                  flex-direction: column;
+                }
+                 .watermark {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) rotate(-45deg);
+                    font-size: 80px;
+                    color: rgba(0, 0, 0, 0.1); /* Adjust the transparency as needed */
+                    white-space: nowrap;
+                    z-index: 0;
+                    pointer-events: none; /* Prevents watermark from interfering with other elements */
+                  }
+                .receipt-header {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 50px;
+                }
+                .company-info {
+                  text-align: left;
+                }
+                .company-info img {
+                  max-width: 150px;
+                  height: auto;
+                }
+                .receipt-info {
+                  margin-bottom: 50px;
+                }
+                .receipt-info p {
+                  margin: 5px 0;
+                  color: #555;
+                }
+                 .additional-info {
+                  margin-bottom: 30px;
+                  font-size: 16px;
+                  color: #333333;
+                }
+                .additional-info p {
+                  margin: 8px 0;
+                }
+                .payment-info {
+                  margin-bottom: 30px;
+                  font-size: 16px;
+                  color: #333333;
+                  text-align: center;
+                }
+                .payment-info p {
+                  margin: 8px 0;
+                }
+                .receipt-table {
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin-bottom: 50px;
+                }
+                .receipt-table th, .receipt-table td {
+                  padding: 8px;
+                  border-bottom: 1px solid #ccc;
+                }
+                .receipt-table th {
+                  text-align: left;
+                  background-color: #f2f2f2;
+                  color: #333;
+                }
+                .receipt-table td {
+                  text-align: left;
+                  color: #666;
+                }
+                .receipt-footer {
+                  text-align: center;
+                  margin-top: auto;
+                }
+                .receipt-footer p {
+                  margin: 5px 0;
+                  color: #777;
+                }
+              </style>
+            </head>
+            <body>
+            <div class="watermark">${watermarkText}</div>
+              <div class="receipt">
+                <div class="receipt-header">
+                  <div class="company-logo">
+                    <img src="${logoBase64}" alt="Company Logo" style="max-width: 150px; height: auto;">
+                  </div>
+                  <div class="company-info">
+                    <p>Kakamega-Webuye Rd, ACK Building</p>
+                    <p>Phone: (0720) 020-401 </p>
+                    <p> Email: propertapril@gmail.com</p>
+                    <p> Website: www.aprilproperties.co.ke</p>
+                  </div>
+                </div>
+                <div class="receipt-info">
+                  <p><strong>#${this.refNo}</strong></p>
+                  <p><strong>Invoice Date:</strong> ${this.format_date(this.invoicedAt ?? 'N/A')}</p>
+                  <p><strong>Due Date:</strong>  ${this.dueDate ?? 'N/A'}</p>
+                  
+                </div>
+                <div class="additional-info">
+                    <p><strong>Invoiced To</strong></p>
+                    <p><strong></strong> ${this.invoicedTenantFullName}</p>
+                    <p><strong></strong> ${this.name ?? 'Victoria Apartments'} - ${this.unitName}</p>
+                    <p><strong></strong> ${this.rentMonth}</p>
+                </div>
+                <table class="receipt-table">
+                  <thead>
+                    <tr>
+                      <th>Description</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Total Rent Due ${this.water}</td>
+                      <td>KES ${this.formatNumber(this.dueAmount)}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th>Total Amount Due:</th>
+                      <td>KES ${this.formatNumber(this.dueAmount)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+                <div class="payment-info">
+                  <p><strong>Payment Options:</strong></p>
+                  <p>Mobile Money: Paybill - ${this.paybillNo ?? 'N/A'} Account Number - ${this.accountNo ?? 'N/A'}</p>
+                </div>
+                <div class="receipt-footer">
+                  <p>Printed on ${this.format_date(new Date().toLocaleString())}</p>
+                </div>
+              </div>
+            </body>
+            </html>
+          `;
+
+          return receiptHTML;
+        },
+        async sendWhatsAppReminder(statement, event) {
+            // Prevent the default anchor behavior
+            event.preventDefault();
+
+            this.unitId = statement.pms_unit_id;
+            this.rentMonth = statement.rent_month;
+
+            // Ensure the tenant's phone number exists
+            if (!statement.tenant || !statement.tenant.phone_number) {
+                Swal.fire({
+                    title: 'Error sending WhatsApp',
+                    text: 'Please ensure ' + (statement.tenant ? statement.tenant.first_name : 'the tenant') + ' has a valid phone number',
+                    icon: 'warning',
+                });
+                return;
+            }
+
+            // Check the property ID and get the relevant info
+            if (statement.pms_property_id == 5) {
+                this.accountNo = statement.unit.account_number;
+                this.paybillNo = statement.unit.paybill_number;
+            } else {
+                this.accountNo = statement.property.account_number;
+                this.paybillNo = statement.property.paybill_number;
+            }
+
+            // Calculate the due date (5th of the rent month)
+            this.dueDate = this.calculateDueDate(this.rentMonth);
+
+            // Prepare the message with a more professional format
+            const message = `Dear ${statement.tenant.first_name} ${statement.tenant.last_name},\n\n` +
+                `This is a kind reminder that your invoice for ${statement.rent_month}, Invoice No. ${statement.ref_no}, ` +
+                `which was generated on ${this.format_date(statement.created_at)}, is due on ${this.dueDate}.\n\n` +
+                `To service this invoice, please make your payment via M-Pesa Paybill Number: ${this.paybillNo},\n` +
+                `Account Number: ${this.accountNo}, for the amount of ${this.formatNumber(statement.total)}.\n\n` +
+                `Ingo Properties`;
+
+            // WhatsApp URL scheme with tenant's phone number and the encoded message
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${statement.tenant.phone_number}&text=${encodeURIComponent(message)}`;
+
+            try {
+                // Open the WhatsApp URL in a new tab
+                window.open(whatsappUrl, '_blank');
+
+                // Increment the WhatsApp count in the pms_statements table
+                // await axios.post('/api/update-whatsapp-count', { 
+                //   id: statement.id,
+                //   tenantId: statement.tenant.id,
+                //   subject: this.rentMonth + ' Invoice Payment Reminder',
+                //   message: message,
+                //   });
+
+                toast.fire(
+                    'WhatsApp message sent to: ' + statement.tenant.phone_number,
+                    'WhatsApp message has been sent successfully.',
+                    'success'
+                );
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error sending WhatsApp',
+                    text: error.response?.data?.message || error.message,
+                    icon: 'warning',
+                });
+            }
+        },
+        calculateDueDate(rentMonth) {
+          let dueDate = new Date(rentMonth);
+          dueDate.setDate(5);
+
+          const day = String(dueDate.getDate()).padStart(2, '0');
+          const month = String(dueDate.getMonth() + 1).padStart(2, '0');
+          const year = dueDate.getFullYear();
+
+          return `${day}/${month}/${year}`;
+        }, 
         deleteInvoice(id){
           Swal.fire({
             title: 'Are you sure?',

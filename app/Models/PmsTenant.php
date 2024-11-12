@@ -14,7 +14,9 @@ class PmsTenant extends Model
         protected $fillable = 
     [
         'first_name',
+        'middle_name',
         'last_name',
+        'email_address',
         'id_number',
         'phone_number',
         'pms_unit_id',

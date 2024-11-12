@@ -28,6 +28,7 @@ use App\Models\PmsExpense;
 use App\Models\PmsStatement;
 use App\Models\Invoice;
 use App\Models\Testimonial;
+use App\Models\Payment;
 use App\Models\DefaultPassword;
 use Carbon\Carbon;
 
@@ -68,6 +69,7 @@ class ListController extends Controller
         $displaymessages = Message::latest()->with('user')->where('status',0)->limit(3)->get();
         $projects = Project::all();
         $homeprojects = Project::where('featured',0)->limit(4)->where('status', 1)->orWhere('status', 0)->get();
+        $payments = Payment::latest()->get();
         $testimonials = Testimonial::latest()->get();
         $hometestimonials = Testimonial::where('status', 1)->limit(4)->get();
         $homeservices = Service::latest()->limit(6)->get();
@@ -125,6 +127,7 @@ class ListController extends Controller
                 'displaymessages' => $displaymessages,
                 'projects' => $projects,
                 'homeprojects' => $homeprojects,
+                'payments' => $payments,
                 'testimonials' => $testimonials,
                 'hometestimonials' => $hometestimonials,
                 'featuredproject' => $featuredproject,
