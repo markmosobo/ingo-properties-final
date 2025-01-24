@@ -56,7 +56,7 @@ class AuthController extends Controller
       $postArray = $request->all(); 
      
       $postArray['password'] = bcrypt($postArray['password']); 
-      $postArray['role_id'] = 2;
+      $postArray['role_id'] = 3;
       $postArray['status'] = 2;
       $user = User::create($postArray); 
       

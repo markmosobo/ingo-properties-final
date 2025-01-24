@@ -97,6 +97,23 @@ class ListController extends Controller
 
         $defaultPassword = DefaultPassword::latest()->first();
 
+        $userscount = User::all()->count();
+        $tenantscount = PmsTenant::all()->count();
+        $activetenantscount = PmsTenant::all()->where('status', 1)->count();
+        $landlordscount = Landlord::all()->count();
+        $projectscount = Project::all()->count();
+        $blogscount = Blog::all()->count();
+        $staffcount = User::all()->where('role_id', 2)->count();
+        $regularuserscount = User::all()->where('role_id', 3)->count();
+        $testimonialscount = Testimonial::all()->count();
+        $approvedblogscount = Blog::with('category')->where('status',1)->count();
+
+        $pmspropertiescount = PmsProperty::latest()->count();
+        $pmsunitscount = PmsUnit::latest()->count();
+        $vacatedunitscount = PmsUnit::where('status', 0)->count();
+        $rentedunitscount = PmsUnit::where('status', 1)->count();
+        $awaitinginvoicingcount = PmsStatement::latest()->whereNotNull('water_bill')->where('status',0)->count();
+        $invoicedcount = PmsStatement::latest()->whereNotNull('water_bill')->where('status',1)->count();
 
         return response()->json([
             "lists" => [
@@ -152,7 +169,25 @@ class ListController extends Controller
                 'invoicestosettlesmssent' => $invoicestosettlesmssent,
                 'settledinvoices' => $settledinvoices,
 
-                'defaultPassword' => $defaultPassword
+                'defaultPassword' => $defaultPassword,
+
+                'userscount' => $userscount,
+                'landlordscount' => $landlordscount,
+                'tenantscount' => $tenantscount,
+                'activetenantscount' => $activetenantscount,
+                'projectscount' => $projectscount,
+                'approvedblogscount' => $approvedblogscount,
+                'blogscount' => $blogscount,
+                'staffcount' => $staffcount,
+                'regularuserscount' => $regularuserscount,
+                'testimonialscount' => $testimonialscount,
+
+                'pmspropertiescount' => $pmspropertiescount,
+                'pmsunitscount' => $pmsunitscount,
+                'rentedunitscount' => $rentedunitscount,
+                'vacatedunitscount' => $vacatedunitscount,
+                'awaitinginvoicingcount' => $awaitinginvoicingcount,
+                'invoicedcount' => $invoicedcount,
 
                 
             ]

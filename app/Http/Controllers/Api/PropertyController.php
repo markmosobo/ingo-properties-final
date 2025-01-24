@@ -215,6 +215,20 @@ class PropertyController extends Controller
         }
     }
 
+    public function userProperties(Request $request, $id)
+    {
+        // $property = Property::findOrFail($id);
+        $useropenproperties = Property::where('created_by', $id)->where('status', 1)->get();
+        $userclosedproperties = Property::where('created_by', $id)->where('status', 2)->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => "Property",
+            'useropenproperties' => $useropenproperties,
+            'userclosedproperties' => $userclosedproperties,
+        ], 200);
+    }
+
     public function single(Request $request, $id)
     {
         // $property = Property::findOrFail($id);

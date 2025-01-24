@@ -42,8 +42,9 @@
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
               <li class="dropdown-header">
                 <h6>{{user.first_name}} {{user.last_name}}</h6>
-                <span v-if="user.role_id == 1">Admin</span>
-                <span v-else>Agent</span>
+                <span v-if="user.role_id == 1">Administrator</span>
+                <span v-else-if="user.role_id == 2">Staff</span>
+                <span v-else>System User</span>
               </li>
               <li>
                 <hr class="dropdown-divider">
@@ -58,7 +59,7 @@
                   @click="navigate"
                   >
                   <i class="bi bi-person"></i>
-                  <span>My Profile</span>
+                  <span>Profile</span>
                 </a>
                 </router-link>
               </li>

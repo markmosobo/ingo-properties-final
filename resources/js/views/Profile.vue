@@ -9,8 +9,9 @@
 
               <!-- <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle"> -->
               <h2>{{form.first_name}} {{form.last_name}}</h2>
-              <h3 v-if="form.role_id == 1">Admin</h3>
-              <h3 v-else>Agent</h3>
+              <h3 v-if="form.role_id == 1">Administrator</h3>
+              <h3 v-else-if="form.role_id == 2">Staff</h3>
+              <h3 v-else>System User</h3>
               <!-- <div class="social-links mt-2">
                 <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
                 <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
@@ -58,7 +59,7 @@
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Phone</div>
-                    <div class="col-lg-9 col-md-8">(254) {{form.phone}}</div>
+                    <div class="col-lg-9 col-md-8">{{form.phone}}</div>
                   </div>
 
                   <div class="row">

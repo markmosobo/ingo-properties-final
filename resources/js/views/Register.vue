@@ -186,7 +186,7 @@
          else
          {
            Swal.fire({
-            title: 'Hurry',
+            title: 'Success',
             text:   "You have been registered successfully",
             icon: 'success',
           

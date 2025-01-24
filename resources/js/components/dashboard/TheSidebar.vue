@@ -18,12 +18,12 @@
         </router-link>
       </li><!-- End Dashboard Nav -->
 
-      <li class="nav-heading">Website Management</li>
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-heading">Website Management</li>
 
 
-      <li v-show="user.role_id == 1" class="nav-item">
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-menu-button-wide"></i><span>Manage Properties</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-menu-button-wide"></i><span>Manage Listings</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
@@ -34,7 +34,7 @@
                   class="nav-link"
                   @click="navigate"
                 >
-              <i class="bi bi-circle"></i><span>All Properties</span>
+              <i class="bi bi-circle"></i><span>All Listings</span>
               </a>
             </router-link>
           </li>
@@ -46,7 +46,7 @@
                   class="nav-link"
                   @click="navigate"
                 >
-              <i class="bi bi-circle"></i><span>Featured Properties</span>
+              <i class="bi bi-circle"></i><span>Featured Listings</span>
               </a>
             </router-link>
           </li>
@@ -113,7 +113,7 @@
         </ul>
       </li><!-- End Components Nav -->
 
-      <li v-show="user.role_id == 1" class="nav-item">
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-item">
         <router-link to="/all-projects" custom v-slot="{ href, navigate, isActive }">
                   <a
                     :href="href"
@@ -127,9 +127,9 @@
         </router-link>
       </li>
 
-      <li v-show="user.role_id == 1" class="nav-item">
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#blogs-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-menu-button-wide"></i><span>Manage Blogs</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-chat"></i><span>Manage Blogs</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="blogs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
@@ -171,9 +171,9 @@
         </ul>
       </li><!-- End Components Nav --> 
 
-      <li v-show="user.role_id == 1" class="nav-item">
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#users-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-menu-button-wide"></i><span>Manage Users</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-people"></i><span>Manage Users</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="users-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
@@ -203,7 +203,7 @@
         </ul>
       </li><!-- End Components Nav --> 
 
-      <li v-show="user.role_id == 1" class="nav-item">
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#configurations-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-menu-button-wide"></i><span>Configurations</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
@@ -234,9 +234,9 @@
       </li>
       <!-- End Components Nav -->
 
-      <li v-show="user.role_id == 1" class="nav-item">
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#testimonials-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-menu-button-wide"></i><span>Testimonials</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-chat"></i><span>Testimonials</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="testimonials-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
@@ -255,10 +255,10 @@
       </li>
       <!-- End Components Nav --> 
 
-      <!-- agents menu-->
-      <li v-show="user.role_id == 2" class="nav-item">
+      <!-- user (signed up/assigned) menu-->
+      <li v-show="user.role_id == 3" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#mylisitings-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-menu-button-wide"></i><span>Manage Listings</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-building"></i><span>Manage Listings</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="mylisitings-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
@@ -276,11 +276,11 @@
         </ul>
       </li><!-- End Components Nav --> 
 
-      <li class="nav-heading">Property Management</li>
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-heading">Property Management</li>
 
-      <li class="nav-item">
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#facts-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Manage Landlords</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-people"></i><span>Manage Landlords</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="facts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
@@ -299,9 +299,9 @@
       </li>
       <!-- End Icons Nav -->
 
-      <li class="nav-item">
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Manage Properties</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-building"></i><span>Manage Properties</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
@@ -321,9 +321,9 @@
       <!-- End Icons Nav -->
 
 
-      <li class="nav-item">
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#tenants-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Manage Tenants</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-people"></i><span>Manage Tenants</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="tenants-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
@@ -351,7 +351,7 @@
         </ul>
       </li><!-- End Tenants Nav -->
 
-      <li class="nav-item">
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#expenses-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-gem"></i><span>Manage Payments</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
@@ -388,7 +388,7 @@
         </ul>
       </li><!-- End Expenses Nav -->
 
-      <li class="nav-item">
+      <li v-show="user.role_id == 1 || user.role_id == 2" class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#invoices-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-file-earmark-text"></i><span>Manage Invoices</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>

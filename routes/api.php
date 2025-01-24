@@ -107,6 +107,8 @@ Route::get('landlord/{id}', [LandlordController::class, 'single']);
 Route::get('pmsproperty/{id}', [PmsPropertyController::class, 'single']);
 Route::get('pmsunits/{id}', [PmsUnitController::class, 'units']);
 Route::get('pmsvacantunits/{id}', [PmsUnitController::class, 'vacantUnits']);
+//signed up user properties
+Route::get('userproperties/{id}', [PropertyController::class, 'userProperties']);
 Route::get('pmsunit/{id}', [PmsUnitController::class, 'single']);
 Route::get('pmstenant/{id}', [PmsTenantController::class, 'single']);
 Route::get('pmsexpense/{id}', [PmsExpenseController::class, 'single']);
