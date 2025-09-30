@@ -177,7 +177,7 @@
           if(response["data"]["status"] == "error")
          {
            Swal.fire({
-            title: 'OPPS',
+            title: 'Oops!',
             text:   "error",
             icon: 'warning',
           
@@ -202,7 +202,7 @@
       })
       .catch((e)=>{
           console.log(e); 
-          Swal.fire({ title: 'Hurry', text:   e, icon: 'warning', });
+          Swal.fire({ title: 'Success', text:   e, icon: 'warning', });
       })
       }
     }
