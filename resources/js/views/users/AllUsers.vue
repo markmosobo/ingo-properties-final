@@ -9,7 +9,7 @@
     
                     <div class="filter">
                       <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                      <!-- <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                         <li class="dropdown-header text-start">
                           <h6>Filter</h6>
                         </li>
@@ -17,11 +17,11 @@
                         <li><a class="dropdown-item" href="#">Today</a></li>
                         <li><a class="dropdown-item" href="#">This Month</a></li>
                         <li><a class="dropdown-item" href="#">This Year</a></li>
-                      </ul>
+                      </ul> -->
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Users <span>| Today</span></h5>
+                      <h5 class="card-title">System Users <span>| All Users</span></h5>
                       <p class="card-text">
                    
                       <router-link to="/add-user" custom v-slot="{ href, navigate, isActive }">

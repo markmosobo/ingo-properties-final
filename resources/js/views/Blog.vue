@@ -302,11 +302,9 @@
                             <img :src="getPhoto() + blog.image_path" class="img-fluid" alt="">
                         </figure>
 
-<p class="drop-cap" style="white-space: pre-line;">
-  {{ blog.content }}
-</p>
-
-
+                        <p class="drop-cap" style="white-space: pre-line;">
+                        {{ blog.content }}
+                        </p>
 
                         <!-- AUTHOR -->
                         <!-- Profile author -->
