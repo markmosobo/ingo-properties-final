@@ -10,6 +10,6 @@ class Payment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'method','account_number','paybill','name'
+        'method','account_number','paybill_number','name', 'account_number'
     ];
 }

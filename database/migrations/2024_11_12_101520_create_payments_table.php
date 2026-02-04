@@ -14,7 +14,12 @@ return new class extends Migration
     public function up()
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
+            $table->string('name')->nullable();
+            $table->string('method')->nullable();
+            $table->string('paybill_number')->nullable();
+            $table->string('account_number')->nullable();
+            $table->string('till_number')->nullable();
             $table->timestamps();
         });
     }

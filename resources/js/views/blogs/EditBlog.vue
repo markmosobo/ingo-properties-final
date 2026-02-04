@@ -52,13 +52,19 @@
  
                 </div>
                 <div class="row mb-3"></div>
-                <div class="form-group row">
-                   <div class="col-sm-12">
-                      <label for="validationCustom04" class="form-label">Content</label>
-                      <textarea v-model="form.content" class="form-control" placeholder="Content goes here*" id="inputNanme4"></textarea>
- 
-                   </div>
-                </div>
+               <div class="form-group row">
+               <div class="col-sm-12">
+                  <label class="form-label">Content</label>
+
+                  <QuillEditor
+                     v-model:content="form.content"
+                     contentType="html"
+                     theme="snow"
+                     style="height: 300px"
+                  />
+               </div>
+               </div>
+
                 <div class="row mb-3"></div>
                 <div class="form-group row">
                     <label for="inputPassword" class="form-label">Feature Photo</label>
@@ -105,6 +111,8 @@
     
  <script>
  import TheMaster from "@/components/dashboard/TheMaster.vue";
+ import { QuillEditor } from '@vueup/vue-quill'
+ import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
  import axios from "axios";
  import Swal from 'sweetalert2';
@@ -122,6 +130,7 @@
  export default {
     components : {
        TheMaster,
+       QuillEditor
     },
     data () {
        return {

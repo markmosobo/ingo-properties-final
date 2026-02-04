@@ -4,84 +4,90 @@
        <div class="card-body">
           <!-- General Form Elements -->
           <form @submit.prevent="">
-          <fieldset v-if="step == 1">
-             <h5 class="card-title text-center">Post blog</h5>
- 
-             <div class="row m-auto p-auto justify-content- g-3 needs-validation" novalidate="" autocomplete="off">
-                <div class="row  mb-3"></div>
- 
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                   <input
-                      type="hidden"
-                      id="user_id"
-                      name="user_id"
-                      value="1"
-                      class="form-control"
-                   />
-                   <div class="col-sm-6">
-                      <label for="validationCustom04" class="form-label"
-                      >Category</label
-                      >
-                      <div class="col-sm-10">
-                         <select name="category" v-model="form.category_id" class="form-select" id="">
-                            <option value="0" selected>Select Category</option>
-                            <option v-for="category in blogcategories" :value="category.id"
-                            :selected="category.id == form.category_id" :key="category.id">{{ category.name}}</option>
- 
-                         </select>
- 
-                      <div class="invalid-feedback">Please enter category!</div>
-                      </div>
-                   </div>
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Title</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="text"
-                            placeholder="Title*"
-                            id="title"
-                            name="title"
-                            v-model="form.title"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
- 
-                </div>
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                   <div class="col-sm-12">
-                      <label for="validationCustom04" class="form-label">Content</label>
-                      <textarea v-model="form.content" class="form-control" placeholder="Content goes here*" id="inputNanme4"></textarea>
- 
-                   </div>
-                </div>
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Add Photo</label>
-                      <div class="col-sm-10">
-                         <!-- <img src="https://lh3.googleusercontent.com/LfmMVU71g-HKXTCP_QWlDOemmWg4Dn1rJjxeEsZKMNaQprgunDTtEuzmcwUBgupKQVTuP0vczT9bH32ywaF7h68mF-osUSBAeM6MxyhvJhG6HKZMTYjgEv3WkWCfLB7czfODidNQPdja99HMb4qhCY1uFS8X0OQOVGeuhdHy8ln7eyr-6MnkCcy64wl6S_S6ep9j7aJIIopZ9wxk7Iqm-gFjmBtg6KJVkBD0IA6BnS-XlIVpbqL5LYi62elCrbDgiaD6Oe8uluucbYeL1i9kgr4c1b_NBSNe6zFwj7vrju4Zdbax-GPHmiuirf2h86eKdRl7A5h8PXGrCDNIYMID-J7_KuHKqaM-I7W5yI00QDpG9x5q5xOQMgCy1bbu3St1paqt9KHrvNS_SCx-QJgBTOIWW6T0DHVlvV_9YF5UZpN7aV5a79xvN1Gdrc7spvSs82v6gta8AJHCgzNSWQw5QUR8EN_-cTPF6S-vifLa2KtRdRAV7q-CQvhMrbBCaEYY73bQcPZFd9XE7HIbHXwXYA=s200-no" class="picture-src" id="wizardPicturePreview" title=""> -->
-                         <input type="file" @change="onChangePhoto" name="image" id="wizard-picture" class="form-control">
+<fieldset v-if="step === 1">
+  <h5 class="card-title text-center mb-4">Post Blog</h5>
 
-                      <div class="invalid-feedback">Please enter photo!</div>
-                      </div>
-                   </div>
-                </div>
-             </div>
-             <!--  button -->
-             <div class="col-lg-12 felx mt-4 row">
-                <div class="col-sm-6 col-lg-6">
-                    <!-- <button @click.prevent="prev()" class="btn btn-dark">Previous</button> -->
-                </div>
-                <div class="col-sm-6 col-lg-6 text-end">
-                    <button type="submit" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Submit</button>
-                </div>
-            </div>
-          </fieldset>
+  <div class="row g-3 needs-validation" novalidate autocomplete="off">
+    <!-- hidden user -->
+    <input
+      type="hidden"
+      id="user_id"
+      name="user_id"
+      value="1"
+    />
+
+    <!-- Category -->
+    <div class="col-md-6">
+      <label class="form-label">Category</label>
+      <select
+        class="form-select"
+        v-model="form.category_id"
+        required
+      >
+        <option value="0">Select Category</option>
+        <option
+          v-for="category in blogcategories"
+          :key="category.id"
+          :value="category.id"
+        >
+          {{ category.name }}
+        </option>
+      </select>
+      <div class="invalid-feedback">Please enter category!</div>
+    </div>
+
+    <!-- Title -->
+    <div class="col-md-6">
+      <label class="form-label">Title</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Title*"
+        v-model="form.title"
+        required
+      />
+      <div class="invalid-feedback">Please enter title!</div>
+    </div>
+
+    <!-- Content -->
+    <div class="col-12">
+      <label class="form-label">Content</label>
+      <QuillEditor
+        v-model:content="form.content"
+        contentType="html"
+        theme="snow"
+        style="height: 300px"
+      />
+    </div>
+
+    <!-- Image -->
+    <div class="col-md-6">
+      <label class="form-label">Add Photo</label>
+      <input
+        type="file"
+        class="form-control"
+        @change="onChangePhoto"
+        required
+      />
+      <div class="invalid-feedback">Please enter photo!</div>
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="row mt-4">
+    <div class="col-6"></div>
+    <div class="col-6 text-end">
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary rounded-pill"
+        @click.prevent="submit"
+      >
+        Submit
+      </button>
+    </div>
+  </div>
+</fieldset>
+
  
           </form>
  
@@ -98,7 +104,8 @@
     
  <script>
  import TheMaster from "@/components/dashboard/TheMaster.vue";
-
+ import { QuillEditor } from '@vueup/vue-quill'
+ import '@vueup/vue-quill/dist/vue-quill.snow.css'
  import axios from "axios";
  import Swal from 'sweetalert2';
 
@@ -115,6 +122,7 @@
  export default {
     components : {
        TheMaster,
+       QuillEditor
     },
     data () {
        return {

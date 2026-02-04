@@ -113,84 +113,70 @@
       </div>
     </main>
   </template>
-  <script>
-  import axios from 'axios';
-  import Swal from 'sweetalert2'
 
-  export default ({
-    data(){
-      return {
-        form: {
-          email: '',
-          password: ''
-        }
+<script>
+import axios from 'axios';
+import Swal from 'sweetalert2';
+
+export default {
+  data() {
+    return {
+      form: {
+        email: '',
+        password: ''
       }
-    },
-    methods: {
-        deleteInvoice(id){
-          Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#006400',
-            cancelButtonColor: '#FFA500',
-            confirmButtonText: 'Yes, delete it!'
-          }).then((result) => {
-            if (result.isConfirmed) { 
-            //send request to the server
-            axios.delete('/api/pmsstatement/'+id).then(() => {
-            toast.fire(
-              'Deleted!',
-              'Invoice has been deleted.',
-              'success'
-            )
-            this.loadLists();
-            }).catch(() => {
-              Swal.fire(
-              'Failed!',
-              'There was something wrong.',
-              'warning'
-            )
+    };
+  },
+  methods: {
+    deleteInvoice(id) {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#006400',
+        cancelButtonColor: '#FFA500',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) { 
+          axios.delete('/api/pmsstatement/' + id)
+            .then(() => {
+              toast.fire('Deleted!', 'Invoice has been deleted.', 'success');
+              this.loadLists();
+            })
+            .catch(() => {
+              Swal.fire('Failed!', 'There was something wrong.', 'warning');
             }); 
-            }else if(result.isDenied) {
-              console.log('cancelled')
-            }
-                             
-          })
-        },
-      login_user(){
-        axios.post('api/login', this.form).then((response) => {
+        } else if (result.isDenied) {
+          console.log('cancelled');
+        }
+      });
+    },
+    login_user() {
+      axios.post('api/login', this.form)
+        .then((response) => {
           console.log(response);
           this.form.email = '';
           this.form.password = '';
-          if(response["data"]["status"] == "error")
-         {
-           Swal.fire({
-            title: 'Oops!',
-            text:   response.data.data,
-            icon: 'warning',
-          
-          });
-         }
-         else
-         {
-          localStorage.setItem('user', JSON.stringify(response.data.user))
-           this.$router.push('/dashboard')
-          //  Swal.fire({
-          //   title: 'Hurry',
-          //   text:   "You have been logged-in successfully",
-          //   icon: 'success',
-          
-          // });
-         }
-        }).catch((error) => {
-          console.log(error)
+          if (response.data.status == "error") {
+            Swal.fire({
+              title: 'Oops!',
+              text: response.data.data,
+              icon: 'warning',
+            });
+          } else {
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+            this.$router.push('/dashboard');
+          }
         })
-      }
+        .catch((error) => {
+          console.log(error);
+        });
     }
-  });
-  </script>
+  }
+};
+</script>
+
 
   <style scoped>
 .background-image {

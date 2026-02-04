@@ -283,10 +283,10 @@
                                             <h6 class="text-capitalize">
                                                 <a href="#"  @click="viewBlog(blog.id)" >{{blog.title}} </a>
                                             </h6>
-                                            <p class=" mb-0">
-                                                {{blog.content.substring(0,100)+".."}}
-
+                                            <p class="mb-0">
+                                            {{ excerpt(blog.content, 100) }}
                                             </p>
+
 
 
                                         </div>
@@ -531,6 +531,12 @@ export default{
         Branch
     },
     methods: {
+        excerpt(html, length = 100) {
+            const text = html.replace(/<[^>]*>/g, '')
+            return text.length > length
+            ? text.substring(0, length) + '...'
+            : text
+        },
         format_date(value){
           if(value){
             return moment(String(value)).format('MMM Do YYYY')

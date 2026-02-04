@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\PmsTenantController;
 use App\Http\Controllers\Api\PmsExpenseController;
 use App\Http\Controllers\Api\PmsStatementController;
 use App\Http\Controllers\Api\PmsInvoiceController;
+use App\Http\Controllers\Api\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +68,7 @@ Route::post('pmsexpenses', [PmsExpenseController::class, 'store']);
 Route::post('pmsstatements', [PmsStatementController::class, 'store']);
 Route::post('testimonial', [ListController::class, 'storeTestimonial']);
 Route::post('pmsunits/{id}', [PmsUnitController::class, 'store']);
+Route::post('payment', [PaymentController::class, 'store']);
 
 Route::get('users', [UserController::class, 'index']);
 Route::get('properties', [PropertyController::class, 'index']);
@@ -186,6 +188,7 @@ Route::put('pmsstatement/{id}', [PmsStatementController::class, 'update']);
 Route::put('pmsinvoicestatement/{id}', [PmsStatementController::class, 'invoice']);
 Route::put('pmssettlestatement/{id}', [PmsStatementController::class, 'settle']);
 Route::put('edit-statement/{id}', [PmsStatementController::class, 'editStatement']);
+Route::put('edit-payment/{id}', [PaymentController::class, 'update']);
 
 //create invoice
 Route::post('pmsinvoicestatement', [PmsStatementController::class, 'createInvoice']);
@@ -217,6 +220,7 @@ Route::delete('pmstenant/{id}', [PmsTenantController::class, 'destroy']);
 Route::delete('pmsunit/{id}', [PmsUnitController::class, 'destroy']);
 Route::delete('pmsexpense/{id}', [PmsExpenseController::class, 'destroy']);
 Route::delete('pmsstatement/{id}', [PmsStatementController::class, 'destroy']);
+Route::delete('payment/{id}', [PaymentController::class, 'destroy']);
 
 Route::put('vacatetenant/{id}',[PmsTenantController::class,'vacate']);
 Route::put('vacateunit/{id}',[PmsUnitController::class,'vacate']);

@@ -2,7 +2,7 @@
     <TheMaster>
         <div class="container mt-3">
             <div class="row">
-              <div class="col-lg-6">
+              <div class="col-lg-12">
                 <div class="card">
                   <div class="card-body">
                     <h5 class="card-title">Blog Details</h5>
@@ -26,7 +26,7 @@
                   <div class="card-body">
                     <h5 class="card-title">Description</h5>
                     <ul class="list-group">
-                     <li class="list-group-item"> {{blog.content}} </li>
+                    <li class="list-group-item" v-html="blog.content"></li>
     
                     </ul>
                   </div>
