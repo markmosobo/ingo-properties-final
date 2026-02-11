@@ -572,6 +572,7 @@ export default {
     },
     loadLists(){
         axios.get('api/abouts').then((response) => {
+            this.homeservices = response.data.lists.homeservices
             this.abouts = response.data.lists.abouts
             console.log(this.abouts)
         }).catch((error) => {
@@ -579,21 +580,15 @@ export default {
         })
     },
     formatDescription(description) {
-    return description
-        .split('\n')
-        .map(paragraph => `<p>${paragraph.replace(/\s+/g, ' ')}</p>`)
-        .join('');
-},
+        return description
+            .split('\n')
+            .map(paragraph => `<p>${paragraph.replace(/\s+/g, ' ')}</p>`)
+            .join('');
+    },
 
-    getServices(){
-        axios.get('api/lists').then((response) => {
-            this.homeservices = response.data.lists.homeservices
-        })
-    }
   },
   mounted(){
     this.loadLists();
-    this.getServices();
   }
 
 

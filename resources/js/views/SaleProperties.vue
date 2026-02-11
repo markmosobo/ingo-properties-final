@@ -647,12 +647,12 @@ export default {
             return "/storage/properties/";
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
+             axios.get('api/lists/sale-properties').then((response) => {
              this.isLoading = true; // Set isLoading to true before making the API call
 
-             this.categories = response.data.lists.categories;
-             this.propertytypes = response.data.lists.propertytypes;
-             this.saleproperties = response.data.lists.saleproperties;
+             this.categories = response.data.categories;
+             this.propertytypes = response.data.propertytypes;
+             this.saleproperties = response.data.saleproperties;
              console.log("properties", this.saleproperties)
             // Set isLoading to false once data is loaded
             this.isLoading = false;

@@ -414,8 +414,8 @@ export default {
   },
   methods: {
     loadLists(){
-        axios.get('api/lists').then((response) => {
-            this.contacts = response.data.lists.contacts
+        axios.get('api/lists/contacts').then((response) => {
+            this.contacts = response.data.contacts
             console.log(this.contacts)
         }).catch((error) => {
             console.log(error)

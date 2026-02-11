@@ -161,9 +161,9 @@ export default {
   },
   methods: {
         loadLists() {
-            axios.get('/api/lists').then((response) => {
-            this.contacts = response.data.lists.contacts;
-            this.sociallinks = response.data.lists.sociallinks;
+            axios.get('/api/lists/socials').then((response) => {
+            this.contacts = response.data.contacts;
+            this.sociallinks = response.data.sociallinks;
             this.facebookLink = this.sociallinks[0].link;
             this.xLink = this.sociallinks[1].link;
             this.instagramLink = this.sociallinks[2].link;

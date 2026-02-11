@@ -550,11 +550,11 @@ export default{
             this.$router.push('/ourblogs/'+id)
         },
         getData(){
-            axios.get('api/lists').then((response) => {
+            axios.get('api/lists/blogs').then((response) => {
                 this.isLoading = true; // Set isLoading to true before making the API call
 
-                this.blogs = response.data.lists.ourblogs
-                this.blogcategories = response.data.lists.blogcategories
+                this.blogs = response.data.ourblogs
+                this.blogcategories = response.data.blogcategories
                 // Set isLoading to false once data is loaded
                 this.isLoading = false;
 

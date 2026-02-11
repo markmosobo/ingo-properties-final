@@ -537,7 +537,7 @@
                             {{about.title}}
                         </p>
                         <p>
-                            {{about.description.substring(0,500)+"..."}}
+                            {{ about?.description?.substring(0,500) + "..." }}
                         </p>
                         <router-link to="/aboutus" custom v-slot="{ href, navigate, isActive }">
                             <a
@@ -826,32 +826,31 @@ export default {
             })
         },
         loadLists() {
-            axios.get('api/lists').then((response) => {
-            this.categories = response.data.lists.categories;
-            this.propertytypes = response.data.lists.propertytypes;
-            this.locations = response.data.lists.locations;
-            this.homefeaturedproperties = response.data.lists.homefeaturedproperties;
-            this.recentproperties = response.data.lists.recentproperties;
-            this.services = response.data.lists.services;
-            // this.homefeaturedproperty2 = this.homefeaturedproperties[1].title;
-            // this.homefeaturedproperty3 = this.homefeaturedproperties[2].title;
-            this.recentblogs = response.data.lists.recentblogs;
-            this.abouts = response.data.lists.abouts;
-            this.homeprojects = response.data.lists.homeprojects;
-            this.hometestimonials = response.data.lists.hometestimonials;
+            axios.get('api/lists/home').then((response) => {
+                this.categories = response.data.categories;
+                this.propertytypes = response.data.propertytypes;
+                this.locations = response.data.locations;
+                this.homefeaturedproperties = response.data.homefeaturedproperties;
+                this.recentproperties = response.data.recentproperties;
+                this.services = response.data.services;
+                this.recentblogs = response.data.recentblogs;
+                this.abouts = response.data.abouts;
+                this.homeprojects = response.data.homeprojects;
+                this.hometestimonials = response.data.hometestimonials;
 
-            // Assign each testimonial only if it exists
-            this.hometestimonial1 = this.hometestimonials[0] || null;
-            this.hometestimonial2 = this.hometestimonials[1] || null;
-            this.hometestimonial3 = this.hometestimonials[2] || null;
-            this.hometestimonial4 = this.hometestimonials[3] || null;
+                // Assign each testimonial individually if it exists
+                this.hometestimonial1 = this.hometestimonials[0] || null;
+                this.hometestimonial2 = this.hometestimonials[1] || null;
+                this.hometestimonial3 = this.hometestimonials[2] || null;
+                this.hometestimonial4 = this.hometestimonials[3] || null;
 
-            this.featuredproject = response.data.lists.featuredproject;
-            console.log("home 1" ,this.hometestimonial3)
-            console.log("home 2" ,this.homeprojects)
+                this.featuredproject = response.data.featuredproject;
 
+                console.log("Testimonial 3:", this.hometestimonial3);
+                console.log("Home Projects:", this.homeprojects);
             });
         }
+
     },
     components: {
         // Main,

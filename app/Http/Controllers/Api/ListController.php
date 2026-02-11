@@ -291,4 +291,131 @@ class ListController extends Controller
             'password' => $password
         ], 200);
     }
+
+    public function homePage()
+    {
+        $categories = Category::all();
+        $propertytypes = PropertyType::all();
+        $locations = Location::all();
+        $homefeaturedproperties = Property::latest()
+            ->where('featured', 1)
+            ->where('status', 1)
+            ->with('type', 'images')
+            ->limit(6)
+            ->get();
+        $recentproperties = Property::inRandomOrder()
+            ->where('featured', 0)
+            ->where('status', 1)
+            ->with('type', 'images')
+            ->limit(6)
+            ->get();
+        $services = Service::all();
+        $recentblogs = Blog::with('category')->latest()->limit(6)->get();
+        $abouts = About::latest()->first();
+        $homeprojects = Project::where('featured', 0)
+            ->whereIn('status', [0, 1])
+            ->limit(4)
+            ->get();
+        $hometestimonials = Testimonial::where('status', 1)->limit(4)->get();
+        $featuredproject = Project::latest()
+            ->where('featured', 1)
+            ->where('status', 1)
+            ->first();
+
+        return response()->json([
+            'categories' => $categories,
+            'propertytypes' => $propertytypes,
+            'locations' => $locations,
+            'homefeaturedproperties' => $homefeaturedproperties,
+            'recentproperties' => $recentproperties,
+            'services' => $services,
+            'recentblogs' => $recentblogs,
+            'abouts' => $abouts,
+            'homeprojects' => $homeprojects,
+            'hometestimonials' => $hometestimonials,
+            'featuredproject' => $featuredproject,
+        ]);
+    }
+
+    public function saleProperties()
+    {
+        $categories = Category::all();
+        $propertytypes = PropertyType::all();
+        $saleproperties = Property::latest()->with('type','images')->where('property_status','sale')->where('status',1)->get();
+
+        return response()->json([
+            'categories' => $categories,
+            'propertytypes' => $propertytypes,
+            'saleproperties' => $saleproperties
+        ]);        
+    }
+
+    public function socials()
+    {
+        $contacts = Contact::all();
+        $sociallinks = SocialLink::all();
+
+        return response()->json([
+            'contacts' => $contacts,
+            'sociallinks' => $sociallinks
+        ]);
+    }
+
+    public function rentProperties()
+    {
+        $categories = Category::all();
+        $propertytypes = PropertyType::all();
+        $rentproperties = Property::latest()->with('type','images')->where('property_status','rent')->where('status',1)->get();
+
+        return response()->json([
+            'categories' => $categories,
+            'propertytypes' => $propertytypes,
+            'rentproperties' => $rentproperties
+        ]);        
+    }
+    
+    public function featuredProperties()
+    {
+        $categories = Category::all();
+        $propertytypes = PropertyType::all();
+        $featuredproperties = Property::latest()->where('featured',1)->with('type','images')->where('status','=',1)->orWhere('status','=',2)->get();
+
+        return response()->json([
+            'categories' => $categories,
+            'propertytypes' => $propertytypes,
+            'featuredproperties' => $featuredproperties
+        ]);        
+    } 
+    
+    public function projects()
+    {
+        $categories = Category::all();
+        $projects = Project::all();
+
+        return response()->json([
+            'categories' => $categories,
+            'projects' => $projects,
+        ]);        
+    }  
+    
+    public function blogs()
+    {
+        $ourblogs = Blog::with('category')->where('status',1)->get();
+        $blogcategories = BlogCategory::all();
+
+        return response()->json([
+            'ourblogs' => $ourblogs,
+            'blogcategories' => $blogcategories,
+        ]);        
+    } 
+    
+    public function contacts()
+    {
+        $contacts = Contact::all();
+
+        return response()->json([
+            'contacts' => $contacts
+        ]);        
+    }    
+
 }

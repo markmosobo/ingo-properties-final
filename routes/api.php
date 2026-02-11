@@ -88,6 +88,17 @@ Route::get('sociallinks', [SocialLinkController::class, 'index']);
 Route::get('messages', [MessageController::class, 'index']);
 Route::get('projects', [ProjectController::class, 'index']);
 
+//chunked APIs
+Route::get('lists/home', [ListController::class, 'homePage']);
+Route::get('lists/socials', [ListController::class, 'socials']);
+Route::get('lists/projects', [ListController::class, 'projects']);
+Route::get('lists/blogs', [ListController::class, 'blogs']);
+Route::get('lists/contacts', [ListController::class, 'contacts']);
+Route::get('lists/sale-properties', [ListController::class, 'saleProperties']);
+Route::get('lists/rent-properties', [ListController::class, 'rentProperties']);
+Route::get('lists/featured-properties', [ListController::class, 'featuredProperties']);
+
+
 Route::get('property/{id}', [PropertyController::class, 'single']);
 Route::get('category/{id}', [CategoryController::class, 'single']);
 Route::get('categoryproperty/{id}', [PropertyController::class, 'category']);

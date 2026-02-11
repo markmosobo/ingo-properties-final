@@ -584,22 +584,17 @@ export default {
         this.$router.push('/categoryproperties/'+id)
     },
     loadLists(){
-        axios.get('api/lists').then((response) => {
-            this.projects = response.data.lists.projects
+        axios.get('api/lists/projects').then((response) => {
+            this.projects = response.data.projects
+            this.categories = response.data.categories
             console.log(this.projects)
         }).catch((error) => {
             console.log(error)
         })
     },
-    getProps(){
-        axios.get('/api/lists').then((response) => {
-            this.categories = response.data.lists.categories
-        })
-    }
   },
   mounted(){
     this.loadLists();
-    this.getProps();
   }
 
 

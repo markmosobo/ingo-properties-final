@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\About;
+use App\Models\Service;
 use Illuminate\Http\Request;
 
 class AboutController extends Controller
@@ -14,11 +15,13 @@ class AboutController extends Controller
     public function index()
     {
         $abouts = About::all();
+        $homeservices = Service::latest()->limit(6)->get();
 
         return response()->json([
             "lists" => [
             'status' => true,
-            'abouts' => $abouts
+            'abouts' => $abouts,
+            'homeservices' => $homeservices
             ]
         ]);
     }

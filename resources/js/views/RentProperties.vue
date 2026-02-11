@@ -648,12 +648,12 @@ export default {
             return number.toString().replace(/\.00$/, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
+             axios.get('api/lists/rent-properties').then((response) => {
              this.isLoading = true; // Set isLoading to true before making the API call
 
-             this.categories = response.data.lists.categories;
-             this.propertytypes = response.data.lists.propertytypes;
-             this.rentproperties = response.data.lists.rentproperties;
+             this.categories = response.data.categories;
+             this.propertytypes = response.data.propertytypes;
+             this.rentproperties = response.data.rentproperties;
             // Set isLoading to false once data is loaded
             this.isLoading = false;
 
