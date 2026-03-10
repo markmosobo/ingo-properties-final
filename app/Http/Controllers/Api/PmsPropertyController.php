@@ -57,7 +57,7 @@ class PmsPropertyController extends Controller
 
     public function single(Request $request, $id)
     {
-        $property = PmsProperty::with('images')->where('id', $id)->get();
+        $property = PmsProperty::with('images','landlord','units')->where('id', $id)->first();
 
         return response()->json([
             'status' => true,

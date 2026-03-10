@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PmsProperty;
+use App\Models\PmsTenant;
 
 class PmsUnit extends Model
 {
@@ -28,6 +29,11 @@ class PmsUnit extends Model
     public function property()
     {
         return $this->belongsTo(PmsProperty::class);
+    }
+
+    public function tenants()
+    {
+        return $this->hasMany(PmsTenant::class, 'pms_unit_id');
     }
 
 }

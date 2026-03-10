@@ -569,7 +569,7 @@
             const subsequentPagesMaxRows = 30; // Rows for subsequent pages
 
             // Add top-left header
-            const rightHeaderText = 'Ingo Properties\nKakamega-Webuye Rd, ACK Building\nTel: 0720 020 401\nP. O. Box 2973-50100, Kakamega\nEmail: propertIngo@gmail.com';
+            const rightHeaderText = 'Ingo Properties\nCosyard Business Centre, Kakamega Mumias Road\nTel: 0759509462\nP. O. Box 2973-50100, Kakamega\nEmail: ingoproperties@gmail.com';
             const rightHeaderFontSize = 12;
             const rightheaderX = 20; // Adjust the X coordinate
             const rightheaderY = 10;
@@ -1058,7 +1058,7 @@
                 //settled invoices
              this.statements = response.data.propertyallsettledinvoices;
              //all invoices (unsettled & vacants too)
-             this.allstatements = response.data.propertyallmonthinvoices;
+             this.allstatements = response.data.propertyallinvoices;
              console.log("all",this.allstatements)
              // Calculate the total amount paid
              setTimeout(() => {

@@ -54,13 +54,13 @@ class PmsUnitController extends Controller
 
     public function single(Request $request, $id)
     {
-        $unit = PmsUnit::where('id', $id)->first();
+        $unit = PmsUnit::where('id', $id)->with(['tenants', 'property'])->first();
 
         return response()->json([
-            'status' => true,
-            'message' => "Unit",
-            'unit' => $unit
-        ], 200);
+            'unit' => $unit,
+            'property' => $unit->property,
+            'tenants' => $unit->tenants,
+        ]);
     } 
 
     public function update(Request $request,  $id)

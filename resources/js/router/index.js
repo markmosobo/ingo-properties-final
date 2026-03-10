@@ -611,6 +611,12 @@ const routes = [
         beforeEnter : guardMyroute,
     },
     {
+        path:'/pmsproperties/:id',
+        name: 'pmsproperty',
+        component : () => import("../views/pms/PmsProperty.vue"),
+        beforeEnter : guardMyroute,
+    },    
+    {
         path:'/pmsunits/:id',
         name: 'pmsunits',
         component: PmsUnits,
