@@ -37,3 +37,20 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.main, #main, body {
+  font-family: 'Open Sans', 'Nunito', 'Poppins', sans-serif;
+  font-weight: 400; /* default */
+  color: #333;       /* optional: consistent text color */
+}
+
+.pagetitle h1 {
+  font-family: 'Poppins', 'Open Sans', sans-serif;
+  font-weight: 600;  /* headings slightly bolder */
+}
+
+slot {
+  font-family: inherit; /* ensure slot content inherits font */
+}
+</style>

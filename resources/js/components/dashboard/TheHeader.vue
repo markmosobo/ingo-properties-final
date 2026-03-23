@@ -133,5 +133,21 @@ import axios from 'axios';
   }
   </script>
   
-  
+  <style>
+body,
+#main,
+.main,
+.header,
+.sidebar,
+.footer {
+  font-family: 'Open Sans', 'Nunito', 'Poppins', sans-serif;
+  font-weight: 400;
+  color: #333;
+}
+
+.pagetitle h1 {
+  font-family: 'Poppins', 'Open Sans', sans-serif;
+  font-weight: 600;
+}
+</style>
   

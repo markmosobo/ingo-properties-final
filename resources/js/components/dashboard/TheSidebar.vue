@@ -401,7 +401,7 @@
                 class="nav-link"
                 @click="navigate"
               >          
-              <i class="bi bi-circle"></i><span>Awaiting Invoicing</span>
+              <i class="bi bi-circle"></i><span>Draft Invoices</span>
             </a>
             </router-link>
           </li>
@@ -413,7 +413,7 @@
                 class="nav-link"
                 @click="navigate"
               >          
-              <i class="bi bi-circle"></i><span>Invoices to Settle</span>
+              <i class="bi bi-circle"></i><span>Unpaid/Partial Invoices</span>
             </a>
             </router-link>
           </li> 
@@ -468,5 +468,14 @@ export default {
 </script>
 
 <style scoped>
-
+#sidebar {
+  font-family: 'Open Sans', 'Nunito', 'Poppins', sans-serif;
+  font-weight: 400; /* default weight */
+}
+#sidebar .nav-link,
+#sidebar .nav-heading,
+#sidebar .nav-content span {
+  font-family: inherit;
+  font-weight: 400;
+}
 </style>

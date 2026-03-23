@@ -96,7 +96,7 @@
                     </div>
     
                       <div class="card-body pb-0">
-                        <h5 class="card-title">Awaiting Invoicing <span>| {{ statements.length }} awaiting invoicing</span></h5>
+                        <h5 class="card-title">Draft Invoices <span>| {{ statements.length }} drafts awaiting invoicing</span></h5>
                         <p class="card-text">
                           <div class="row">
                             <div class="col d-flex">
@@ -139,10 +139,10 @@
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                                   <a @click="navigateTo('/awaitinginvoicing')" class="dropdown-item" href="#">
-                                    <i class="ri-file-list-2-fill mr-2"></i>Awaiting Invoicing
+                                    <i class="ri-file-list-2-fill mr-2"></i>Draft Invoices
                                   </a>
                                   <a @click="navigateTo('/invoicestosettle')" class="dropdown-item" href="#">
-                                    <i class="ri-file-edit-fill mr-2"></i>Invoices to Settle
+                                    <i class="ri-file-edit-fill mr-2"></i>Unpaid/Partial Invoices
                                   </a>
                                   <a @click="navigateTo('/settledinvoices')" class="dropdown-item" href="#">
                                     <i class="ri-bank-card-fill mr-2"></i>Settled Invoices
@@ -164,7 +164,14 @@
 
                         <!-- Display table when statements.length is not zero -->
                         <div>
-                          <table id="AllStatementsTable" class="table table-borderless">
+                          <!-- Loading Spinner -->
+                          <div v-if="isLoadingStatements" class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                              <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Loading statements...</p>
+                          </div>
+                          <table v-if="!isLoadingStatements" id="AllStatementsTable" class="table table-borderless">
                             <thead>
                               <tr>
                                 <th scope="col">Tenant</th>
@@ -424,6 +431,7 @@
           },
           searchQuery: '',
           filteredTenants: [],
+          isLoadingStatements: true,
           loading: true,
           invoicing: false,
           generating: false,
@@ -1110,22 +1118,28 @@
           const year = currentDate.getFullYear();
           return `${months[monthIndex]} ${year}`;
         },
+
         loadLists() {
-             axios.get('/api/lists').then((response) => {
-             this.statements = response.data.lists.allawaitinginvoicing;
-             this.tenants = response.data.lists.pmstenants;
-             this.filteredTenants = this.tenants;
-             this.expenses = response.data.lists.pmsexpenses;
-             console.log(this.statements)
-             // Calculate the total amount paid
-            this.totalAmountPaid = this.calculateTotalAmountPaid();
-             setTimeout(() => {
+          this.isLoadingStatements = true;
+
+          axios.get('/api/lists')
+            .then((response) => {
+              this.statements = response.data.lists.allawaitinginvoicing;
+              this.tenants = response.data.lists.pmstenants;
+              this.filteredTenants = this.tenants;
+              this.expenses = response.data.lists.pmsexpenses;
+
+              this.totalAmountPaid = this.calculateTotalAmountPaid();
+            })
+            .finally(() => {
+              this.isLoadingStatements = false;
+
+              setTimeout(() => {
                   $("#AllStatementsTable").DataTable();
               }, 10);
-    
-             });
-        },
-         filterTenants() {
+            });
+        },        
+        filterTenants() {
           const query = this.searchQuery.toLowerCase();
           this.filteredTenants = this.tenants.filter(tenant => {
             const fullName = `${tenant.first_name} ${tenant.last_name}`.toLowerCase();

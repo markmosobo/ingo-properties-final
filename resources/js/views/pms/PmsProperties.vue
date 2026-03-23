@@ -6,106 +6,58 @@
                 <!-- Top Selling -->
                 <div class="col-12">
                   <div class="card top-selling overflow-auto">
-    
-                    <div class="filter">
-<!--                       <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                        <li class="dropdown-header text-start">
-                          <h6>Filter</h6>
-                        </li>
-    
-                        <li><a class="dropdown-item" href="#">Today</a></li>
-                        <li><a class="dropdown-item" href="#">This Month</a></li>
-                        <li><a class="dropdown-item" href="#">This Year</a></li>
-                      </ul> -->
-                    </div>
-    
+      
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Managed Properties <span>| Today</span></h5>
-                      <p class="card-text">
-                        <div class="row">
-                          <div class="col d-flex">
-                         
-                            <router-link to="/add-pmsproperty" custom v-slot="{ href, navigate, isActive }">
-                                <a
-                                  :href="href"
-                                  :class="{ active: isActive }"
-                                  class="btn btn-sm btn-primary rounded-pill"
-                                  style="background-color: darkgreen; border-color: darkgreen;"
-                                  @click="navigate"
-                                >
-                                  Add Property
-                                </a>
-                            </router-link>
-                            </div>
-                          <div class="col-auto d-flex justify-content-end">
-                          <div class="btn-group" role="group">
-                              <button id="btnGroupDrop1" type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="ri-add-line"></i>
-                              </button>
-                              <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                     <a @click="navigateTo('/pmsproperties' )" class="dropdown-item" href="#"><i class="ri-building-fill mr-2"></i>Properties</a>
-                                     <a @click="navigateTo('/pmstenants' )" class="dropdown-item" href="#"><i class="ri-user-fill mr-2"></i>Tenants</a>
-                                    <a @click="navigateTo('/pmslandlords' )" class="dropdown-item" href="#"><i class="ri-user-fill mr-2"></i>Landlords</a>
-                                </div>
-                              </div>
-                            </div>
-                        </div>  
-            
-                      </p>
-    
-                      <table id="AllPropertiesTable" class="table table-borderless">
-                        <thead>
-                          <tr>
-                            <!--<th scope="col">Preview</th>-->
-                            <th scope="col">Name</th>
-                            <th scope="col">Landlord</th>
-                            <th scope="col">Number of Units</th>
-                            <th scope="col">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr v-for="property in properties" :key="property.id">
-                            <!--<th scope="row"><a href="#">
-                              <img :src="getPhoto() + property.images[0].name" />
-                            </a></th>-->
-                            <!-- <td>{{property["images"][0]["name"]}}</td> -->
-                            <td>{{property.name}}</td>
-                            <td>{{property.landlord.first_name}} {{property.landlord.last_name}}</td>
-                            <td>{{property.units.length}}</td>
-                            <td>
-                              <div class="btn-group" role="group">
+                      <h5 class="card-title">Managed Properties <span>| Overview</span></h5>
+
+                      <div v-if="loading" class="text-center py-5">
+                        <div class="spinner-border text-success" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading properties...</p>
+                      </div>
+
+                      <div v-else>
+                        <table id="AllPropertiesTable" class="table table-borderless">
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Landlord</th>
+                              <th>Number of Units</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="property in properties" :key="property.id">
+                              <td>{{property.name}}</td>
+                              <td>{{property.landlord.first_name}} {{property.landlord.last_name}}</td>
+                              <td>{{property.units.length}}</td>
+                              <td>
+                                <div class="btn-group" role="group">
                                   <button id="btnGroupDrop1" type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  Action
+                                    Action
                                   </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a @click="navigateTo('/pmsproperties/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                            
-                                  <a @click="navigateTo('/pmsunits/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Units</a>
-                                  <a @click="navigateTo('/pmspropertystatements/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Invoices</a>
-                                  <a @click="navigateTo('/propertyawaitinginvoicing/'+property.id)" class="dropdown-item" href="#">
-                                    <i class="ri-file-list-2-fill mr-2"></i>Awaiting Invoicing
-                                  </a>
-                                  <a @click="navigateTo('/propertyinvoicestosettle/'+property.id)" class="dropdown-item" href="#">
-                                    <i class="ri-file-edit-fill mr-2"></i>Invoices to Settle
-                                  </a>
-                                  <a @click="navigateTo('/propertysettledinvoices/'+property.id)" class="dropdown-item" href="#">
-                                    <i class="ri-bank-card-fill mr-2"></i>Settled Invoices
-                                  </a>
- 
-                                  <a @click="navigateTo('/edit-pmsproperty/'+property.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                  <a @click="deleteProperty(property.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
-                                 
+                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <a @click="navigateTo('/pmsproperties/'+property.id )" class="dropdown-item"><i class="ri-eye-fill mr-2"></i>View</a>
+                                    <a @click="navigateTo('/pmsunits/'+property.id )" class="dropdown-item"><i class="ri-eye-fill mr-2"></i>View Units</a>
+                                    <a @click="navigateTo('/pmspropertystatements/'+property.id )" class="dropdown-item"><i class="ri-eye-fill mr-2"></i>View Invoices</a>
+                                    <a @click="navigateTo('/propertyawaitinginvoicing/'+property.id)" class="dropdown-item"><i class="ri-file-list-2-fill mr-2"></i>Awaiting Invoicing</a>
+                                    <a @click="navigateTo('/propertyinvoicestosettle/'+property.id)" class="dropdown-item"><i class="ri-file-edit-fill mr-2"></i>Invoices to Settle</a>
+                                    <a @click="navigateTo('/propertysettledinvoices/'+property.id)" class="dropdown-item"><i class="ri-bank-card-fill mr-2"></i>Settled Invoices</a>
+                                    <a @click="navigateTo('/edit-pmsproperty/'+property.id )" class="dropdown-item"><i class="ri-pencil-fill mr-2"></i>Edit</a>
+                                    <a @click="deleteProperty(property.id)" class="dropdown-item"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
                                   </div>
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-    
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
     
                   </div>
-                </div><!-- End Top Selling -->
+                </div>
+                <!-- End Top Selling -->
     
             </div>
         </section>
@@ -136,7 +88,8 @@
           properties: [],
           categories: [],
           propertytypes: [],
-          user: []
+          user: [],
+          loading: true
         }
       },
       methods: {
@@ -228,15 +181,21 @@
                 })
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.properties = response.data.lists.pmsproperties;
-             console.log("props", this.properties)
-             setTimeout(() => {
-                  $("#AllPropertiesTable").DataTable();
-              }, 10);
-    
-             });
-          },
+          this.loading = true; // start spinner
+          axios.get('api/lists').then((response) => {
+            this.properties = response.data.lists.pmsproperties;
+            console.log("props", this.properties);
+
+            setTimeout(() => {
+                $("#AllPropertiesTable").DataTable();
+            }, 10);
+
+          }).catch((error) => {
+            console.error(error);
+          }).finally(() => {
+            this.loading = false; // stop spinner
+          });
+        },
       },
       components : {
           TheMaster,

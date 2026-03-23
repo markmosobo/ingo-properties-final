@@ -63,33 +63,53 @@
                         
                           <!-- <button v-if="statements.length !== 0" @click="generatePDF">Generate PDF</button> -->
                           </div>
-                          <div class="col-auto d-flex justify-content-end">
-<!--                           <div class="btn-group" role="group">
-                              <button id="btnGroupDrop1" type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="ri-add-line"></i>
-                              </button>
-                              <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                    <a @click="navigateTo('/awaitinginvoicing')" class="dropdown-item" href="#">
-                                      <i class="ri-file-list-2-fill mr-2"></i>Awaiting Invoicing
-                                    </a>
-                                    <a @click="navigateTo('/invoicestosettle')" class="dropdown-item" href="#">
-                                      <i class="ri-file-edit-fill mr-2"></i>Invoices to Settle
-                                    </a>
-                                    <a @click="navigateTo('/settledinvoices')" class="dropdown-item" href="#">
-                                      <i class="ri-bank-card-fill mr-2"></i>Settled Invoices
-                                    </a>
-   
-                                     <a @click="navigateTo('/managedproperties' )" class="dropdown-item" href="#"><i class="ri-building-fill mr-2"></i>Properties</a>
-                                     <a @click="navigateTo('/pmstenants' )" class="dropdown-item" href="#"><i class="ri-user-fill mr-2"></i>Tenants</a>
-                                    <a @click="navigateTo('/pmslandlords' )" class="dropdown-item" href="#"><i class="ri-user-fill mr-2"></i>Landlords</a>
+                            <div class="col-auto d-flex justify-content-end">
+                              <div class="btn-group" role="group">
+                                <button
+                                  id="btnGroupDrop1"
+                                  type="button"
+                                  style="background-color: darkgreen; border-color: darkgreen;"
+                                  class="btn btn-sm btn-primary rounded-pill dropdown-toggle"
+                                  data-toggle="dropdown"
+                                  data-bs-toggle="dropdown"
+                                  aria-haspopup="true"
+                                  aria-expanded="false"
+                                >
+                                  <i class="ri-add-line"></i>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                  <a @click="navigateTo('/awaitinginvoicing')" class="dropdown-item" href="#">
+                                    <i class="ri-file-list-2-fill mr-2"></i>Draft Invoices
+                                  </a>
+                                  <a @click="navigateTo('/invoicestosettle')" class="dropdown-item" href="#">
+                                    <i class="ri-file-edit-fill mr-2"></i>Unpaid/Partial Invoices
+                                  </a>
+                                  <a @click="navigateTo('/settledinvoices')" class="dropdown-item" href="#">
+                                    <i class="ri-bank-card-fill mr-2"></i>Settled Invoices
+                                  </a>
+                                  <a @click="navigateTo('/managedproperties')" class="dropdown-item" href="#">
+                                    <i class="ri-building-fill mr-2"></i>Properties
+                                  </a>
+                                  <a @click="navigateTo('/pmstenants')" class="dropdown-item" href="#">
+                                    <i class="ri-user-fill mr-2"></i>Tenants
+                                  </a>
+                                  <a @click="navigateTo('/pmslandlords')" class="dropdown-item" href="#">
+                                    <i class="ri-user-fill mr-2"></i>Landlords
+                                  </a>
+                                </div>
                               </div>
-                            </div> -->
-                          </div>
+                            </div>
                         </div> 
             
                       </p>
-    
-                      <table id="AllStatementsTable" class="table table-borderless">
+                    <div v-if="isLoadingStatements" class="text-center py-5">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                      <div class="mt-2">Loading statements…</div>
+                    </div>   
+
+                    <table v-if="!isLoadingStatements" id="AllStatementsTable" class="table table-borderless">
                       <thead>
                         <tr>
                           <th scope="col">Tenant</th>
@@ -351,6 +371,7 @@
           lastmonthstatement: [],
           lastmonthBalance: '',
           overPayment: false,
+          isLoadingStatements: false,
 
           form: {
             payment_method: '',
@@ -1844,21 +1865,29 @@
         },
 
         loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.statements = response.data.lists.invoicestosettle;
-             this.awaitinginvoicing = response.data.lists.awaitinginvoicing;
-             this.invoicestosettlesmsnotsent = response.data.lists.invoicestosettlesmsnotsent;
-             this.invoicestosettlesmssent = response.data.lists.invoicestosettlesmssent;
-             this.expenses = response.data.lists.pmsexpenses;
-             console.log(response)
-             // Calculate the total amount paid
-            this.totalAmountPaid = this.calculateTotalAmountPaid();
-             setTimeout(() => {
+          this.isLoadingStatements = true; // 👈 start spinner
+
+          axios.get('api/lists')
+            .then((response) => {
+              this.statements = response.data.lists.invoicestosettle;
+              this.awaitinginvoicing = response.data.lists.awaitinginvoicing;
+              this.invoicestosettlesmsnotsent = response.data.lists.invoicestosettlesmsnotsent;
+              this.invoicestosettlesmssent = response.data.lists.invoicestosettlesmssent;
+              this.expenses = response.data.lists.pmsexpenses;
+
+              this.totalAmountPaid = this.calculateTotalAmountPaid();
+
+              setTimeout(() => {
                   $("#AllStatementsTable").DataTable();
               }, 10);
-    
-             });
-        },
+            })
+            .catch((error) => {
+              console.error(error);
+            })
+            .finally(() => {
+              this.isLoadingStatements = false; // 👈 stop spinner
+            });
+        },        
         calculateTotalAmountPaid() {
         if (!this.expenses || this.expenses.length === 0) {
               return 0; // If expenses data is empty or undefined, return 0

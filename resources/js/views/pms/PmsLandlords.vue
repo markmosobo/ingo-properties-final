@@ -21,7 +21,10 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Landlords <span>| Today</span></h5>
+                      <h5 class="card-title">
+                        Landlords
+                        <span class="text-muted">| Registered under Ingo Properties agreements</span>
+                      </h5>
                       <p class="card-text">
                         <div class="row">
                           <div class="col d-flex">
@@ -54,8 +57,13 @@
                         </div>   
             
                       </p>
-    
-                      <table id="AlllandlordsTable" class="table table-borderless">
+                      <div v-if="loading" class="text-center py-5">
+                        <div class="spinner-border text-success" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="mt-2 text-muted">Loading landlords...</div>
+                      </div>    
+                      <table v-show="!loading" id="AlllandlordsTable" class="table table-borderless">
                         <thead>
                           <tr>
                             <th scope="col">Full Name</th>
@@ -121,7 +129,8 @@
           landlords: [],
           categories: [],
           landlordtypes: [],
-          user: []
+          user: [],
+          loading: true
         }
       },
       methods: {
@@ -165,15 +174,19 @@
                 })
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.landlords = response.data.lists.landlords;
-             console.log("props", response)
-             setTimeout(() => {
-                  $("#AlllandlordsTable").DataTable();
-              }, 10);
-    
-             });
-          },
+          this.loading = true;
+
+          axios.get('api/lists').then((response) => {
+            this.landlords = response.data.lists.landlords;
+            console.log("props", response)
+
+            setTimeout(() => {
+              $("#AlllandlordsTable").DataTable();
+            }, 10);
+
+            this.loading = false;
+          });
+        },
       },
       components : {
           TheMaster,
