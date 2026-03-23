@@ -104,33 +104,51 @@
                           <button v-if="statements.length !== 0" @click="printInvoice" class="me-2">Print Invoice</button>
                           <button v-if="statements.length !== 0" @click="generatePDF">Generate Rent Statement</button>
                         </div>
-                        <div class="col-auto d-flex justify-content-end">
-             <!--            <div class="btn-group" role="group">
-                            <button id="btnGroupDrop1" type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <i class="ri-add-line"></i>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                              <a @click="navigateTo('/pmspropertystatements/'+property.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Statements</a>
-                                  <a @click="navigateTo('/propertyawaitinginvoicing/'+property.id)" class="dropdown-item" href="#">
-                                    <i class="ri-file-list-2-fill mr-2"></i>Awaiting Invoicing
+                            <div class="col-auto d-flex justify-content-end">
+                              <div class="btn-group" role="group">
+                                <button
+                                  id="btnGroupDrop1"
+                                  type="button"
+                                  style="background-color: darkgreen; border-color: darkgreen;"
+                                  class="btn btn-sm btn-primary rounded-pill dropdown-toggle"
+                                  data-toggle="dropdown"
+                                  data-bs-toggle="dropdown"
+                                  aria-haspopup="true"
+                                  aria-expanded="false"
+                                >
+                                  <i class="ri-add-line"></i>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                  <a @click="navigateTo('/awaitinginvoicing')" class="dropdown-item" href="#">
+                                    <i class="ri-file-list-2-fill mr-2"></i>Draft Invoices
                                   </a>
-                                  <a @click="navigateTo('/propertyinvoicestosettle/'+property.id)" class="dropdown-item" href="#">
-                                    <i class="ri-file-edit-fill mr-2"></i>Invoices to Settle
+                                  <a @click="navigateTo('/invoicestosettle')" class="dropdown-item" href="#">
+                                    <i class="ri-file-edit-fill mr-2"></i>Unpaid/Partial Invoices
                                   </a>
-                                  <a @click="navigateTo('/propertysettledinvoices/'+property.id)" class="dropdown-item" href="#">
+                                  <a @click="navigateTo('/settledinvoices')" class="dropdown-item" href="#">
                                     <i class="ri-bank-card-fill mr-2"></i>Settled Invoices
                                   </a>
- 
-                                  <a @click="navigateTo('/edit-pmsproperty/'+property.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                  <a @click="navigateTo('/pmsproperties' )" class="dropdown-item" href="#"><i class="ri-building-fill mr-2"></i>Properties</a>
-                                  <a @click="navigateTo('/pmslandlords' )" class="dropdown-item" href="#"><i class="ri-user-fill mr-2"></i>Landlords</a>
+                                  <a @click="navigateTo('/managedproperties')" class="dropdown-item" href="#">
+                                    <i class="ri-building-fill mr-2"></i>Properties
+                                  </a>
+                                  <a @click="navigateTo('/pmstenants')" class="dropdown-item" href="#">
+                                    <i class="ri-user-fill mr-2"></i>Tenants
+                                  </a>
+                                  <a @click="navigateTo('/pmslandlords')" class="dropdown-item" href="#">
+                                    <i class="ri-user-fill mr-2"></i>Landlords
+                                  </a>
+                                </div>
+                              </div>
                             </div>
-                          </div> -->
-                        </div>
                       </div>
                       </p>
-    
-                      <table id="AllStatementsTable" class="table table-borderless">
+                      <div v-if="isLoadingStatements" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="mt-2">Loading statements…</div>
+                      </div>    
+                      <table v-if="!isLoadingStatements" id="AllStatementsTable" class="table table-borderless">
                         <thead>
                           <tr>
                             <th scope="col">H/S No.</th>
@@ -236,9 +254,9 @@
     </TheMaster>
     </template>
     
-    <script>
-     import TheMaster from "@/components/dashboard/TheMaster.vue";
-     import axios from "axios";
+<script>
+    import TheMaster from "@/components/dashboard/TheMaster.vue";
+    import axios from "axios";
     import Swal from 'sweetalert2';
     import "jquery/dist/jquery.min.js";
     import "datatables.net-dt/js/dataTables.dataTables";
@@ -305,6 +323,7 @@
               water_bill: ''
             },
             loading: false,
+            isLoadingStatements: false,
 
 
         }
@@ -399,10 +418,9 @@
             printWindow.print();
         },
         buildInvoiceContent(refNo) {
-          // Determine whether to include the row
           const showExpensesDeductionRow = this.expenses !== 0;
           const logoBase64 = this.logoBase64;
-          // Build the HTML content for the receipt
+
           const receiptHTML = `
             <!DOCTYPE html>
             <html lang="en">
@@ -412,66 +430,77 @@
               <title>Invoice Of Payment</title>
               <style>
                 body {
-                  font-family: Arial, sans-serif;
+                  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                   margin: 0;
                   padding: 0;
-                  background-color: #f5f5f5;
+                  background-color: #f4f4f4;
+                  color: #333;
                 }
                 .receipt {
-                  max-width: 600px;
+                  max-width: 700px;
                   margin: 20px auto;
-                  padding: 20px;
+                  padding: 25px;
                   background-color: #fff;
-                  border: 2px solid #ccc;
                   border-radius: 10px;
-                  display: flex;
-                  flex-direction: column;
+                  box-shadow: 0 0 15px rgba(0,0,0,0.1);
                 }
                 .receipt-header {
                   display: flex;
                   justify-content: space-between;
                   align-items: center;
-                  margin-bottom: 20px;
+                  margin-bottom: 30px;
+                  border-bottom: 2px solid #e0e0e0;
+                  padding-bottom: 15px;
                 }
-                .company-info {
-                  text-align: left;
-                }
-                .company-info img {
-                  max-width: 150px;
+                .company-logo img {
+                  max-width: 160px;
                   height: auto;
                 }
+                .company-info {
+                  text-align: right;
+                  line-height: 1.5;
+                }
+                .company-info p {
+                  margin: 2px 0;
+                  font-size: 0.95rem;
+                }
                 .receipt-info {
-                  margin-bottom: 20px;
+                  margin-bottom: 25px;
                 }
                 .receipt-info p {
-                  margin: 5px 0;
-                  color: #555;
+                  margin: 4px 0;
+                  font-size: 0.95rem;
+                }
+                .receipt-info strong {
+                  display: inline-block;
+                  width: 150px;
                 }
                 .receipt-table {
                   width: 100%;
                   border-collapse: collapse;
                   margin-bottom: 20px;
+                  font-size: 0.95rem;
                 }
                 .receipt-table th, .receipt-table td {
-                  padding: 8px;
-                  border-bottom: 1px solid #ccc;
+                  padding: 10px;
+                  border-bottom: 1px solid #ddd;
                 }
                 .receipt-table th {
+                  background-color: #f9f9f9;
                   text-align: left;
-                  background-color: #f2f2f2;
-                  color: #333;
                 }
                 .receipt-table td {
                   text-align: left;
-                  color: #666;
+                }
+                .receipt-table tfoot th, .receipt-table tfoot td {
+                  font-weight: bold;
+                  font-size: 1rem;
                 }
                 .receipt-footer {
                   text-align: center;
-                  margin-top: auto;
-                }
-                .receipt-footer p {
-                  margin: 5px 0;
+                  font-size: 0.85rem;
                   color: #777;
+                  margin-top: 20px;
                 }
               </style>
             </head>
@@ -479,23 +508,24 @@
               <div class="receipt">
                 <div class="receipt-header">
                   <div class="company-logo">
-                    <img src="${logoBase64}" alt="Company Logo" style="max-width: 150px; height: auto;">
+                    <img src="${logoBase64}" alt="Company Logo">
                   </div>
                   <div class="company-info">
-                    <p>Cosyard Business Center, Kakamega Mumias Road, Kakamega.</p>
-                    <p>Phone: (0720) 020-401 </p>
-                    <p> Email: propertIngo@gmail.com</p>
+                    <p>Cosyard Business Center</p>
+                    <p>Kakamega Mumias Road, Kakamega</p>
+                    <p>Phone: 0759509462</p>
+                    <p>Email: ingoproperties@gmail.com</p>
                   </div>
                 </div>
+
                 <div class="receipt-info">
-                  <p><strong>Invoice For:</strong></p>
-                  <p><strong></strong> ${this.landlord}</p>
-                  <p><strong></strong> ${this.property.name} - ${this.unitsNo} Units</p>
-                  <p><strong></strong> ${this.currentMonth}</p>
-                  <p><strong></strong>  ${new Date().toLocaleString()}</p>
-                  
+                  <p><strong>Invoice For:</strong> ${this.landlord}</p>
+                  <p><strong>Property:</strong> ${this.property.name} - ${this.unitsNo} Units</p>
+                  <p><strong>Month:</strong> ${this.currentMonth}</p>
+                  <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
                   <p><strong>Payment Status:</strong> Unsettled</p>
                 </div>
+
                 <table class="receipt-table">
                   <thead>
                     <tr>
@@ -509,10 +539,9 @@
                       <td>KES ${this.formatNumber(this.rentLessCommission)}</td>
                     </tr>
                     <tr>
-                      <td>Total Due Remmitted</td>
+                      <td>Total Due Remitted</td>
                       <td>KES ${this.formatNumber(this.totalPaid)}</td>
                     </tr>
-                    <!-- Conditionally include expenses deduction row -->
                     ${showExpensesDeductionRow ? `
                     <tr>
                       <td>Total Expenses</td>
@@ -522,11 +551,12 @@
                   </tbody>
                   <tfoot>
                     <tr>
-                      <th>Net Remmission:</th>
+                      <th>Net Remission:</th>
                       <td>KES ${this.formatNumber(this.netRemmission)}</td>
                     </tr>
                   </tfoot>
                 </table>
+
                 <div class="receipt-footer">
                   <p>PDF Generated on ${new Date().toLocaleDateString()}</p>
                 </div>
@@ -563,193 +593,133 @@
           XLSX.writeFile(workbook, filename);
         },
         generatePDF() {
-            let pdfName = 'Full Statement';
-            var doc = new jsPDF('landscape');
-            const firstPageMaxRows = 13; // Rows for the first page
-            const subsequentPagesMaxRows = 30; // Rows for subsequent pages
+            // Safe values
+            const commissionPercent = this.property.commission ?? 0;
+            const totalPaid = this.totalPaid ?? 0;
+            const totalExpenses = this.totalAmountPaid ?? 0;
 
-            // Add top-left header
-            const rightHeaderText = 'Ingo Properties\nCosyard Business Centre, Kakamega Mumias Road\nTel: 0759509462\nP. O. Box 2973-50100, Kakamega\nEmail: ingoproperties@gmail.com';
-            const rightHeaderFontSize = 12;
-            const rightheaderX = 20; // Adjust the X coordinate
-            const rightheaderY = 10;
+            const commissionTotal = (commissionPercent / 100) * totalPaid;
+            const netRemmission = totalPaid - (totalExpenses + commissionTotal);
+            const rentLessCommission = totalPaid - commissionTotal;
 
-            doc.setFontSize(rightHeaderFontSize);
-            doc.setTextColor(44, 62, 80);
-            doc.text(rightHeaderText, rightheaderX, rightheaderY, { align: 'left' });
+            const doc = new jsPDF('portrait', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            
+            // ----- HEADER -----
+            // Logo on left
+            const logoWidth = 40;
+            const logoHeight = 20;
+            const logoX = 20;
+            const logoY = 10;
+            const logoImg = this.logoBase64 || '/images/apex-logo.png'; // fallback logo
+            doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
 
-            // Add top-right header
-            const headerText = 'Generated on: ' + new Date().toLocaleString() + '\n' + 'Statement for:' + '\n' + this.landlord + '\n' + this.property.name + '\n' + this.landlordPhone + '\n' + this.landlordEmail + '\n' + this.landlordAddress + '\n' + this.property.units_no + ' Units';
-            const headerFontSize = 12;
-            const headerX = doc.internal.pageSize.width - 20; // Adjust the X coordinate
-            const headerY = 10;
+            // Company info on right
+            const infoX = pageWidth - 20;
+            const infoY = 10;
+            doc.setFontSize(12);
+            doc.setTextColor(33, 37, 41);
+            doc.text("Ingo Properties", infoX, infoY, { align: 'right' });
+            doc.text("Cosyard Business Centre, Kakamega Mumias Road", infoX, infoY + 6, { align: 'right' });
+            doc.text("Tel: 0759509462 | Email: ingoproperties@gmail.com", infoX, infoY + 12, { align: 'right' });
 
-            doc.setFontSize(headerFontSize);
-            doc.setTextColor(44, 62, 80);
-            doc.text(headerText, headerX, headerY, { align: 'right' });
+            // ----- TITLE -----
+            doc.setFontSize(16);
+            doc.setTextColor(0, 0, 0);
+            const title = `${this.property.name} ${this.currentMonth} Rent Statement`.toUpperCase();
+            doc.text(title, pageWidth / 2, logoY + 35, { align: 'center' });
 
-            // Add image at the top
-            const imageUrl = '/images/apex-logo.png'; // Replace with the URL of your image
-            const imageWidth = 50; // Adjust the width of the image as needed
-            const imageHeight = 50; // Adjust the height of the image as needed
-            const imageX = (doc.internal.pageSize.width - imageWidth) / 2;
-            const imageY = 20;
-            doc.addImage(imageUrl, 'JPEG', imageX, imageY, imageWidth, imageHeight);
+            // ----- PROPERTY & LANDLORD INFO -----
+            doc.setFontSize(11);
+            doc.setTextColor(50, 50, 50);
+            const propY = logoY + 45;
+            doc.text(`Statement For: ${this.landlord}`, 20, propY);
+            doc.text(`Property: ${this.property.name} (${this.unitsNo} Units)`, 20, propY + 6);
+            doc.text(`Phone: ${this.landlordPhone} | Email: ${this.landlordEmail}`, 20, propY + 12);
+            doc.text(`Generated On: ${new Date().toLocaleString()}`, 20, propY + 18);
+            doc.text(`Payment Status: Unsettled`, 20, propY + 24);
 
-            // Add title
-            const titleText = (this.property.name + " " + this.currentMonth + ' Rent Statement').toUpperCase();
-            const titleFontSize = 16;
-            const titleWidth = doc.getStringUnitWidth(titleText) * titleFontSize / doc.internal.scaleFactor;
-            const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
-            const titleY = imageY + imageHeight + 10;
+            // ----- SUMMARY BOX -----
+            const boxY = propY + 32;
+            doc.setDrawColor(200);
+            doc.setFillColor(245, 245, 245);
+            doc.rect(20, boxY, pageWidth - 40, 28, 'FD');
 
-            doc.setFontSize(titleFontSize);
-            doc.setTextColor(44, 62, 80); // Set text color to a dark shade
-            doc.text(titleText, titleX, titleY);
-
-            const roundedCommission = Math.round(this.property.commission * 100);
-            const commissionTotal = this.propertyCommission / 100 * this.totalPaid;
-            const netRemissionTotal = Math.round(this.totalPaid - (this.totalAmountPaid + commissionTotal));
-
-            // Add content headers
-            doc.setFontSize(14);
-            doc.setTextColor(44, 62, 80);
-            doc.text('Total Expenses: ' + 'KES ' + this.formatNumber(this.totalAmountPaid), 20, imageY + imageHeight + 35);
-
-            doc.setFontSize(14);
-            doc.setTextColor(52, 73, 94); // Set text color to a slightly lighter shade
-
-            let textY = imageY + imageHeight + 20; // Initial y-coordinate for the first text
-
-            doc.text('Total Rent Less Commission: ' + 'KES ' + this.formatNumber(this.rentLessCommission), 20, textY);
-            textY += 10; // Increment y-coordinate for the next text
-
-            doc.text('Total Due Remitted: ' + 'KES ' + this.formatNumber(this.totalPaid), 20, textY);
-            textY += 10; // Increment y-coordinate for the next text
-
-            doc.text('Net Remission: ' + 'KES ' + this.formatNumber(this.netRemmission), 20, textY);
-            textY += 10; // Increment y-coordinate for the next text
-
-            // Set font size for the table headers and data
-            const tableFontSize = 8;
-            doc.setFontSize(tableFontSize);
+            doc.setFontSize(11);
             doc.setTextColor(0);
+            doc.text(`Total Rent Less Commission: KES ${this.formatNumber(rentLessCommission)}`, 25, boxY + 8);
+            doc.text(`Total Due Remitted: KES ${this.formatNumber(totalPaid)}`, 25, boxY + 14);
+            doc.text(`Total Expenses: KES ${this.formatNumber(totalExpenses)}`, 25, boxY + 20);
+            doc.text(`Net Remission: KES ${this.formatNumber(netRemmission)}`, pageWidth - 25, boxY + 20, { align: 'right' });
 
-            let headerYPos = imageY + imageHeight + 45;
-            let cellHeight = 10;
-            let cellPadding = 2;
-            let lineHeight = 5;
-            let columnWidths = [20, 50, 20, 20, 20, 20, 20, 20, 30]; // Adjusted column widths for 9 columns
-            let columnHeaders = ['H/S NO.', 'TENANT NAME', 'DUE', 'RENT', 'GARBAGE', 'WATER', 'PAID', 'BALANCE', 'DATE PAID']; // Example headers
+            // ----- TABLE OF STATEMENTS -----
+            const headers = ['H/S No.', 'Tenant Name', 'Due', 'Rent', 'Garbage', 'Water', 'Paid', 'Balance', 'Date Paid'];
+            const columnWidths = [20, 50, 20, 20, 20, 20, 20, 20, 30];
+            let tableY = boxY + 38;
 
+            doc.setFontSize(10);
+            doc.setTextColor(33, 37, 41);
+            
+            // Draw headers
             let xPos = 20;
-            doc.setDrawColor(0);
-
-            for (let i = 0; i < columnWidths.length; i++) {
-                doc.rect(xPos, headerYPos, columnWidths[i], cellHeight);
-                doc.setTextColor(0); // Set text color to black
-                doc.text(columnHeaders[i], xPos + cellPadding, headerYPos + cellHeight - cellPadding);
+            headers.forEach((header, i) => {
+                doc.setFillColor(220, 220, 220);
+                doc.rect(xPos, tableY, columnWidths[i], 8, 'FD');
+                doc.text(header, xPos + 2, tableY + 6);
                 xPos += columnWidths[i];
-            }
+            });
 
-            let currentPage = 1;
+            let rowY = tableY + 8;
+            const maxRowsPerPage = 25;
             let currentRow = 0;
-            let maxRowsPerPage = firstPageMaxRows; // Set initial max rows for the first page
 
-            // Initialize totals
-            let totals = Array(columnHeaders.length).fill(0);
-
-            this.allstatements.forEach((statement, index) => {
+            this.allstatements.forEach(statement => {
                 if (currentRow >= maxRowsPerPage) {
                     doc.addPage();
-                    headerYPos = 20;
+                    rowY = 20;
                     currentRow = 0;
-                    currentPage++;
-                    maxRowsPerPage = subsequentPagesMaxRows; // Set max rows for subsequent pages
 
+                    // Redraw table headers on new page
                     xPos = 20;
-                    for (let i = 0; i < columnWidths.length; i++) {
-                        doc.rect(xPos, headerYPos, columnWidths[i], cellHeight, 'F');
-                        doc.setTextColor(0); // Set text color to black
-                        doc.text(columnHeaders[i], xPos + cellPadding, headerYPos + cellHeight - cellPadding);
+                    headers.forEach((header, i) => {
+                        doc.setFillColor(220, 220, 220);
+                        doc.rect(xPos, rowY, columnWidths[i], 8, 'FD');
+                        doc.text(header, xPos + 2, rowY + 6);
                         xPos += columnWidths[i];
-                    }
-                    headerYPos += cellHeight;
+                    });
+                    rowY += 8;
                 }
 
-                let yPos = headerYPos + (currentRow + 1) * lineHeight;
                 xPos = 20;
-                for (let i = 0; i < columnWidths.length; i++) {
-                    doc.rect(xPos, yPos, columnWidths[i], cellHeight);
-                    switch (i) {
-                        case 0:
-                            const unitNumber = statement.unit ? statement.unit.unit_number : 'N/A';
-                            const truncatedText = unitNumber.length > 4 ? unitNumber.slice(0, 4) + '...' : unitNumber;
-                            doc.text(truncatedText, xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            break;
-                        case 1:
-                            doc.text(
-                                statement.tenant ? `${statement.tenant.first_name} ${statement.tenant.last_name}` : 'Vacant',
-                                xPos + cellPadding,
-                                yPos + cellHeight - cellPadding
-                            );
-                            break;
-                        case 2:
-                            doc.text(this.formatNumber(statement.total), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[2] += parseFloat(statement.total) || 0;
-                            break;
-                        case 3:
-                            let monthlyRent = statement.unit ? parseFloat(statement.unit.monthly_rent) : 0;
-                            doc.text(this.formatNumber(monthlyRent), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[3] += monthlyRent || 0;
-                            break;
-                        case 4:
-                            let garbageFee = statement.unit ? parseFloat(statement.unit.garbage_fee) : 0;
-                            doc.text(this.formatNumber(garbageFee), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[4] += garbageFee || 0;
-                            break;
-                        case 5:
-                            let waterBill = parseFloat(statement.water_bill) || 0;
-                            doc.text(this.formatNumber(waterBill), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[5] += waterBill;
-                            break;
-                        case 6:
-                            let paidAmount = parseFloat(statement.paid) || 0;
-                            doc.text(this.formatNumber(paidAmount), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[6] += paidAmount;
-                            break;
-                        case 7:
-                            let balance = parseFloat(statement.balance) || 0;
-                            doc.text(this.formatNumber(balance), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[7] += balance;
-                            break;
-                        case 8:
-                            doc.text(this.format_date(statement.paid_at ?? 'N/A'), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            break;
-                    }
+                const values = [
+                    statement.unit?.unit_number ?? 'N/A',
+                    statement.tenant ? `${statement.tenant.first_name} ${statement.tenant.last_name}` : 'Vacant',
+                    statement.total ?? 0,
+                    statement.unit?.monthly_rent ?? 0,
+                    statement.unit?.garbage_fee ?? 0,
+                    statement.water_bill ?? 0,
+                    statement.paid ?? 0,
+                    statement.balance ?? 0,
+                    this.format_date(statement.paid_at) ?? 'N/A'
+                ];
+
+                values.forEach((val, i) => {
+                    doc.rect(xPos, rowY, columnWidths[i], 8);
+                    doc.text(this.formatNumber(val), xPos + 2, rowY + 6);
                     xPos += columnWidths[i];
-                }
+                });
+
+                rowY += 8;
                 currentRow++;
             });
 
-            // Add totals row
-            let totalsYPos = headerYPos + (currentRow + 1) * lineHeight;
-            xPos = 20;
-            doc.setDrawColor(0);
-            for (let i = 0; i < columnWidths.length; i++) {
-                doc.rect(xPos, totalsYPos, columnWidths[i], cellHeight);
-                if (i > 1 && i < columnWidths.length - 1) { // Skip first two and last column
-                    doc.text(this.formatNumber(totals[i]), xPos + cellPadding, totalsYPos + cellHeight - cellPadding);
-                }
-                xPos += columnWidths[i];
-            }
-
-            // Add footer
+            // ----- FOOTER -----
             doc.setFontSize(10);
-            doc.text('Generated on: ' + new Date().toLocaleString(), 20, doc.internal.pageSize.height - 10);
+            doc.setTextColor(100);
+            doc.text(`Generated by Ingo Properties on ${new Date().toLocaleString()}`, 20, doc.internal.pageSize.getHeight() - 10);
 
-            // Save the PDF
-            let fileName = this.property.name + " " + this.formatMonth(new Date()) + ' Rent Statement' + '_Total_Pages_' + currentPage + '.pdf';
+            // Save
+            const fileName = `${this.property.name} ${this.formatMonth(new Date())} Rent Statement.pdf`;
             doc.save(fileName);
         },
 
@@ -1054,19 +1024,29 @@
           return `${day}/${month}/${year}`;
         },
         loadLists() {
-             axios.get('/api/propertyallsettledinvoices/'+this.$route.params.id).then((response) => {
-                //settled invoices
-             this.statements = response.data.propertyallsettledinvoices;
-             //all invoices (unsettled & vacants too)
-             this.allstatements = response.data.propertyallinvoices;
-             console.log("all",this.allstatements)
-             // Calculate the total amount paid
-             setTimeout(() => {
+          this.isLoadingStatements = true; // 🔄 start spinner
+
+          axios.get('/api/propertyallsettledinvoices/' + this.$route.params.id)
+            .then((response) => {
+              // Settled invoices
+              this.statements = response.data.propertyallsettledinvoices;
+              // All invoices (unsettled & vacant)
+              this.allstatements = response.data.propertyallinvoices;
+
+              console.log("all", this.allstatements);
+
+              // Initialize DataTable after DOM update
+              setTimeout(() => {
                   $("#AllStatementsTable").DataTable();
               }, 10);
-    
-             });
-        },
+        })
+            .catch((error) => {
+              console.error(error);
+            })
+            .finally(() => {
+              this.isLoadingStatements = false; // ✅ stop spinner
+            });
+        },        
         getUnit(unitNumber) {
             axios.get('/api/pmsunit/' + parseInt(unitNumber))
                 .then((response) => {
@@ -1082,33 +1062,45 @@
                 .catch((error) => {
                     console.error("Error fetching unit:", error);
                 });
-        },
-        getProperty()
-        {
-          axios.get('/api/pmsproperty/'+ this.$route.params.id).then((response) => {
-            this.property = response.data.property;
-            this.commission = this.property.landlord.commission;
-            this.fixedCommission = this.property.landlord.fixed_commission;
-            this.fName = this.property.landlord.first_name;
-            this.lName = this.property.landlord.last_name;
-            this.landlord = this.fName + " " + this.lName;
-            this.landlordPhone = this.property.landlord.phone_no;
-            this.landlordAddress = this.property.landlord.address;
-            this.landlordEmail = this.property.landlord.email;
-            this.unitsNo = this.property.units_no;
-            if(this.commission !== null)
-            {
-              this.propertyCommission = ((this.commission/100) * this.totalPaid).toFixed(2);
-            }
-            else
-            {
-              this.propertyCommission = this.fixedCommission;
-            }
-            this.rentLessCommission = this.totalPaid - this.propertyCommission;
-            console.log("kijamo", response)
-          }).catch(() => {
-              console.log('error')
-          })
+                },
+        getProperty() {
+          axios.get('/api/pmsproperty/' + this.$route.params.id)
+            .then((response) => {
+              const prop = response.data.property;
+
+              // Save property
+              this.property = prop;
+
+              // Landlord info safely
+              const landlord = prop.landlord ?? {};
+              this.fName = landlord.first_name ?? '';
+              this.lName = landlord.last_name ?? '';
+              this.landlord = `${this.fName} ${this.lName}`;
+              this.landlordPhone = landlord.phone_no ?? '';
+              this.landlordAddress = landlord.address ?? '';
+              this.landlordEmail = landlord.email ?? '';
+              this.commission = landlord.commission ?? 0;
+              this.fixedCommission = landlord.fixed_commission ?? 0;
+
+              // Property details
+              this.unitsNo = prop.units_no ?? 0;
+
+              // Safely calculate commission and rent less commission
+              const totalPaidSafe = this.totalPaid ?? 0;
+
+              if (this.commission > 0) {
+                this.propertyCommission = ((this.commission / 100) * totalPaidSafe).toFixed(2);
+              } else {
+                this.propertyCommission = this.fixedCommission ?? 0;
+              }
+
+              this.rentLessCommission = totalPaidSafe - (Number(this.propertyCommission) ?? 0);
+
+              console.log("Property data loaded safely:", response);
+            })
+            .catch((err) => {
+              console.log('Error fetching property:', err);
+            });
         },
         getPropertyExpenses()
         {
@@ -1171,13 +1163,13 @@
 
       }
     }
-    </script>
+</script>
     
     
-    <style scoped>
+  <style scoped>
     .active-link {
       background-color: darkgreen;
       border-color: darkgreen;
       color: white; /* Optional: to ensure the text is visible */
     }
-    </style>
+  </style>
