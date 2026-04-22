@@ -31,7 +31,7 @@
                             class="btn btn-sm btn-primary rounded-pill"
                             @click="navigate"
                           >
-                            Add Property
+                            Add Listing
                           </a>
                       </router-link>
             
@@ -49,38 +49,137 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="property in properties" :key="property.id">
-                            <th scope="row"><a href="#">
-                              <img :src="getPhoto() + property.images[0].name" />
-                            </a></th>
-                            <!-- <td>{{property["images"][0]["name"]}}</td> -->
-                            <td>{{property.title}}</td>
-                            <td>{{(property.price).toLocaleString()}}</td>
-                            <td>{{property.location}}</td>
-                            <td>
-                              <span v-if="property.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Pending</span>   
-                              <span v-else-if="property.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Approved</span>
-                              <span v-else class="badge bg-light text-dark"><i class="bi bi-star me-1"></i> Closed</span>
 
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <!-- <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                             -->
-                                  <a v-if="property.created_by == user.id" @click="navigateTo('/editproperty/'+property.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                  <a v-if="property.status == 0" @click="approveProperty(property.id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Approve</a>
-                                  <a v-if="property.featured == 0 && property.status == 1" @click="featureProperty(property.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Feature</a>
-                                  <a v-if="property.featured == 1 && property.status == 1" @click="unfeatureProperty(property.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Unfeature</a>
-                                  <a v-if="property.status == 1" @click="closeProperty(property.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Close</a>
-                                  <a v-if="property.status == 2" @click="reopenProperty(property.id)" class="dropdown-item" href="#"><i class="ri-refresh-fill mr-2"></i>Reopen</a>
-                                  <a @click="deleteProperty(property.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
-                                  </div>
-                              </div>
+                          <!-- LOADING -->
+                          <tr v-if="loading">
+                            <td colspan="6" class="text-center py-5">
+                              <div class="spinner-border text-success" role="status"></div>
+                              <div class="mt-2 text-muted">Loading listings...</div>
                             </td>
                           </tr>
+
+                          <!-- EMPTY STATE -->
+                          <tr v-else-if="!properties.length">
+                            <td colspan="6" class="text-center text-muted py-4">
+                              No listings available.
+                            </td>
+                          </tr>
+
+                          <!-- DATA -->
+                          <tr v-else v-for="property in properties" :key="property.id">
+
+                            <!-- IMAGE -->
+                            <td>
+                              <img
+                                v-if="property.images?.length"
+                                :src="getPhoto() + property.images[0].name"
+                                style="width:60px;height:45px;object-fit:cover;border-radius:6px;"
+                              />
+                              <span v-else class="text-muted small">No image</span>
+                            </td>
+
+                            <td>{{ property.title }}</td>
+
+                            <td>{{ property.price?.toLocaleString() ?? '0' }}</td>
+
+                            <td>{{ property.location }}</td>
+
+                            <td>
+                              <span v-if="property.status == 0" class="badge bg-warning text-dark">
+                                Pending
+                              </span>
+
+                              <span v-else-if="property.status == 1" class="badge bg-success">
+                                Approved
+                              </span>
+
+                              <span v-else class="badge bg-light text-dark">
+                                Closed
+                              </span>
+                            </td>
+
+                            <td>
+                              <div class="btn-group">
+
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-primary rounded-pill dropdown-toggle"
+                                  data-bs-toggle="dropdown"
+                                >
+                                  Action
+                                </button>
+
+                                <div class="dropdown-menu">
+
+                                  <a
+                                    v-if="property.created_by == user.id"
+                                    @click="navigateTo('/editproperty/' + property.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-pencil-line me-2 text-primary"></i>
+                                    Edit
+                                  </a>
+
+                                  <a
+                                    v-if="property.status == 0"
+                                    @click="approveProperty(property.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-check-line me-2 text-success"></i>
+                                    Approve
+                                  </a>
+
+                                  <a
+                                    v-if="property.featured == 0 && property.status == 1"
+                                    @click="featureProperty(property.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-star-line me-2 text-warning"></i>
+                                    Feature
+                                  </a>
+
+                                  <a
+                                    v-if="property.featured == 1 && property.status == 1"
+                                    @click="unfeatureProperty(property.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-star-fill me-2 text-warning"></i>
+                                    Unfeature
+                                  </a>
+
+                                  <a
+                                    v-if="property.status == 1"
+                                    @click="closeProperty(property.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-close-circle-line me-2 text-danger"></i>
+                                    Close
+                                  </a>
+
+                                  <a
+                                    v-if="property.status == 2"
+                                    @click="reopenProperty(property.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-refresh-line me-2 text-info"></i>
+                                    Reopen
+                                  </a>
+
+                                  <a
+                                    @click="deleteProperty(property.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-delete-bin-line me-2 text-danger"></i>
+                                    Delete
+                                  </a>
+
+                                </div>
+
+                              </div>
+                            </td>
+
+                          </tr>
+
                         </tbody>
                       </table>
     
@@ -118,7 +217,8 @@
           properties: [],
           categories: [],
           propertytypes: [],
-          user: []
+          user: [],
+          loading: false,
         }
       },
       methods: {
@@ -222,17 +322,24 @@
                 })
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.categories = response.data.lists.categories;
-             this.propertytypes = response.data.lists.propertytypes;
-             this.properties = response.data.lists.properties;
-             console.log("props", response)
-             setTimeout(() => {
-                  $("#AllPropertiesTable").DataTable();
-              }, 10);
-    
-             });
-          },
+          this.loading = true;
+
+          axios.get('api/lists/listings')
+            .then((response) => {
+              this.categories = response.data.categories;
+              this.propertytypes = response.data.propertytypes;
+              this.properties = response.data.properties;
+
+                    setTimeout(() => {
+                          $("#AllPropertiesTable").DataTable();
+                      }, 10);
+
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+        },        
+
       },
       components : {
           TheMaster,

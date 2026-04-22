@@ -20,33 +20,89 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="blog in featuredblogs" :key="blog.id">
-                            <td>{{blog.title.substring(0,20)+".."}}</td>
-                            <td>{{blog.category_id}}</td>
-                            <td>{{blog.content.substring(0,20)+".."}}</td>
-                            <td>
-                              <span v-if="blog.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Pending</span>   
-                              <span v-else-if="blog.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Approved</span>
-                              <span v-else class="badge bg-light text-dark"><i class="bi bi-star me-1"></i> Archived</span>
 
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a @click="navigateTo('/viewblog/'+blog.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                            
-                                  <!-- <a class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                  <a v-if="blog.status == 0" @click="approveBlog(blog.id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Approve</a>
-                                  <a v-if="blog.featured == 0 && blog.status == 1" @click="featureBlog(blog.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Feature</a> -->
-                                  <a v-if="blog.featured == 1 && blog.status == 1" @click="unfeatureBlog(blog.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Unfeature</a>
-                                  <!-- <a v-if="blog.status == 1" @click="archiveBlog(blog.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Archive</a>
-                                  <a v-if="blog.status == 2" @click="unarchiveBlog(blog.id)" class="dropdown-item" href="#"><i class="ri-refresh-fill mr-2"></i>Unarchive</a> -->
-                                  </div>
-                              </div>
+                          <!-- LOADING -->
+                          <tr v-if="loading">
+                            <td colspan="5" class="text-center py-5">
+                              <div class="spinner-border text-success" role="status"></div>
+                              <div class="mt-2 text-muted">Loading featured blogs...</div>
                             </td>
                           </tr>
+
+                          <!-- EMPTY STATE -->
+                          <tr v-else-if="!featuredblogs.length">
+                            <td colspan="5" class="text-center text-muted py-4">
+                              No featured blogs available.
+                            </td>
+                          </tr>
+
+                          <!-- DATA ROWS -->
+                          <tr v-else v-for="blog in featuredblogs" :key="blog.id">
+
+                            <td>
+                              {{ blog.title ? blog.title.substring(0, 20) + '...' : '---' }}
+                            </td>
+
+                            <td>
+                              {{ blog.category_id }}
+                            </td>
+
+                            <td>
+                              {{ blog.content ? blog.content.substring(0, 20) + '...' : '---' }}
+                            </td>
+
+                            <td>
+                              <span v-if="blog.status == 0" class="badge bg-warning text-dark">
+                                Pending
+                              </span>
+
+                              <span v-else-if="blog.status == 1" class="badge bg-success">
+                                Approved
+                              </span>
+
+                              <span v-else class="badge bg-dark">
+                                Archived
+                              </span>
+                            </td>
+
+                            <!-- ACTION -->
+                            <td>
+                              <div class="btn-group">
+
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-primary rounded-pill dropdown-toggle"
+                                  data-bs-toggle="dropdown"
+                                >
+                                  Action
+                                </button>
+
+                                <div class="dropdown-menu">
+
+                                  <a
+                                    @click="navigateTo('/viewblog/' + blog.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-eye-line me-2 text-primary"></i>
+                                    View
+                                  </a>
+
+                                  <a
+                                    v-if="blog.featured == 1 && blog.status == 1"
+                                    @click="unfeatureBlog(blog.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-star-fill me-2 text-warning"></i>
+                                    Unfeature
+                                  </a>
+
+                                </div>
+
+                              </div>
+                            </td>
+
+                          </tr>
+
                         </tbody>
                       </table>
                     </div>
@@ -83,7 +139,8 @@
           blogs: [],
           blogcategories: [],
           featuredblogs: [],
-          users: []
+          users: [],
+          loading: false,
         }
       },
       methods: {
@@ -155,17 +212,25 @@
           })
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.blogcategories = response.data.lists.blogcategories;
-             this.blogs = response.data.lists.blogs;
-             this.users = response.data.lists.users;
-             this.featuredblogs = response.data.lists.featuredblogs;
-             setTimeout(() => {
+          this.loading = true;
+
+          axios.get('api/lists/featured-blogs')
+            .then((response) => { 
+              this.blogcategories = response.data.blogcategories;
+              this.blogs = response.data.blogs;
+              this.users = response.data.users;
+              this.featuredblogs = response.data.featuredblogs;
+
+              setTimeout(() => {
                   $("#BlogsTable").DataTable();
               }, 10);
-    
-             });
-          },
+
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+        },        
+
       },
       components : {
           TheMaster,

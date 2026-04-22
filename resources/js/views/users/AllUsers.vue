@@ -51,33 +51,114 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="user in users" :key="user.id">
-                            <td>{{user.first_name}} {{user.last_name}}</td>
-                            <td>{{(user.email)}}</td>
-                            <td>{{user.phone ?? 'N/A'}}</td>
-                            <td>{{user.role['name']}}</td>
-                            <td>
-                              <span v-if="user.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Pending</span>   
-                              <span v-else-if="user.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Active</span>
-                              <span v-else class="badge bg-light text-dark"><i class="bi bi-star me-1"></i> Inactive</span>
 
-                            </td>
-                            <td>{{format_date(user.created_at)}}</td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-success rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a @click="navigateTo('/viewuser/'+user.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>     
-                                  <a @click="navigateTo('/edituser/'+user.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a> 
-                                  <a @click="resetPassword(user)" class="dropdown-item" href="#"><i class="ri-lock-fill mr-2"></i>Reset Password</a>                                            
-                                  <a v-if="user.status == 2" @click="activateUser(user.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Activate</a>
-                                  <a v-if="user.status == 1" @click="deactivateUser(user.id)" class="dropdown-item" href="#"><i class="ri-refresh-fill mr-2"></i>Deactivate</a>
-                                  </div>
-                              </div>
+                          <!-- LOADING -->
+                          <tr v-if="loading">
+                            <td colspan="7" class="text-center py-5">
+                              <div class="spinner-border text-success" role="status"></div>
+                              <div class="mt-2 text-muted">Loading users...</div>
                             </td>
                           </tr>
+
+                          <!-- EMPTY STATE -->
+                          <tr v-else-if="!users.length">
+                            <td colspan="7" class="text-center text-muted py-4">
+                              No users found.
+                            </td>
+                          </tr>
+
+                          <!-- DATA ROWS -->
+                          <tr v-else v-for="user in users" :key="user.id">
+
+                            <td>{{ user.first_name }} {{ user.last_name }}</td>
+
+                            <td>{{ user.email ?? 'N/A' }}</td>
+
+                            <td>{{ user.phone ?? 'N/A' }}</td>
+
+                            <td>
+                              {{ user.role?.name ?? 'N/A' }}
+                            </td>
+
+                            <td>
+                              <span v-if="user.status == 0" class="badge bg-warning text-dark">
+                                Pending
+                              </span>
+
+                              <span v-else-if="user.status == 1" class="badge bg-success">
+                                Active
+                              </span>
+
+                              <span v-else class="badge bg-dark">
+                                Inactive
+                              </span>
+                            </td>
+
+                            <td>{{ format_date(user.created_at) }}</td>
+
+                            <!-- ACTION -->
+                            <td>
+                              <div class="btn-group">
+
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-success rounded-pill dropdown-toggle"
+                                  data-bs-toggle="dropdown"
+                                >
+                                  Action
+                                </button>
+
+                                <div class="dropdown-menu">
+
+                                  <a
+                                    @click="navigateTo('/viewuser/' + user.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-eye-line me-2 text-primary"></i>
+                                    View
+                                  </a>
+
+                                  <a
+                                    @click="navigateTo('/edituser/' + user.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-pencil-line me-2 text-primary"></i>
+                                    Edit
+                                  </a>
+
+                                  <a
+                                    @click="resetPassword(user)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-lock-line me-2 text-warning"></i>
+                                    Reset Password
+                                  </a>
+
+                                  <a
+                                    v-if="user.status == 2"
+                                    @click="activateUser(user.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-check-line me-2 text-success"></i>
+                                    Activate
+                                  </a>
+
+                                  <a
+                                    v-if="user.status == 1"
+                                    @click="deactivateUser(user.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-close-circle-line me-2 text-danger"></i>
+                                    Deactivate
+                                  </a>
+
+                                </div>
+
+                              </div>
+                            </td>
+
+                          </tr>
+
                         </tbody>
                       </table>
     
@@ -143,7 +224,8 @@
         return {
           users: [],
           user: [],
-          defaultPassword: ''
+          defaultPassword: '',
+          loading: false,
         }
       },
       methods: {
@@ -193,16 +275,23 @@
           })
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.users = response.data.lists.users;
-             this.defaultPassword = response.data.lists.defaultPassword.default_password;
-             console.log(this.users)
-             setTimeout(() => {
+          this.loading = true;
+
+          axios.get('api/lists/users')
+            .then((response) => {
+              this.users = response.data.users;
+              this.defaultPassword = response.data.defaultPassword.default_password;
+
+              setTimeout(() => {
                   $("#AllUsersTable").DataTable();
               }, 10);
-    
-             });
-          },
+
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+        }        
+
       },
       components : {
           TheMaster,

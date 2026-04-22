@@ -391,10 +391,14 @@ class ListController extends Controller
     {
         $categories = Category::all();
         $projects = Project::all();
+        $propertytypes = PropertyType::all();
+        $properties = Property::latest()->with('type','images')->get();
 
         return response()->json([
             'categories' => $categories,
             'projects' => $projects,
+            'properties' => $properties,
+            'propertytypes' => $propertytypes            
         ]);        
     }  
     
@@ -402,19 +406,40 @@ class ListController extends Controller
     {
         $ourblogs = Blog::with('category')->where('status',1)->get();
         $blogcategories = BlogCategory::all();
+        $users = User::latest()->with('role')->get();
+        $blogs = Blog::with('category')->get();
 
         return response()->json([
             'ourblogs' => $ourblogs,
             'blogcategories' => $blogcategories,
+            'users' => $users,
+            'blogs' => $blogs
         ]);        
     } 
+
+    public function featuredBlogs()
+    {
+        $blogcategories = BlogCategory::all();
+        $blogs = Blog::with('category')->get();
+        $users = User::latest()->with('role')->get();
+        $featuredblogs = Blog::latest()->where('featured',1)->where('status',1)->get();
+
+        return response()->json([
+            'blogcategories' => $blogcategories,
+            'blogs' => $blogs,
+            'users' => $users,
+            'featuredblogs' => $featuredblogs
+        ]);        
+    }     
     
     public function contacts()
     {
         $contacts = Contact::all();
+        $sociallinks = SocialLink::all();
 
         return response()->json([
-            'contacts' => $contacts
+            'contacts' => $contacts,
+            'sociallinks' => $sociallinks
         ]);        
     }
     
@@ -433,6 +458,75 @@ class ListController extends Controller
 
         return response()->json([
             'tenants' => $tenants
+        ]);
+    }
+    
+    public function listings()
+    {
+        $categories = Category::all();
+        $properties = Property::latest()->with('type','images')->get();
+        $propertytypes = PropertyType::all();
+
+        return response()->json([
+            'categories' => $categories,
+            'propertytypes' => $propertytypes,
+            'properties' => $properties
+        ]);
+    } 
+    
+    public function expenses()
+    {
+
+        $pmsexpenses = PmsExpense::with('user')->get();
+
+        return response()->json([
+            'pmsexpenses' => $pmsexpenses
+        ]);
+    } 
+    
+    public function users()
+    {
+
+        $users = User::latest()->with('role')->get();
+        $defaultPassword = DefaultPassword::latest()->first();
+
+        return response()->json([
+            'users' => $users,
+            'defaultPassword' => $defaultPassword,
+        ]);
+    }
+    
+    public function roles()
+    {
+
+        $roles = Role::all();
+
+        return response()->json([
+            'roles' => $roles
+        ]);
+    }
+    
+    public function abouts()
+    {
+
+        $abouts = About::latest()->take(1)->get();
+        $services = Service::all();
+
+        return response()->json([
+            'abouts' => $abouts,
+            'services' => $services
+        ]);
+    }  
+    
+    public function testimonials()
+    {
+
+        $testimonials = Testimonial::latest()->get();
+        $defaultPassword = DefaultPassword::latest()->first();
+
+        return response()->json([
+            'testimonials' => $testimonials,
+            'defaultPassword' => $defaultPassword,
         ]);
     }    
 

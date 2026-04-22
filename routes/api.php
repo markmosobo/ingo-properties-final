@@ -93,12 +93,20 @@ Route::get('lists/home', [ListController::class, 'homePage']);
 Route::get('lists/socials', [ListController::class, 'socials']);
 Route::get('lists/projects', [ListController::class, 'projects']);
 Route::get('lists/blogs', [ListController::class, 'blogs']);
+Route::get('lists/featured-blogs', [ListController::class, 'featuredBlogs']);
 Route::get('lists/contacts', [ListController::class, 'contacts']);
 Route::get('lists/sale-properties', [ListController::class, 'saleProperties']);
 Route::get('lists/rent-properties', [ListController::class, 'rentProperties']);
 Route::get('lists/featured-properties', [ListController::class, 'featuredProperties']);
 Route::get('lists/landlords', [ListController::class, 'landlords']);
 Route::get('lists/tenants', [ListController::class, 'tenants']);
+Route::get('lists/expenses', [ListController::class, 'expenses']);
+
+Route::get('lists/listings', [ListController::class, 'listings']);
+Route::get('lists/users', [ListController::class, 'users']);
+Route::get('lists/roles', [ListController::class, 'roles']);
+Route::get('lists/abouts', [ListController::class, 'abouts']);
+Route::get('lists/testimonials', [ListController::class, 'testimonials']);
 
 
 Route::get('property/{id}', [PropertyController::class, 'single']);

@@ -51,31 +51,64 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="user in testimonials" :key="user.id">
-                            <td>{{user.full_name}}</td>
-                            <td>{{(user.label)}}</td>
-                            <td>{{user.body ?? 'N/A'}}</td>
-                            <td>
-                              <span v-if="user.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Pending</span>   
-                              <span v-else-if="user.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Approved</span>
-                              <span v-else class="badge bg-light text-dark"><i class="bi bi-star me-1"></i> Inactive</span>
 
+                          <!-- SPINNER -->
+                          <tr v-if="loading">
+                            <td colspan="6" class="text-center py-5">
+                              <div class="spinner-border text-success" role="status"></div>
+                              <div class="mt-2 text-muted">Loading testimonials...</div>
                             </td>
-                            <td>{{format_date(user.created_at)}}</td>
+                          </tr>
+
+                          <!-- DATA -->
+                          <tr v-else v-for="user in testimonials" :key="user.id">
+                            <td>{{user.full_name}}</td>
+                            <td>{{user.label}}</td>
+                            <td>{{user.body ?? 'N/A'}}</td>
+
+                            <td>
+                              <span v-if="user.status == 0" class="badge bg-warning text-dark">
+                                <i class="bi bi-exclamation-triangle me-1"></i> Pending
+                              </span>
+
+                              <span v-else-if="user.status == 1" class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i> Approved
+                              </span>
+
+                              <span v-else class="badge bg-light text-dark">
+                                <i class="bi bi-star me-1"></i> Inactive
+                              </span>
+                            </td>
+
+                            <td>{{ format_date(user.created_at) }}</td>
+
                             <td>
                               <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <button type="button"
+                                  class="btn btn-sm btn-primary rounded-pill dropdown-toggle"
+                                  data-toggle="dropdown">
                                   Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <!-- <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                             -->
-                                  <a @click="editModal(user)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                  <a v-if="user.status == 0" @click="approveTestimonial(user.id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Approve</a>
-                                  <a @click="deleteTestimonial(user.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
-                                  </div>
+                                </button>
+
+                                <div class="dropdown-menu">
+                                  <a @click="editModal(user)" class="dropdown-item">
+                                    <i class="ri-pencil-fill mr-2"></i>Edit
+                                  </a>
+
+                                  <a v-if="user.status == 0"
+                                    @click="approveTestimonial(user.id)"
+                                    class="dropdown-item">
+                                    <i class="ri-check-fill mr-2"></i>Approve
+                                  </a>
+
+                                  <a @click="deleteTestimonial(user.id)" class="dropdown-item">
+                                    <i class="ri-delete-bin-line mr-2"></i>Delete
+                                  </a>
+                                </div>
                               </div>
                             </td>
                           </tr>
+
                         </tbody>
                       </table>
     
@@ -229,6 +262,7 @@
       data(){
         return {
           testimonials: [],
+          loading: false,
           user: [],
           form: {
             full_name: '',
@@ -265,34 +299,34 @@
             modal.show();
         },
         confirmEditTestimonial() {
-    let payload = {
-        body: this.form.body,
-        full_name: this.form.full_name,
-        label: this.form.label,
-    };
+          let payload = {
+              body: this.form.body,
+              full_name: this.form.full_name,
+              label: this.form.label,
+          };
 
-    axios.put("/api/edit-testimonial/" + this.selectedTestimonial.id, payload)
-        .then(response => {
-            console.log(response);
-            toast.fire(
-                'Success!',
-                'Testimonial updated!',
-                'success'
-            );
-        })
-        .catch(error => {
-            console.log(error);
-        })
-        .finally(() => {
-            // Reference the modal instance directly and hide it
-            const modalElement = document.getElementById('EditTestimonialModal');
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            if (modalInstance) {
-                modalInstance.hide();
-            }
-            this.loadLists();
-        });
-},
+          axios.put("/api/edit-testimonial/" + this.selectedTestimonial.id, payload)
+              .then(response => {
+                  console.log(response);
+                  toast.fire(
+                      'Success!',
+                      'Testimonial updated!',
+                      'success'
+                  );
+              })
+              .catch(error => {
+                  console.log(error);
+              })
+              .finally(() => {
+                  // Reference the modal instance directly and hide it
+                  const modalElement = document.getElementById('EditTestimonialModal');
+                  const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                  if (modalInstance) {
+                      modalInstance.hide();
+                  }
+                  this.loadLists();
+              });
+      },
 
 
 
@@ -422,16 +456,22 @@
           })
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.testimonials = response.data.lists.testimonials;
-             this.defaultPassword = response.data.lists.defaultPassword.default_password;
-             console.log(this.testimonials)
-             setTimeout(() => {
-                  $("#AllTestimonialsTable").DataTable();
-              }, 10);
-    
-             });
-          },
+          this.loading = true;
+
+          axios.get('api/lists/testimonials').then((response) => {
+            this.testimonials = response.data.testimonials;
+            this.defaultPassword = response.data.defaultPassword.default_password;
+
+            console.log(this.testimonials);
+
+            setTimeout(() => {
+              $("#AllTestimonialsTable").DataTable();
+            }, 10);
+
+          }).finally(() => {
+            this.loading = false;
+          });
+        },
       },
       components : {
           TheMaster,

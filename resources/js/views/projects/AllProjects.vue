@@ -49,36 +49,138 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="project in projects" :key="project.id">
-                            <th scope="row"><a href="#">
-                              <img :src="getPhoto() + project.image_path" />
-                            </a></th>
-                            <td>{{project.name}}</td>
-                            <td>{{project.location}}</td>
-                            <td>{{project.description}}</td>
-                            <td>
-                              <span v-if="project.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Ongoing</span>   
-                              <span v-else-if="project.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Completed</span>
-                              <span v-else class="badge bg-light text-dark"><i class="bi bi-star me-1"></i> Closed</span>
 
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a @click="navigateTo('/viewproject/'+project.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                            
-                                  <a @click="navigateTo('/editproject/'+project.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                  <a v-if="project.status == 0" @click="completeProject(project.id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Complete</a>
-                                  <a v-if="project.featured == 0 && project.status == 1" @click="featureProject(project.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Feature</a>
-                                  <a v-if="project.featured == 1 && project.status == 1" @click="unfeatureProject(project.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Unfeature</a>
-                                  <a v-if="project.status == 1" @click="closeProject(project.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Close</a>
-                                  <a v-if="project.status == 2" @click="reopenProject(project.id)" class="dropdown-item" href="#"><i class="ri-refresh-fill mr-2"></i>Reopen</a>
-                                  </div>
-                              </div>
+                          <!-- LOADING -->
+                          <tr v-if="loading">
+                            <td colspan="6" class="text-center py-5">
+                              <div class="spinner-border text-success" role="status"></div>
+                              <div class="mt-2 text-muted">Loading projects...</div>
                             </td>
                           </tr>
+
+                          <!-- EMPTY STATE -->
+                          <tr v-else-if="!projects.length">
+                            <td colspan="6" class="text-center text-muted py-4">
+                              No projects found.
+                            </td>
+                          </tr>
+
+                          <!-- DATA -->
+                          <tr v-else v-for="project in projects" :key="project.id">
+
+                            <!-- IMAGE -->
+                            <td>
+                              <img
+                                v-if="project.image_path"
+                                :src="getPhoto() + project.image_path"
+                                style="width:60px;height:45px;object-fit:cover;border-radius:6px;"
+                              />
+                              <span v-else class="text-muted small">No image</span>
+                            </td>
+
+                            <td>{{ project.name }}</td>
+                            <td>{{ project.location }}</td>
+
+                            <td>
+                              {{ project.description?.substring(0, 40) ?? 'N/A' }}...
+                            </td>
+
+                            <td>
+                              <span v-if="project.status == 0" class="badge bg-warning text-dark">
+                                Ongoing
+                              </span>
+
+                              <span v-else-if="project.status == 1" class="badge bg-success">
+                                Completed
+                              </span>
+
+                              <span v-else class="badge bg-light text-dark">
+                                Closed
+                              </span>
+                            </td>
+
+                            <!-- ACTION -->
+                            <td>
+                              <div class="btn-group">
+
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-primary rounded-pill dropdown-toggle"
+                                  data-bs-toggle="dropdown"
+                                >
+                                  Action
+                                </button>
+
+                                <div class="dropdown-menu">
+
+                                  <a
+                                    @click="navigateTo('/viewproject/' + project.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-eye-line me-2 text-primary"></i>
+                                    View
+                                  </a>
+
+                                  <a
+                                    @click="navigateTo('/editproject/' + project.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-pencil-line me-2 text-primary"></i>
+                                    Edit
+                                  </a>
+
+                                  <a
+                                    v-if="project.status == 0"
+                                    @click="completeProject(project.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-check-line me-2 text-success"></i>
+                                    Complete
+                                  </a>
+
+                                  <a
+                                    v-if="project.featured == 0 && project.status == 1"
+                                    @click="featureProject(project.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-star-line me-2 text-warning"></i>
+                                    Feature
+                                  </a>
+
+                                  <a
+                                    v-if="project.featured == 1 && project.status == 1"
+                                    @click="unfeatureProject(project.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-star-fill me-2 text-warning"></i>
+                                    Unfeature
+                                  </a>
+
+                                  <a
+                                    v-if="project.status == 1"
+                                    @click="closeProject(project.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-close-circle-line me-2 text-danger"></i>
+                                    Close
+                                  </a>
+
+                                  <a
+                                    v-if="project.status == 2"
+                                    @click="reopenProject(project.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-refresh-line me-2 text-info"></i>
+                                    Reopen
+                                  </a>
+
+                                </div>
+
+                              </div>
+                            </td>
+
+                          </tr>
+
                         </tbody>
                       </table>
     
@@ -117,7 +219,8 @@
           categories: [],
           propertytypes: [],
           projects: [],
-          user: []
+          user: [],
+          loading: false,
         }
       },
       methods: {
@@ -190,17 +293,25 @@
           })
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.categories = response.data.lists.categories;
-             this.propertytypes = response.data.lists.propertytypes;
-             this.properties = response.data.lists.properties;
-             this.projects = response.data.lists.projects;
-             setTimeout(() => {
+          this.loading = true;
+
+          axios.get('api/lists/projects')
+            .then((response) => {
+              this.categories = response.data.categories;
+              this.propertytypes = response.data.propertytypes;
+              this.properties = response.data.properties;
+              this.projects = response.data.projects;
+
+              setTimeout(() => {
                   $("#AllProjectsTable").DataTable();
               }, 10);
-    
-             });
-          },
+
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+        },        
+
       },
       components : {
           TheMaster,

@@ -49,38 +49,153 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="blog in blogs" :key="blog.id">
-                            <th scope="row"><a href="#">
-                              <img :src="getPhoto() + blog.image_path" />
-                            </a></th>
-                            <td>{{ blog.title ? blog.title.substring(0, 10) + '...' : '' }}</td>
-                            <td>{{ blog.category.name }}</td>
-                            <td>{{ blog.content ? blog.content.substring(0, 10) + '...' : '' }}</td>
-              
-                            <td>
-                              <span v-if="blog.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Pending</span>   
-                              <span v-else-if="blog.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Approved</span>
-                              <span v-else class="badge bg-light text-dark"><i class="bi bi-star me-1"></i> Archived</span>
 
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a @click="navigateTo('/viewblog/'+blog.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                            
-                                  <a v-if="blog.created_by == user.id" @click="navigateTo('/edit-blog/'+blog.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                  <a v-if="blog.status == 0" @click="approveBlog(blog.id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Approve</a>
-                                  <a v-if="blog.featured == 0 && blog.status == 1" @click="featureBlog(blog.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Feature</a>
-                                  <a v-if="blog.featured == 1 && blog.status == 1" @click="unfeatureBlog(blog.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Unfeature</a>
-                                  <a v-if="blog.status == 1" @click="archiveBlog(blog.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Archive</a>
-                                  <a v-if="blog.status == 2" @click="unarchiveBlog(blog.id)" class="dropdown-item" href="#"><i class="ri-refresh-fill mr-2"></i>Unarchive</a>
-                                  <a v-if="user.role_id ==1" @click="deleteBlog(blog.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
-                                  </div>
-                              </div>
+                          <!-- LOADING -->
+                          <tr v-if="loading">
+                            <td colspan="6" class="text-center py-5">
+                              <div class="spinner-border text-success" role="status"></div>
+                              <div class="mt-2 text-muted">Loading blogs...</div>
                             </td>
                           </tr>
+
+                          <!-- EMPTY STATE -->
+                          <tr v-else-if="!blogs.length">
+                            <td colspan="6" class="text-center text-muted py-4">
+                              No blogs found.
+                            </td>
+                          </tr>
+
+                          <!-- DATA ROWS -->
+                          <tr v-else v-for="blog in blogs" :key="blog.id">
+
+                            <!-- IMAGE -->
+                            <th scope="row">
+                              <img
+                                v-if="blog.image_path"
+                                :src="getPhoto() + blog.image_path"
+                                style="width:60px;height:45px;object-fit:cover;border-radius:6px;"
+                              />
+                              <span v-else class="text-muted small">No image</span>
+                            </th>
+
+                            <td>
+                              {{ blog.title ? blog.title.substring(0, 10) + '...' : '---' }}
+                            </td>
+
+                            <td>
+                              {{ blog.category?.name ?? 'Uncategorized' }}
+                            </td>
+
+                            <td>
+                              {{ blog.content ? blog.content.substring(0, 10) + '...' : '---' }}
+                            </td>
+
+                            <td>
+                              <span v-if="blog.status == 0" class="badge bg-warning text-dark">
+                                Pending
+                              </span>
+
+                              <span v-else-if="blog.status == 1" class="badge bg-success">
+                                Approved
+                              </span>
+
+                              <span v-else class="badge bg-dark">
+                                Archived
+                              </span>
+                            </td>
+
+                            <!-- ACTION -->
+                            <td>
+                              <div class="btn-group">
+
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-primary rounded-pill dropdown-toggle"
+                                  data-bs-toggle="dropdown"
+                                >
+                                  Action
+                                </button>
+
+                                <div class="dropdown-menu">
+
+                                  <a
+                                    @click="navigateTo('/viewblog/' + blog.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-eye-line me-2 text-primary"></i>
+                                    View
+                                  </a>
+
+                                  <a
+                                    v-if="blog.created_by == user.id"
+                                    @click="navigateTo('/edit-blog/' + blog.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-pencil-line me-2 text-primary"></i>
+                                    Edit
+                                  </a>
+
+                                  <a
+                                    v-if="blog.status == 0"
+                                    @click="approveBlog(blog.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-check-line me-2 text-success"></i>
+                                    Approve
+                                  </a>
+
+                                  <a
+                                    v-if="blog.featured == 0 && blog.status == 1"
+                                    @click="featureBlog(blog.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-star-line me-2 text-warning"></i>
+                                    Feature
+                                  </a>
+
+                                  <a
+                                    v-if="blog.featured == 1 && blog.status == 1"
+                                    @click="unfeatureBlog(blog.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-star-fill me-2 text-warning"></i>
+                                    Unfeature
+                                  </a>
+
+                                  <a
+                                    v-if="blog.status == 1"
+                                    @click="archiveBlog(blog.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-archive-line me-2 text-secondary"></i>
+                                    Archive
+                                  </a>
+
+                                  <a
+                                    v-if="blog.status == 2"
+                                    @click="unarchiveBlog(blog.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-refresh-line me-2 text-info"></i>
+                                    Unarchive
+                                  </a>
+
+                                  <a
+                                    v-if="user.role_id == 1"
+                                    @click="deleteBlog(blog.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-delete-bin-line me-2 text-danger"></i>
+                                    Delete
+                                  </a>
+
+                                </div>
+
+                              </div>
+                            </td>
+
+                          </tr>
+
                         </tbody>
                       </table>
     
@@ -119,6 +234,7 @@
           blogcategories: [],
           users: [],
           user: [],
+          loading: false,
         }
       },
       methods: {
@@ -222,16 +338,24 @@
                 })
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.blogcategories = response.data.lists.blogcategories;
-             this.blogs = response.data.lists.blogs;
-             this.users = response.data.lists.users;
-             setTimeout(() => {
-                            $("#AllBlogsTable").DataTable();
-                        }, 10);
-    
-             });
-          },
+          this.loading = true;
+
+          axios.get('api/lists/blogs')
+            .then((response) => {
+              this.blogcategories = response.data.blogcategories;
+              this.blogs = response.data.blogs;
+              this.users = response.data.users;
+
+              setTimeout(() => {
+                  $("#AllBlogsTable").DataTable();
+              }, 10);
+
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+        }        
+
       },
       components : {
           TheMaster,

@@ -282,9 +282,9 @@
         loadLists() {
           this.loading = true;
 
-          axios.get('api/lists')
+          axios.get('api/lists/expenses')
             .then((response) => {
-              this.expenses = response.data.lists.pmsexpenses;
+              this.expenses = response.data.pmsexpenses;
 
               setTimeout(() => {
                   $("#AllPropertiesTable").DataTable();

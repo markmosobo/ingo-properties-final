@@ -46,21 +46,65 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="category in blogcategories" :key="category.id">
-                            <td>{{category.name}}</td>
-                            <td>{{format_date(category.created_at)}}</td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                    <a @click="navigateTo('/edit-blogcategory/'+category.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                    <a @click="deleteBlogCategory(category.id)" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>Delete</a>   
-                                  </div>
-                              </div>
+
+                          <!-- LOADING -->
+                          <tr v-if="loading">
+                            <td colspan="3" class="text-center py-5">
+                              <div class="spinner-border text-success" role="status"></div>
+                              <div class="mt-2 text-muted">Loading categories...</div>
                             </td>
                           </tr>
+
+                          <!-- EMPTY STATE -->
+                          <tr v-else-if="!blogcategories.length">
+                            <td colspan="3" class="text-center text-muted py-4">
+                              No blog categories found.
+                            </td>
+                          </tr>
+
+                          <!-- DATA ROWS -->
+                          <tr v-else v-for="category in blogcategories" :key="category.id">
+
+                            <td>{{ category.name }}</td>
+
+                            <td>{{ format_date(category.created_at) }}</td>
+
+                            <td>
+                              <div class="btn-group">
+
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-primary rounded-pill dropdown-toggle"
+                                  data-bs-toggle="dropdown"
+                                >
+                                  Action
+                                </button>
+
+                                <div class="dropdown-menu">
+
+                                  <a
+                                    @click="navigateTo('/edit-blogcategory/' + category.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-pencil-line me-2 text-primary"></i>
+                                    Edit
+                                  </a>
+
+                                  <a
+                                    @click="deleteBlogCategory(category.id)"
+                                    class="dropdown-item d-flex align-items-center"
+                                  >
+                                    <i class="ri-delete-bin-line me-2 text-danger"></i>
+                                    Delete
+                                  </a>
+
+                                </div>
+
+                              </div>
+                            </td>
+
+                          </tr>
+
                         </tbody>
                       </table>
     
@@ -97,6 +141,7 @@
       data(){
         return {
           blogcategories: [],
+          loading: false,
         }
       },
       methods: {
@@ -141,14 +186,22 @@
                 })
         },
         loadLists() {
-             axios.get('api/blogcategories').then((response) => {
-             this.blogcategories = response.data.lists.blogcategories;
-             setTimeout(() => {
+          this.loading = true;
+
+          axios.get('api/blogcategories')
+            .then((response) => {
+              this.blogcategories = response.data.lists.blogcategories;
+
+              setTimeout(() => {
                             $("#AllBlogCategoriesTable").DataTable();
                         }, 10);
-    
-             });
-          },
+
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+        }        
+
       },
       components : {
           TheMaster,

@@ -7,7 +7,7 @@
                 <div class="col-12">
                   <div class="card top-selling overflow-auto">
     
-                    <div class="filter">
+                    <!-- <div class="filter">
                       <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                       <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                         <li class="dropdown-header text-start">
@@ -18,10 +18,10 @@
                         <li><a class="dropdown-item" href="#">This Month</a></li>
                         <li><a class="dropdown-item" href="#">This Year</a></li>
                       </ul>
-                    </div>
+                    </div> -->
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Roles <span>| Today</span></h5>
+                      <h5 class="card-title">All Roles <span></span></h5>
                       <p class="card-text">
                    
                       <router-link to="/add-role" custom v-slot="{ href, navigate, isActive }">
@@ -46,21 +46,37 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="category in categories" :key="category.id">
-                            <td>{{category.name}}</td>
-                            <td>{{format_date(category.created_at) }}</td>
-                            <!--<td>
-                              <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                    <a @click="navigateTo('/edit-category/'+category.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                    <a @click="deleteCategory(category.id)" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>Delete</a>   
-                                  </div>
-                              </div>
-                            </td>-->
+
+                          <!-- LOADING SPINNER -->
+                          <tr v-if="loading">
+                            <td colspan="2" class="text-center py-5">
+                              <div class="spinner-border text-success" role="status"></div>
+                              <div class="mt-2 text-muted">Loading roles...</div>
+                            </td>
                           </tr>
+
+                          <!-- EMPTY STATE -->
+                          <tr v-else-if="!categories.length">
+                            <td colspan="2" class="text-center text-muted py-4">
+                              No roles found.
+                            </td>
+                          </tr>
+
+                          <!-- DATA -->
+                          <tr v-else v-for="category in categories" :key="category.id">
+                            
+                            <td>
+                              <span class="badge bg-dark text-uppercase">
+                                {{ category.name }}
+                              </span>
+                            </td>
+
+                            <td>
+                              {{ format_date(category.created_at) }}
+                            </td>
+
+                          </tr>
+
                         </tbody>
                       </table>
     
@@ -97,6 +113,7 @@
       data(){
         return {
           categories: [],
+          loading: false,
         }
       },
       methods: {
@@ -141,14 +158,21 @@
                 })
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.categories = response.data.lists.roles;
-             setTimeout(() => {
-                            $("#AllCategoriesTable").DataTable();
-                        }, 10);
-    
-             });
-          },
+          this.loading = true;
+
+          axios.get('api/lists/roles')
+            .then((response) => {
+              this.categories = response.data.roles;
+
+            setTimeout(() => {
+                $("#AllCategoriesTable").DataTable();
+            }, 10);
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+        }        
+
       },
       components : {
           TheMaster,

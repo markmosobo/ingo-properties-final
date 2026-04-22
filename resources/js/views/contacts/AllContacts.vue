@@ -2,33 +2,47 @@
     <TheMaster>
         <div class="container mt-3">
             <div class="row">
-              <div class="col-lg-6">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">Contact Details</h5>
-                    <p v-for="contact in contacts" class="card-text">
-                      <strong>Primary Phone: </strong>(+254) {{contact.phone}} <br>
-                      <strong>Secondary Phone: </strong>(+254) {{contact.phone_2}} <br>
-                      <strong>Email Address: </strong>  {{contact.email}}<br>
-                      <strong>Physical Address: </strong>  {{contact.address}}<br>
-                      <!-- <strong>Property Type:</strong>  hgjhh <br> -->
-                      <!-- <strong>Featured:</strong>
-                        <span v-if="property.featured == 0" class="badge bg-success">No</span>
-                        <span v-else class="badge bg-warning"> No</span>
-                      <br>
-                      <strong>Status:</strong>
-                        <span v-if="property.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Pending</span>   
-                        <span v-else-if="property.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Approved</span>
-                        <span v-else class="badge bg-light text-dark"><i class="bi bi-star me-1"></i> Closed</span>
-                      <br> -->
-                      <div class="text-center">
-                    <button @click="navigateTo('/edit-contact/'+contact.id )" class="btn btn-sm btn-secondary rounded-pill">Edit</button>
-                    </div><br>
-                    </p>
-                    
-                  </div>
-                </div>
-              </div>
+<div class="col-lg-6">
+  <div class="card">
+    <div class="card-body">
+
+      <h5 class="card-title">Contact Details</h5>
+
+      <!-- LOADING -->
+      <div v-if="loading" class="text-center py-4">
+        <div class="spinner-border text-success"></div>
+        <div class="text-muted mt-2">Loading contacts...</div>
+      </div>
+
+      <!-- EMPTY -->
+      <div v-else-if="!contacts.length" class="text-muted text-center py-4">
+        No contact details found.
+      </div>
+
+      <!-- DATA -->
+      <div v-else v-for="contact in contacts" :key="contact.id" class="card-text">
+
+        <strong>Primary Phone:</strong> (+254) {{ contact.phone }} <br>
+        <strong>Secondary Phone:</strong> (+254) {{ contact.phone_2 }} <br>
+        <strong>Email Address:</strong> {{ contact.email }} <br>
+        <strong>Physical Address:</strong> {{ contact.address }} <br>
+
+        <div class="text-center mt-2">
+          <button
+            @click="navigateTo('/edit-contact/' + contact.id)"
+            class="btn btn-sm btn-secondary rounded-pill"
+          >
+            Edit
+          </button>
+        </div>
+
+        <hr>
+
+      </div>
+
+    </div>
+  </div>
+</div>
               
 
 
@@ -63,31 +77,90 @@
                             <th scope="col">Action</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr v-for="link in sociallinks" :key="link.id">
-                            <td>{{link.name}}</td>
-                            <td>{{link.link}}</td>
-                            <td>
-                                <span v-if="link.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Inactive</span>   
-                                <span v-if="link.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Active</span>
+<tbody>
 
-                            </td>
-                            <td>
-                            <div class="btn-group" role="group">
-                                <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Action
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                    <a @click="navigateTo('/edit-sociallink/'+link.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                    <a @click="deleteSocialLink(link.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>   
-                                    <a v-if="link.status == 0" @click="activateSocial(link.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Activate</a>
-                                    <a v-if="link.status == 1" @click="deactivateSocial(link.id)" class="dropdown-item" href="#"><i class="ri-refresh-fill mr-2"></i>Deactivate</a>
+  <!-- LOADING -->
+  <tr v-if="loading">
+    <td colspan="4" class="text-center py-5">
+      <div class="spinner-border text-success"></div>
+      <div class="text-muted mt-2">Loading social links...</div>
+    </td>
+  </tr>
 
-                                </div>
-                            </div>
-                            </td>
-                        </tr>
-                        </tbody>
+  <!-- EMPTY -->
+  <tr v-else-if="!sociallinks.length">
+    <td colspan="4" class="text-center text-muted py-4">
+      No social links found.
+    </td>
+  </tr>
+
+  <!-- DATA -->
+  <tr v-else v-for="link in sociallinks" :key="link.id">
+
+    <td>{{ link.name }}</td>
+
+    <td>{{ link.link }}</td>
+
+    <td>
+      <span v-if="link.status == 0" class="badge bg-warning text-dark">
+        Inactive
+      </span>
+
+      <span v-else class="badge bg-success">
+        Active
+      </span>
+    </td>
+
+    <td>
+      <div class="btn-group">
+
+        <button
+          class="btn btn-sm btn-primary rounded-pill dropdown-toggle"
+          data-bs-toggle="dropdown"
+        >
+          Action
+        </button>
+
+        <div class="dropdown-menu">
+
+          <a
+            @click="navigateTo('/edit-sociallink/' + link.id)"
+            class="dropdown-item"
+          >
+            <i class="ri-pencil-line me-2"></i>Edit
+          </a>
+
+          <a
+            @click="deleteSocialLink(link.id)"
+            class="dropdown-item"
+          >
+            <i class="ri-delete-bin-line me-2"></i>Delete
+          </a>
+
+          <a
+            v-if="link.status == 0"
+            @click="activateSocial(link.id)"
+            class="dropdown-item"
+          >
+            Activate
+          </a>
+
+          <a
+            v-if="link.status == 1"
+            @click="deactivateSocial(link.id)"
+            class="dropdown-item"
+          >
+            Deactivate
+          </a>
+
+        </div>
+
+      </div>
+    </td>
+
+  </tr>
+
+</tbody>
                     </table>
 
                     </div>
@@ -122,7 +195,8 @@
       data(){
         return {
             contacts: [],
-            sociallinks: []
+            sociallinks: [],
+            loading: false
         }
       },
       methods: {
@@ -185,18 +259,25 @@
                                    
                 })
         },
-        loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.contacts = response.data.lists.contacts;
-             this.sociallinks = response.data.lists.sociallinks;
-             console.log("contacts", this.contacts)
-             console.log("social", this.sociallinks)
-             setTimeout(() => {
-                            $("#AllSocialLinksTable").DataTable();
-                        }, 10);
-    
-             });
-          },
+loadLists() {
+  this.loading = true;
+
+  axios.get('api/lists/contacts').then((response) => {
+    this.contacts = response.data.contacts;
+    this.sociallinks = response.data.sociallinks;
+
+    console.log("contacts", this.contacts);
+    console.log("social", this.sociallinks);
+
+    setTimeout(() => {
+      $("#AllSocialLinksTable").DataTable();
+    }, 10);
+
+  }).finally(() => {
+    this.loading = false;
+  });
+},        
+
       },
       components : {
           TheMaster,
