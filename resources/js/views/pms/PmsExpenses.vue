@@ -50,27 +50,76 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="expense in expenses" :key="expense.id">
-                            <td>{{expense.ref_no}}</td>
-                            <td>{{expense.payment_type}}</td>
-                            <td>{{formatNumber(expense.amount_paid)}}</td>
-                            <td>{{expense.paid_to}}</td>
-                            <td>{{expense.user.first_name}} {{expense.user.last_name}}</td>
-                            <td>{{format_date(expense.created_at)}}</td>
+
+                          <!-- LOADING STATE -->
+                          <tr v-if="loading">
+                            <td colspan="7" class="text-center py-5">
+                              <div class="spinner-border text-success" role="status"></div>
+                              <div class="mt-2 text-muted">Loading expenses...</div>
+                            </td>
+                          </tr>
+
+                          <!-- EMPTY STATE -->
+                          <tr v-else-if="!expenses.length">
+                            <td colspan="7" class="text-center text-muted py-4">
+                              No expenses found.
+                            </td>
+                          </tr>
+
+                          <!-- DATA ROWS -->
+                          <tr v-else v-for="expense in expenses" :key="expense.id">
+                            <td>{{ expense.ref_no }}</td>
+                            <td>{{ expense.payment_type }}</td>
+                            <td>{{ formatNumber(expense.amount_paid) }}</td>
+                            <td>{{ expense.paid_to }}</td>
+
+                            <td>
+                              {{ expense.user?.first_name }} {{ expense.user?.last_name }}
+                            </td>
+
+                            <td>{{ format_date(expense.created_at) }}</td>
+
                             <td>
                               <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-primary rounded-pill dropdown-toggle"
+                                  data-bs-toggle="dropdown"
+                                >
                                   Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <!-- <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                             -->
-                                  <a v-if="expense.created_by == user.id" @click="navigateTo('/editexpense/'+expense.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                  <a class="dropdown-item" @click="generateInvoice(expense.id)" href="#"><i class="ri-printer-fill mr-2"></i>Download Invoice</a>
-                                  <a @click="deleteExpense(expense.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
-                                  </div>
+                                </button>
+
+                                <div class="dropdown-menu">
+
+                                  <a
+                                    v-if="expense.created_by == user.id"
+                                    @click="navigateTo('/editexpense/' + expense.id)"
+                                    class="dropdown-item"
+                                  >
+                                    Edit
+                                  </a>
+
+                                  <a
+                                    class="dropdown-item"
+                                    @click="generateInvoice(expense.id)"
+                                  >
+                                    Download Invoice
+                                  </a>
+
+                                  <a
+                                    class="dropdown-item"
+                                    @click="deleteExpense(expense.id)"
+                                  >
+                                    Delete
+                                  </a>
+
+                                </div>
+
                               </div>
                             </td>
                           </tr>
+
                         </tbody>
                       </table>
                       <div><strong>Total Amount Paid: {{ formatNumber(calculateTotal()) }}</strong></div>
@@ -112,6 +161,7 @@
           categories: [],
           propertytypes: [],
           user: [],
+          loading: false,
           pmsexpense: []
         }
       },
@@ -230,16 +280,22 @@
                 })
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
+          this.loading = true;
 
-             this.expenses = response.data.lists.pmsexpenses;
-             console.log("props", response)
-             setTimeout(() => {
+          axios.get('api/lists')
+            .then((response) => {
+              this.expenses = response.data.lists.pmsexpenses;
+
+              setTimeout(() => {
                   $("#AllPropertiesTable").DataTable();
               }, 10);
-    
-             });
-          },
+
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+        }        
+
       },
       components : {
           TheMaster,

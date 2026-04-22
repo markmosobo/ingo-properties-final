@@ -21,7 +21,7 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">{{unit.name}} Units <span>| Today</span></h5>
+                      <h5 class="card-title">{{unit.name}} Units <span>| {{ properties.length }} total</span></h5>
                       <p class="card-text">                 
                           <a
                             class="btn btn-sm btn-primary rounded-pill active"
@@ -161,8 +161,8 @@
         getProperty() {
              axios.get('/api/pmsproperty/'+this.$route.params.id).then((response) => {
      
-             this.unit = response.data.property[0];
-             console.log("props", this.unit)
+             this.unit = response.data.property;
+             console.log("se mee", this.unit)
     
              });
         },

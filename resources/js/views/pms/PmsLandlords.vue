@@ -281,7 +281,7 @@
 
         uploadDocument() {
           if (!this.docForm.type || !this.docForm.file) {
-            Swal.fire("Missing data", "Select document type and file", "warning");
+            toast.fire("Missing data", "Select document type and file", "warning");
             return;
           }
 
@@ -297,13 +297,13 @@
               headers: { "Content-Type": "multipart/form-data" },
             })
             .then(() => {
-              Swal.fire("Uploaded", "Document attached successfully", "success");
+              toast.fire("Uploaded", "Document attached successfully", "success");
               bootstrap.Modal.getInstance(
                 document.getElementById("attachDocsModal")
               ).hide();
             })
             .catch(() => {
-              Swal.fire("Error", "Upload failed", "error");
+              toast.fire("Error", "Upload failed", "error");
             })
             .finally(() => {
               this.uploading = false;

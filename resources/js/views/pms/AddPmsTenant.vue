@@ -157,9 +157,22 @@
                       <div class="col-sm-10">
                          <select @change="getUnitInfo" :disabled="!form.pms_property_id" name="unit" v-model="form.pms_unit_id" class="form-select" id="">
                             <option value="0" selected disabled>Select Unit</option>
-                            <option v-for="unit in propunits" :value="unit.id"
-                            :selected="unit.id == form.unit_id" :key="unit.id">{{ unit.unit_number}}</option>
- 
+                            <option
+                            v-for="unit in propunits"
+                            :value="unit.id"
+                            :key="unit.id"
+                            >
+                            {{ unit.unit_number }}
+
+                            <span v-if="unit.monthly_rent">
+                                (Ksh {{ unit.monthly_rent }})
+                            </span>
+
+                            <span v-else class="text-danger">
+                                (No rent set)
+                            </span>
+                            </option>
+  
                          </select>
  
                          <div class="invalid-feedback">Please select a unit!</div>

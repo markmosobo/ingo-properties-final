@@ -178,9 +178,16 @@
 
                       <!-- Header -->
                       <div class="modal-header">
-                        <h5 class="modal-title">
-                          Attach Documents – {{ selectedTenant?.first_name }}
-                        </h5>
+                        <div>
+                          <h5 class="modal-title">
+                            Attach Documents – {{ selectedTenant?.first_name }} {{ selectedTenant?.last_name }}
+                          </h5>
+
+                          <small class="text-muted">
+                            {{ selectedTenant?.property?.name }} • Unit {{ selectedTenant?.unit?.unit_number }}
+                          </small>
+                        </div>
+
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                       </div>
 
@@ -189,17 +196,17 @@
 
                         <!-- EXISTING DOCUMENTS -->
                         <div class="mb-4">
-                          <h6 class="fw-bold mb-3">Attached Documents</h6>
+                          <h6 class="fw-bold mb-3">Tenant Documents</h6>
 
-                          <div v-if="selectedTenant?.documents?.length">
+                          <div v-if="selectedTenant?.tenant_documents?.length">
                             <ul class="list-group">
 
                               <li
-                                v-for="doc in selectedTenant.documents"
+                                v-for="doc in selectedTenant.tenant_documents"
                                 :key="doc.id"
                                 class="list-group-item d-flex justify-content-between align-items-center"
                               >
-                                <!-- Left side -->
+                                <!-- Left -->
                                 <div>
                                   <span class="badge bg-primary text-uppercase mb-1">
                                     {{ doc.type }}
@@ -212,7 +219,7 @@
                                   </small>
                                 </div>
 
-                                <!-- Right side -->
+                                <!-- Right -->
                                 <a
                                   :href="`/storage/${doc.file_path}`"
                                   target="_blank"
@@ -226,7 +233,7 @@
                           </div>
 
                           <div v-else class="text-muted small">
-                            No documents attached yet.
+                            No documents uploaded for this tenant yet.
                           </div>
                         </div>
 
@@ -252,8 +259,18 @@
                             @change="handleFile"
                             accept=".pdf,.doc,.docx,.jpg,.png"
                           />
+
                           <small class="text-muted">
                             Allowed: PDF, DOC, DOCX, JPG, PNG (Max 5MB)
+                          </small>
+                        </div>
+
+                        <!-- CONTEXT INFO -->
+                        <div class="alert alert-light border mt-3">
+                          <small>
+                            <strong>Property:</strong> {{ selectedTenant?.property?.name }} <br>
+                            <strong>Unit:</strong> {{ selectedTenant?.unit?.unit_number }} <br>
+                            <strong>Rent:</strong> KES {{ selectedTenant?.unit?.monthly_rent }}
                           </small>
                         </div>
 
@@ -338,7 +355,7 @@
 
         uploadDocument() {
           if (!this.docForm.type || !this.docForm.file) {
-            Swal.fire("Missing data", "Select document type and file", "warning");
+            toast.fire("Missing data", "Select document type and file", "warning");
             return;
           }
 
@@ -354,13 +371,13 @@
               headers: { "Content-Type": "multipart/form-data" },
             })
             .then(() => {
-              Swal.fire("Uploaded", "Document attached successfully", "success");
+              toast.fire("Uploaded", "Document attached successfully", "success");
               bootstrap.Modal.getInstance(
                 document.getElementById("attachDocsModal")
               ).hide();
             })
             .catch(() => {
-              Swal.fire("Error", "Upload failed", "error");
+              toast.fire("Error", "Upload failed", "error");
             })
             .finally(() => {
               this.uploading = false;
