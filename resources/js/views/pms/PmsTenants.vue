@@ -21,8 +21,7 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">All Tenants <span>| Today</span></h5>
-                      <p class="card-text">
+                         <h5 class="card-title">All Tenants <span>| {{ tenants.length }} total</span></h5>                      <p class="card-text">
                          <div class="row">
                           <div class="col d-flex">
                    
@@ -77,30 +76,84 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="tenant in tenants" :key="tenant.id">
+                          <!-- LOADING SPINNER -->
+                          <tr v-if="loading">
+                            <td colspan="5" class="text-center py-5">
+                              <div class="spinner-border text-success" role="status"></div>
+                              <div class="mt-2 text-muted">Loading tenants...</div>
+                            </td>
+                          </tr>
+
+                          <!-- DATA ROWS -->
+                          <tr v-else v-for="tenant in tenants" :key="tenant.id">
                             <td>{{tenant.first_name}} {{tenant.last_name}}</td>
                             <td>{{tenant.property.name}}</td>
                             <td>{{tenant.unit.unit_number}}</td>
                             <td>
-                              <span v-if="tenant.status == 0" class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i> Vacated</span>   
-                              <span v-else-if="tenant.status == 1" class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Renting</span>
-                              <span v-else class="badge bg-light text-dark"><i class="bi bi-star me-1"></i> Closed</span>
-
+                              <span v-if="tenant.status == 0" class="badge bg-warning text-dark">
+                                <i class="bi bi-exclamation-triangle me-1"></i> Vacated
+                              </span>
+                              <span v-else-if="tenant.status == 1" class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i> Renting
+                              </span>
+                              <span v-else class="badge bg-light text-dark">
+                                <i class="bi bi-star me-1"></i> Closed
+                              </span>
                             </td>
+
                             <td>
                               <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-primary rounded-pill dropdown-toggle"
+                                  style="background-color: darkgreen; border-color: darkgreen;"
+                                  data-bs-toggle="dropdown"
+                                >
                                   Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a class="dropdown-item" @click="navigateTo('/pmstenant/'+tenant.id )" href="#"><i class="ri-eye-fill mr-2"></i>View</a>                                            
-                                  <!-- <a @click="navigateTo('/pmstenantstatements/'+tenant.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Statements</a> -->
-                                  <a @click="navigateTo('/pmstenantinvoices/'+tenant.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Invoices</a>
-                                  <a @click="navigateTo('/edit-pmstenant/'+tenant.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                  <a v-if="tenant.status == 1" @click="vacateTenant(tenant.id)" class="dropdown-item" href="#"><i class="ri-eye-close-fill mr-2"></i>Vacate</a>
-                                  <a v-if="tenant.status == 2" @click="reopenTenant(tenant.id)" class="dropdown-item" href="#"><i class="ri-refresh-fill mr-2"></i>Reopen</a>
-                                  <a @click="deleteTenant(tenant.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
-                                  </div>
+                                </button>
+
+                                <div class="dropdown-menu">
+                                  <a class="dropdown-item" @click="navigateTo('/pmstenant/'+tenant.id)">
+                                    <i class="ri-eye-fill mr-2"></i>View
+                                  </a>
+
+                                  <a class="dropdown-item" @click="navigateTo('/pmstenantinvoices/'+tenant.id)">
+                                    <i class="ri-eye-fill mr-2"></i>View Invoices
+                                  </a>
+
+                                  <a class="dropdown-item" @click="navigateTo('/edit-pmstenant/'+tenant.id)">
+                                    <i class="ri-pencil-fill mr-2"></i>Edit
+                                  </a>
+
+                                  <a
+                                    class="dropdown-item"
+                                    href="#"
+                                    @click.prevent="openAttachModal(tenant)"
+                                  >
+                                    <i class="ri-attachment-2 mr-2"></i>
+                                    Attach Documents
+                                  </a>                                  
+
+                                  <a
+                                    v-if="tenant.status == 1"
+                                    class="dropdown-item"
+                                    @click="vacateTenant(tenant.id)"
+                                  >
+                                    <i class="ri-eye-close-fill mr-2"></i>Vacate
+                                  </a>
+
+                                  <a
+                                    v-if="tenant.status == 2"
+                                    class="dropdown-item"
+                                    @click="reopenTenant(tenant.id)"
+                                  >
+                                    <i class="ri-refresh-fill mr-2"></i>Reopen
+                                  </a>
+
+                                  <a class="dropdown-item" @click="deleteTenant(tenant.id)">
+                                    <i class="ri-delete-bin-line mr-2"></i>Delete
+                                  </a>
+                                </div>
                               </div>
                             </td>
                           </tr>
@@ -113,6 +166,123 @@
                   </div>
                 </div><!-- End Top Selling -->
     
+                <!-- Attach Documents Modal -->
+                <div
+                  class="modal fade"
+                  id="attachDocsModal"
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+
+                      <!-- Header -->
+                      <div class="modal-header">
+                        <h5 class="modal-title">
+                          Attach Documents – {{ selectedTenant?.first_name }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+
+                      <!-- Body -->
+                      <div class="modal-body">
+
+                        <!-- EXISTING DOCUMENTS -->
+                        <div class="mb-4">
+                          <h6 class="fw-bold mb-3">Attached Documents</h6>
+
+                          <div v-if="selectedTenant?.documents?.length">
+                            <ul class="list-group">
+
+                              <li
+                                v-for="doc in selectedTenant.documents"
+                                :key="doc.id"
+                                class="list-group-item d-flex justify-content-between align-items-center"
+                              >
+                                <!-- Left side -->
+                                <div>
+                                  <span class="badge bg-primary text-uppercase mb-1">
+                                    {{ doc.type }}
+                                  </span>
+
+                                  <br />
+
+                                  <small class="text-muted">
+                                    {{ doc.file_name }}
+                                  </small>
+                                </div>
+
+                                <!-- Right side -->
+                                <a
+                                  :href="`/storage/${doc.file_path}`"
+                                  target="_blank"
+                                  class="btn btn-sm btn-outline-success rounded-pill"
+                                >
+                                  View
+                                </a>
+                              </li>
+
+                            </ul>
+                          </div>
+
+                          <div v-else class="text-muted small">
+                            No documents attached yet.
+                          </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- UPLOAD SECTION -->
+                        <div class="mb-3">
+                          <label class="form-label">Document Type</label>
+                          <select v-model="docForm.type" class="form-select">
+                            <option value="">Select type</option>
+                            <option value="agreement">Tenant Agreement</option>
+                            <option value="id">ID / Passport</option>
+                            <option value="contract">Contract</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label">Select File</label>
+                          <input
+                            type="file"
+                            class="form-control"
+                            @change="handleFile"
+                            accept=".pdf,.doc,.docx,.jpg,.png"
+                          />
+                          <small class="text-muted">
+                            Allowed: PDF, DOC, DOCX, JPG, PNG (Max 5MB)
+                          </small>
+                        </div>
+
+                      </div>
+
+                      <!-- Footer -->
+                      <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">
+                          Cancel
+                        </button>
+
+                        <button
+                          class="btn btn-success"
+                          :disabled="uploading"
+                          @click="uploadDocument"
+                        >
+                          <span
+                            v-if="uploading"
+                            class="spinner-border spinner-border-sm me-2"
+                          ></span>
+
+                          Upload Document
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
           </div>
         </section>
     </TheMaster>
@@ -141,10 +311,61 @@
         return {
           tenants: [],
           categories: [],
-          user: []
+          user: [],
+          loading: false,
+          selectedTenant: null,
+          uploading: false,
+          docForm: {
+            type: "",
+            file: null,
+          }          
         }
       },
       methods: {
+        openAttachModal(tenant) {
+          this.selectedTenant = tenant;
+          this.docForm = { type: "", file: null };
+
+          const modal = new bootstrap.Modal(
+            document.getElementById("attachDocsModal")
+          );
+          modal.show();
+        },
+
+        handleFile(e) {
+          this.docForm.file = e.target.files[0];
+        },
+
+        uploadDocument() {
+          if (!this.docForm.type || !this.docForm.file) {
+            Swal.fire("Missing data", "Select document type and file", "warning");
+            return;
+          }
+
+          this.uploading = true;
+
+          const formData = new FormData();
+          formData.append("type", this.docForm.type);
+          formData.append("file", this.docForm.file);
+          formData.append("tenant_id", this.selectedTenant.id);
+
+          axios
+            .post("/api/users/upload-document", formData, {
+              headers: { "Content-Type": "multipart/form-data" },
+            })
+            .then(() => {
+              Swal.fire("Uploaded", "Document attached successfully", "success");
+              bootstrap.Modal.getInstance(
+                document.getElementById("attachDocsModal")
+              ).hide();
+            })
+            .catch(() => {
+              Swal.fire("Error", "Upload failed", "error");
+            })
+            .finally(() => {
+              this.uploading = false;
+            });
+        },         
         getPhoto()
         {
             return "/storage/properties/";
@@ -209,16 +430,21 @@
                 })
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
+          this.loading = true;
 
-             this.tenants = response.data.lists.pmstenants;
-             console.log("props", response)
-             setTimeout(() => {
+          axios.get('api/lists/tenants')
+            .then((response) => {
+              this.tenants = response.data.tenants;
+
+              setTimeout(() => {
                   $("#AllPropertiesTable").DataTable();
               }, 10);
-    
-             });
-          },
+
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+        },        
       },
       components : {
           TheMaster,

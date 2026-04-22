@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\LandlordDocument;
 use Illuminate\Http\Request;
 use App\Models\Landlord;
 use App\Models\PmsProperty;
@@ -64,4 +65,40 @@ class LandlordController extends Controller
             'landlordproperty' => $landlordproperty
         ], 200);
     }
+
+    public function attachDocument(Request $request)
+    {
+        $request->validate([
+            'landlord_id' => 'required|exists:landlords,id',
+            'type'        => 'required|string|max:50',
+            'file'        => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+        ]);
+
+        $landlord = Landlord::findOrFail($request->landlord_id);
+
+        $file = $request->file('file');
+
+        $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+
+        // ✅ IMPORTANT FIX: store in PUBLIC disk
+        $path = $file->storeAs(
+            "landlords/{$landlord->id}/documents",
+            $filename,
+            'public'
+        );
+
+        LandlordDocument::create([
+            'landlord_id' => $landlord->id,
+            'type'        => $request->type,
+            'file_name'   => $filename,
+            'file_path'   => $path,
+            'uploaded_by' => auth()->id(),
+        ]);
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Document uploaded successfully',
+            'path'    => $path,
+        ]);
+    }   
 }

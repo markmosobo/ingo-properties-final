@@ -149,6 +149,9 @@
         {
             axios.get('/api/landlordproperty/'+this.$route.params.id).then((response) => {
                 this.properties = response.data.landlordproperty
+                setTimeout(() => {
+                  $("#AllPropertiesTable").DataTable();
+                }, 10);
                 console.log("lprops", response)
             })
         },

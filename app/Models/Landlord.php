@@ -14,4 +14,11 @@ class Landlord extends Model
         'email',
         'phone_no'
     ];
+
+    // app/Models/Landlord.php
+
+    public function documents()
+    {
+        return $this->hasMany(LandlordDocument::class);
+    }    
 }

@@ -416,6 +416,24 @@ class ListController extends Controller
         return response()->json([
             'contacts' => $contacts
         ]);        
+    }
+    
+    public function landlords()
+    {
+        $landlords = Landlord::with('documents')->get();
+
+        return response()->json([
+            'landlords' => $landlords
+        ]);        
+    }
+    
+    public function tenants()
+    {
+        $tenants = PmsTenant::with('tenantDocuments','unit','property')->get();
+
+        return response()->json([
+            'tenants' => $tenants
+        ]);
     }    
 
 }

@@ -1,196 +1,204 @@
 <template>
-    <main class="background-image">
+  <main class="background-image">
+    <section
+      class="section min-vh-100 d-flex flex-column align-items-center justify-content-center py-4"
+    >
       <div class="container">
-        <section
-          class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4"
-        >
-          <div class="container">
-            <div class="row justify-content-center">
-              <div
-                class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center"
-              >
-                <div class="d-flex justify-content-center py-4">
-                  <router-link to="/">
-                  <a
-                    href="#"
-                    class="logo d-flex align-items-center w-auto"
-                  >
-                    <!-- <img src="@/assets/img/logo.png" alt="" /> -->
-                    <img src="/images/ingo-colored-logo.png" alt="">
-                    <span class="d-none d-lg-block">IPMC</span>
-                  </a>
-                  </router-link>
+        <div class="row justify-content-center">
+          <div
+            class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center"
+          >
+            <!-- Logo -->
+            <div class="d-flex justify-content-center py-4">
+              <router-link to="/" class="logo d-flex align-items-center w-auto">
+                <img src="/images/ingo-colored-logo.png" alt="IPMC Logo" />
+                <span class="d-none d-lg-block ms-2">IPMC</span>
+              </router-link>
+            </div>
+
+            <!-- Login Card -->
+            <div class="card login-card mb-3">
+              <div class="card-body">
+                <div class="mb-4 text-center">
+                  <h4 class="fw-bold mb-1">Welcome Back</h4>
+                  <p class="text-muted small">
+                    Sign in to continue to IPMC
+                  </p>
                 </div>
-                <!-- End Logo -->
-  
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <div class="pt-4 pb-2">
-                      <h5 class="card-title text-center pb-0 fs-4">
-                        Login to Your Account
-                      </h5>
-                      <p class="text-center small">
-                        Enter your username & password to login
-                      </p>
-                    </div>
-  
-                    <form v-on:submit.prevent="login_user" class="row g-3 needs-validation" novalidate>
-                      <div class="col-12">
-                        <label for="yourUsername" class="form-label"
-                          >Email</label
-                        >
-                          <input
-                            type="text"
-                            name="username"
-                            class="form-control"
-                            id="yourUsername"
-                            v-model="form.email"
-                            required
-                          />
-                          <div class="invalid-feedback">
-                            Please enter your email.
-                          </div>
-                      </div>
-  
-                      <div class="col-12">
-                        <label for="yourPassword" class="form-label"
-                          >Password</label
-                        >
-                        <input
-                          type="password"
-                          name="password"
-                          class="form-control"
-                          id="yourPassword"
-                          v-model="form.password"
-                          required
-                        />
-                        <div class="invalid-feedback">
-                          Please enter your password!
-                        </div>
-                      </div>
-  
-                      <div class="col-12">
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="checkbox"
-                            name="remember"
-                            value="true"
-                            id="rememberMe"
-                          />
-                          <label class="form-check-label" for="rememberMe"
-                            >Remember me</label
-                          >
-                        </div>
-                      </div>
-                      <div class="col-12">
-                        <button class="btn btn-success rounded-pill w-100" type="submit">
-                          Login
-                        </button>
-                      </div>
-                      <div class="col-12">
-                        <p class="small mb-0">
-                          Don't have account?
-                          <router-link to="/register"> create Account</router-link>
-                        </p>
-                      </div>
-                    </form>
+
+                <form @submit.prevent="login_user" class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label">Email</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      placeholder="you@example.com"
+                      v-model="form.email"
+                      required
+                    />
                   </div>
-                </div>
-  
-                <div class="credits">
-                  <!-- All the links in the footer should remain intact. -->
-                  <!-- You can delete the links only if you purchased the pro version. -->
-                  <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                  <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-                  <!-- Designed by
-                  <a href="https://bootstrapmade.com/">BootstrapMade</a> -->
-                </div>
+
+                  <div class="col-12">
+                    <label class="form-label">Password</label>
+                    <input
+                      type="password"
+                      class="form-control"
+                      placeholder="••••••••"
+                      v-model="form.password"
+                      required
+                    />
+                  </div>
+
+                  <div class="col-12 d-flex justify-content-between align-items-center">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="rememberMe"
+                      />
+                      <label class="form-check-label small" for="rememberMe">
+                        Remember me
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <button
+                      class="btn btn-success rounded-pill w-100"
+                      type="submit"
+                      :disabled="loading"
+                    >
+                      <span
+                        v-if="loading"
+                        class="spinner-border spinner-border-sm me-2"
+                      ></span>
+                      <span>{{ loading ? 'Signing in…' : 'Login' }}</span>
+                    </button>
+                  </div>
+
+                  <div class="col-12 text-center">
+                    <p class="small mb-0">
+                      Don’t have an account?
+                      <router-link to="/register">Create one</router-link>
+                    </p>
+                  </div>
+                </form>
               </div>
             </div>
+
+            <!-- Footer -->
+            <p class="text-center text-muted small mt-3">
+              © {{ new Date().getFullYear() }} IPMC • Secure Access
+            </p>
           </div>
-        </section>
+        </div>
       </div>
-    </main>
-  </template>
+    </section>
+  </main>
+</template>
 
 <script>
-import axios from 'axios';
-import Swal from 'sweetalert2';
+import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
   data() {
     return {
+      loading: false,
       form: {
-        email: '',
-        password: ''
-      }
+        email: "",
+        password: "",
+      },
     };
   },
   methods: {
-    deleteInvoice(id) {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#006400',
-        cancelButtonColor: '#FFA500',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-        if (result.isConfirmed) { 
-          axios.delete('/api/pmsstatement/' + id)
-            .then(() => {
-              toast.fire('Deleted!', 'Invoice has been deleted.', 'success');
-              this.loadLists();
-            })
-            .catch(() => {
-              Swal.fire('Failed!', 'There was something wrong.', 'warning');
-            }); 
-        } else if (result.isDenied) {
-          console.log('cancelled');
-        }
-      });
-    },
     login_user() {
-      axios.post('api/login', this.form)
+      this.loading = true;
+
+      axios
+        .post("/api/login", this.form)
         .then((response) => {
-          console.log(response);
-          this.form.email = '';
-          this.form.password = '';
-          if (response.data.status == "error") {
-            Swal.fire({
-              title: 'Oops!',
-              text: response.data.data,
-              icon: 'warning',
-            });
+          if (response.data.status === "error") {
+            Swal.fire("Oops!", response.data.data, "warning");
           } else {
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            this.$router.push('/dashboard');
+            localStorage.setItem(
+              "user",
+              JSON.stringify(response.data.user)
+            );
+            this.$router.push("/dashboard");
           }
         })
-        .catch((error) => {
-          console.log(error);
+        .catch(() => {
+          Swal.fire(
+            "Error",
+            "Unable to login. Please try again.",
+            "error"
+          );
+        })
+        .finally(() => {
+          this.loading = false;
         });
-    }
-  }
+    },
+  },
 };
 </script>
 
-
-  <style scoped>
+<style scoped>
+/* Background + overlay */
 .background-image {
-  background-image: url('@/assets/img/ingo.png');
+  position: relative;
+  min-height: 100vh;
+  background-image: url("@/assets/img/ingo.png");
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  height: 100vh;
-  width: 100%;
 }
 
-.container {
-  height: 100%;
-  align-items: center;
-  justify-content: center;
+.background-image::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.section {
+  position: relative;
+  z-index: 2;
+}
+
+/* Card */
+.login-card {
+  border: none;
+  border-radius: 18px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+}
+
+/* Inputs */
+.form-control {
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+}
+
+.form-control:focus {
+  border-color: #198754;
+  box-shadow: 0 0 0 0.15rem rgba(25, 135, 84, 0.25);
+}
+
+/* Button */
+.btn-success {
+  height: 44px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(25, 135, 84, 0.35);
+}
+
+/* Logo */
+.logo img {
+  height: 40px;
 }
 </style>

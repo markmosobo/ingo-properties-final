@@ -97,6 +97,8 @@ Route::get('lists/contacts', [ListController::class, 'contacts']);
 Route::get('lists/sale-properties', [ListController::class, 'saleProperties']);
 Route::get('lists/rent-properties', [ListController::class, 'rentProperties']);
 Route::get('lists/featured-properties', [ListController::class, 'featuredProperties']);
+Route::get('lists/landlords', [ListController::class, 'landlords']);
+Route::get('lists/tenants', [ListController::class, 'tenants']);
 
 
 Route::get('property/{id}', [PropertyController::class, 'single']);
@@ -291,3 +293,7 @@ Route::post('/generate-monthly-statements', [PmsStatementController::class, 'gen
 Route::post('/send-landlordinvoice', [PmsInvoiceController::class, 'sendLandlordInvoice']);
 Route::post('/send-tenantinvoice', [PmsInvoiceController::class, 'sendTenantInvoice']);
 Route::post('/send-custom-mail', [PmsInvoiceController::class, 'sendCustomMail']);
+
+//attach documents
+Route::post('/landlords/upload-document', [LandlordController::class, 'attachDocument']);
+Route::post('/users/upload-document', [UserController::class, 'attachDocument']);

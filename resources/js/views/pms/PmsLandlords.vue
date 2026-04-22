@@ -87,6 +87,14 @@
                                   <a @click="navigateTo('/pmslandlordproperties/'+landlord.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Property</a>
                                    <!-- <a @click="navigateTo('/pmslandlordstatements/'+landlord.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Statements</a>                                            -->
                                   <a @click="navigateTo('/edit-pmslandlord/'+landlord.id )" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
+                                  <a
+                                    class="dropdown-item"
+                                    href="#"
+                                    @click.prevent="openAttachModal(landlord)"
+                                  >
+                                    <i class="ri-attachment-2 mr-2"></i>
+                                    Attach Documents
+                                  </a>
                                   <a @click="deleteLandlord(landlord.id)" class="dropdown-item" href="#"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
                                   </div>
                               </div>
@@ -99,7 +107,124 @@
     
                   </div>
                 </div><!-- End Top Selling -->
-    
+
+                <!-- Attach Documents Modal -->
+                <div
+                  class="modal fade"
+                  id="attachDocsModal"
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+
+                      <!-- Header -->
+                      <div class="modal-header">
+                        <h5 class="modal-title">
+                          Attach Documents – {{ selectedLandlord?.first_name }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+
+                      <!-- Body -->
+                      <div class="modal-body">
+
+                        <!-- EXISTING DOCUMENTS -->
+                        <div class="mb-4">
+                          <h6 class="fw-bold mb-3">Attached Documents</h6>
+
+                          <div v-if="selectedLandlord?.documents?.length">
+                            <ul class="list-group">
+
+                              <li
+                                v-for="doc in selectedLandlord.documents"
+                                :key="doc.id"
+                                class="list-group-item d-flex justify-content-between align-items-center"
+                              >
+                                <!-- Left side -->
+                                <div>
+                                  <span class="badge bg-primary text-uppercase mb-1">
+                                    {{ doc.type }}
+                                  </span>
+
+                                  <br />
+
+                                  <small class="text-muted">
+                                    {{ doc.file_name }}
+                                  </small>
+                                </div>
+
+                                <!-- Right side -->
+                                <a
+                                  :href="`/storage/${doc.file_path}`"
+                                  target="_blank"
+                                  class="btn btn-sm btn-outline-success rounded-pill"
+                                >
+                                  View
+                                </a>
+                              </li>
+
+                            </ul>
+                          </div>
+
+                          <div v-else class="text-muted small">
+                            No documents attached yet.
+                          </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- UPLOAD SECTION -->
+                        <div class="mb-3">
+                          <label class="form-label">Document Type</label>
+                          <select v-model="docForm.type" class="form-select">
+                            <option value="">Select type</option>
+                            <option value="agreement">Landlord Agreement</option>
+                            <option value="id">ID / Passport</option>
+                            <option value="contract">Contract</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label">Select File</label>
+                          <input
+                            type="file"
+                            class="form-control"
+                            @change="handleFile"
+                            accept=".pdf,.doc,.docx,.jpg,.png"
+                          />
+                          <small class="text-muted">
+                            Allowed: PDF, DOC, DOCX, JPG, PNG (Max 5MB)
+                          </small>
+                        </div>
+
+                      </div>
+
+                      <!-- Footer -->
+                      <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">
+                          Cancel
+                        </button>
+
+                        <button
+                          class="btn btn-success"
+                          :disabled="uploading"
+                          @click="uploadDocument"
+                        >
+                          <span
+                            v-if="uploading"
+                            class="spinner-border spinner-border-sm me-2"
+                          ></span>
+
+                          Upload Document
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                                    
             </div>
         </section>
     </TheMaster>
@@ -130,10 +255,60 @@
           categories: [],
           landlordtypes: [],
           user: [],
-          loading: true
+          loading: true,
+          selectedLandlord: null,
+          uploading: false,
+          docForm: {
+            type: "",
+            file: null,
+          },          
         }
       },
       methods: {
+        openAttachModal(landlord) {
+          this.selectedLandlord = landlord;
+          this.docForm = { type: "", file: null };
+
+          const modal = new bootstrap.Modal(
+            document.getElementById("attachDocsModal")
+          );
+          modal.show();
+        },
+
+        handleFile(e) {
+          this.docForm.file = e.target.files[0];
+        },
+
+        uploadDocument() {
+          if (!this.docForm.type || !this.docForm.file) {
+            Swal.fire("Missing data", "Select document type and file", "warning");
+            return;
+          }
+
+          this.uploading = true;
+
+          const formData = new FormData();
+          formData.append("type", this.docForm.type);
+          formData.append("file", this.docForm.file);
+          formData.append("landlord_id", this.selectedLandlord.id);
+
+          axios
+            .post("/api/landlords/upload-document", formData, {
+              headers: { "Content-Type": "multipart/form-data" },
+            })
+            .then(() => {
+              Swal.fire("Uploaded", "Document attached successfully", "success");
+              bootstrap.Modal.getInstance(
+                document.getElementById("attachDocsModal")
+              ).hide();
+            })
+            .catch(() => {
+              Swal.fire("Error", "Upload failed", "error");
+            })
+            .finally(() => {
+              this.uploading = false;
+            });
+        },        
         getPhoto()
         {
             return "/storage/landlords/";
@@ -176,8 +351,8 @@
         loadLists() {
           this.loading = true;
 
-          axios.get('api/lists').then((response) => {
-            this.landlords = response.data.lists.landlords;
+          axios.get('api/lists/landlords').then((response) => {
+            this.landlords = response.data.landlords;
             console.log("props", response)
 
             setTimeout(() => {

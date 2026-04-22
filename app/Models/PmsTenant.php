@@ -31,5 +31,10 @@ class PmsTenant extends Model
 
     public function property(){
         return $this->belongsTo(PmsProperty::class, 'pms_property_id');
+    }   
+    
+    public function tenantDocuments()
+    {
+        return $this->hasMany(TenantDocument::class, 'tenant_id');
     }    
 }
