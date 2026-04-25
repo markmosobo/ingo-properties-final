@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\CommissionService;
 use Illuminate\Http\Request;
 use App\Models\PmsProperty;
 use App\Http\Requests\StorePmsPropertyRequest;
@@ -58,13 +59,26 @@ class PmsPropertyController extends Controller
     public function single(Request $request, $id)
     {
         $property = PmsProperty::with('images','landlord','units')->where('id', $id)->first();
-
+        $commissionService = new CommissionService();
+        $commission = $commissionService->resolve($property);
+        
         return response()->json([
             'status' => true,
             'message' => "Property",
-            'property' => $property
+            'property' => $property,
+            'commission' => $commission
         ], 200);
-    }    
+    }  
+       
+    public function destroy($id)
+    {
+        $property = PmsProperty::findOrFail($id);
+        $property->delete();
 
+        return response()->json([
+            'status' => true,
+            'message' => "Property deleted successfully!"
+        ]);
+    }
 
 }

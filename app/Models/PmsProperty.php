@@ -32,4 +32,12 @@ class PmsProperty extends Model
     {
         return $this->hasMany(PmsUnit::class);
     }
+
+    protected static function booted()
+    {
+        static::deleting(function ($property) {
+            $property->units()->delete();
+            $property->images()->delete();
+        });
+    }    
 }

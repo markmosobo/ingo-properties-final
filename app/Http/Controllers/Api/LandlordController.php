@@ -12,24 +12,64 @@ class LandlordController extends Controller
 {
     public function store(Request $request)
     {
-        $landlord = Landlord::create($request->all());
+        $validated = $request->validate([
+            'first_name'        => 'required|string',
+            'last_name'         => 'required|string',
+            'email'             => 'nullable|email',
+            'phone_no'          => 'nullable|string',
+            'commission'        => 'nullable|numeric|between:0,100',
+            'fixed_commission'  => 'nullable|numeric|min:0',
+        ]);
+
+        // enforce exclusivity
+        if (!is_null($validated['commission'] ?? null)) {
+            $validated['fixed_commission'] = null;
+        }
+
+        if (!is_null($validated['fixed_commission'] ?? null)) {
+            $validated['commission'] = null;
+        }
+
+        $landlord = Landlord::create($validated);
 
         return response()->json([
             'status' => true,
             'message' => "Landlord Created successfully!",
             'landlord' => $landlord
-        ], 200);
+        ], 201);
     }
 
-    public function update(Request $request, Landlord $landlord)
+    public function update(Request $request, $id)
     {
-        $landlord->update($request->all());
+        $landlord = Landlord::findOrFail($id);
+
+        $validated = $request->validate([
+            'first_name'        => 'required|string',
+            'last_name'         => 'required|string',
+            'email'             => 'nullable|email',
+            'phone_no'          => 'nullable|string',
+            'address'           => 'nullable|string',
+            'id_number'         => 'nullable|string',
+            'commission'        => 'nullable|numeric|between:0,100',
+            'fixed_commission'  => 'nullable|numeric|min:0',
+        ]);
+
+        // enforce exclusivity
+        if (!empty($validated['commission'])) {
+            $validated['fixed_commission'] = null;
+        }
+
+        if (!empty($validated['fixed_commission'])) {
+            $validated['commission'] = null;
+        }
+
+        $landlord->update($validated);
 
         return response()->json([
             'status' => true,
             'message' => "Landlord Updated successfully!",
-            'landlord' => $landlord
-        ], 200);
+            'landlord' => $landlord->fresh()
+        ]);
     }
 
     public function destroy(Request $request, $id)

@@ -143,6 +143,15 @@
                                   </a>
 
                                   <a
+                                    v-if="tenant.status == 0"
+                                    class="dropdown-item"
+                                    @click="openReenterModal(tenant)"
+                                  >
+                                    <i class="ri-login-circle-line mr-2"></i>
+                                    Re-enter Unit
+                                  </a>
+
+                                  <a
                                     v-if="tenant.status == 2"
                                     class="dropdown-item"
                                     @click="reopenTenant(tenant.id)"
@@ -300,14 +309,107 @@
                   </div>
                 </div>
 
+                <div
+                  class="modal fade"
+                  id="reEnterModal"
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+
+                      <!-- HEADER -->
+                      <div class="modal-header">
+                        <div>
+                          <h5 class="modal-title">
+                            Re-enter Tenant – {{ selectedTenant?.first_name }} {{ selectedTenant?.last_name }}
+                          </h5>
+
+                          <small class="text-muted">
+                            Move tenant to another property/unit
+                          </small>
+                        </div>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+
+                      <!-- BODY -->
+                      <div class="modal-body">
+
+                        <!-- PROPERTY SELECT -->
+                        <label class="form-label">Select Property</label>
+                        <select
+                          v-model="reenterForm.pms_property_id"
+                          class="form-select"
+                          @change="getVacantUnits"
+                        >
+                          <option disabled value="">Select property</option>
+                          <option
+                            v-for="p in properties"
+                            :key="p.id"
+                            :value="p.id"
+                          >
+                            {{ p.name }}
+                          </option>
+                        </select>
+
+                        <!-- UNIT SELECT -->
+                        <label class="form-label mt-3">Select Unit</label>
+                        <select
+                          v-model="reenterForm.pms_unit_id"
+                          class="form-select"
+                          :disabled="!reenterForm.pms_property_id"
+                        >
+                          <option disabled value="">Select unit</option>
+                          <option
+                            v-for="u in vacantUnits"
+                            :key="u.id"
+                            :value="u.id"
+                          >
+                            {{ u.unit_number }} (Ksh {{ u.monthly_rent }})
+                          </option>
+                        </select>
+
+                        <div
+                          v-if="vacantUnits.length === 0 && reenterForm.pms_property_id"
+                          class="text-danger mt-2"
+                        >
+                          No vacant units in this property
+                        </div>
+
+                        <!-- INFO BOX -->
+                        <div class="alert alert-light border mt-3">
+                          <small>
+                            You are reassigning this tenant to a new unit.
+                            Previous unit was marked as vacant automatically.
+                          </small>
+                        </div>
+
+                      </div>
+
+                      <!-- FOOTER -->
+                      <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">
+                          Cancel
+                        </button>
+
+                        <button class="btn btn-success" @click="reEnterTenant">
+                          Re-enter Tenant
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>                
+
           </div>
         </section>
     </TheMaster>
     </template>
     
     <script>
-     import TheMaster from "@/components/dashboard/TheMaster.vue";
-     import axios from "axios";
+    import TheMaster from "@/components/dashboard/TheMaster.vue";
+    import axios from "axios";
     import Swal from 'sweetalert2';
     import "jquery/dist/jquery.min.js";
     import "datatables.net-dt/js/dataTables.dataTables";
@@ -330,7 +432,17 @@
           categories: [],
           user: [],
           loading: false,
+          showReenterModal: false,
+
+          properties: [],
+          vacantUnits: [],
+
           selectedTenant: null,
+
+          reenterForm: {
+            pms_property_id: '',
+            pms_unit_id: ''
+          },
           uploading: false,
           docForm: {
             type: "",
@@ -339,6 +451,45 @@
         }
       },
       methods: {
+        getVacantUnits(){
+          axios.get('/api/pmsvacantunits/' + this.reenterForm.pms_property_id)
+            .then(res => {
+              this.vacantUnits = res.data.units;
+            });
+        },
+        openReenterModal(tenant){
+          this.selectedTenant = tenant;
+
+          this.reenterForm = {
+            pms_property_id: '',
+            pms_unit_id: ''
+          };
+
+          this.vacantUnits = [];
+
+          const modal = new bootstrap.Modal(
+            document.getElementById("reEnterModal")
+          );
+
+          modal.show();
+        },
+        reEnterTenant(){
+          axios.put('api/reentertenant/' + this.selectedTenant.id, this.reenterForm)
+            .then(() => {
+
+              toast.fire(
+                'Success',
+                'Tenant successfully reassigned',
+                'success'
+              );
+
+              this.showReenterModal = false;
+              this.loadLists();
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        },        
         openAttachModal(tenant) {
           this.selectedTenant = tenant;
           this.docForm = { type: "", file: null };
@@ -452,6 +603,7 @@
           axios.get('api/lists/tenants')
             .then((response) => {
               this.tenants = response.data.tenants;
+              this.properties = response.data.properties;
 
               setTimeout(() => {
                   $("#AllPropertiesTable").DataTable();

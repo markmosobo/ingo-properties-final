@@ -21,7 +21,7 @@
                     <div class="col-sm-6">
                        <label for="title" class="form-label">Name*</label>
                        <div class="col-sm-10">
-                          <input type="text" placeholder="Name" id="title" v-model="form.name" name="title" class="form-control"
+                          <input type="text" placeholder="Name" id="name" v-model="form.name" name="name" class="form-control"
                              required />
                           <div class="invalid-feedback" v-if="!form.name">Please enter name</div>
                        </div>
@@ -43,25 +43,34 @@
                 </div>
                 <div class="row mb-3"></div>
                 <div class="form-group row">
-                   <div class="col-sm-6">
-                       <label for="title" class="form-label">Paybill Number*</label>
-                       <div class="col-sm-10">
-                          <input type="text" placeholder="Paybill Number" id="title" v-model="form.paybill_number" name="title" class="form-control"
-                             required />
-                          <div class="invalid-feedback" v-if="!form.name">Please enter name</div>
-                       </div>
-                    </div>              
-                   <div class="col-sm-6">
-                       <label for="title" class="form-label">Account Number*</label>
-                       <div class="col-sm-10">
-                          <input type="text" placeholder="Account Number" id="title" v-model="form.account_number" name="title" class="form-control"
-                             required />
-                          <div class="invalid-feedback" v-if="!form.name">Please enter name</div>
-                       </div>
-                    </div>
+                  <div class="col-sm-6">
+                  <label class="form-label">Commission Percentage*</label>
+                  <div class="col-sm-10">
+                     <input
+                        type="number"
+                        placeholder="e.g 7"
+                        v-model="form.commission"
+                        :disabled="disablePropertyCommission"
+                        class="form-control"
+                     />
+                  </div>
+                  </div>
+
+                  <div class="col-sm-6">
+                  <label class="form-label">Fixed Commission*</label>
+                  <div class="col-sm-10">
+                     <input
+                        type="number"
+                        placeholder="e.g 15000"
+                        v-model="form.fixed_commission"
+                        :disabled="disablePropertyFixedCommission"
+                        class="form-control"
+                     />
+                  </div>
+                  </div>
                
-                   </div>
-                   <div class="row mb-3"></div>
+                </div>
+                <div class="row mb-3"></div>
                
              </div>
              <!--  button -->
@@ -136,13 +145,13 @@
                             <div class="col-sm-6">
                               <strong>Commission:  <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="This is the commission percentage e.g 8"></i>
                               </strong>
-                              <input type="number" name="first_name" v-model="landlord.commission"
+                              <input type="number" name="commission" v-model="landlord.commission"
                               :disabled="disableCommission" class="form-control">
                             </div>
                             <div class="col-sm-6">
                               <strong>Fixed Commission:<i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="This is the agreed commission amount e.g 12000"></i>
                               </strong>
-                              <input type="number" name="last_name" v-model="landlord.fixed_commission"
+                              <input type="number" name="fixed_commission" v-model="landlord.fixed_commission"
                                :disabled="disableFixedCommission" class="form-control">
                             </div>
                         </div>      
@@ -189,11 +198,15 @@ export default {
    data () {
       return {
          form: {  
-         commission: '',
-         fixed_commission: '',       
-         created_by: '',
-         media: [],
-         property_status: '',
+            name: '',
+            landlord_id: '',
+            paybill_numberL: '',
+            account_number: '',
+            commission: '',
+            fixed_commission: '',       
+            created_by: '',
+            media: [],
+            property_status: '',
          
          },
          errors:{
@@ -221,6 +234,23 @@ export default {
          submitted: false
       }   
    },
+   computed: {
+      // landlord modal (already correct)
+      disableFixedCommission() {
+         return this.landlord.commission !== '' && this.landlord.commission !== null;
+      },
+      disableCommission() {
+         return this.landlord.fixed_commission !== '' && this.landlord.fixed_commission !== null;
+      },
+
+      // property form
+      disablePropertyCommission() {
+         return this.form.fixed_commission !== '' && this.form.fixed_commission !== null;
+      },
+      disablePropertyFixedCommission() {
+         return this.form.commission !== '' && this.form.commission !== null;
+      }
+   },   
    methods: {
       submitLandlord() {
           // Validate
@@ -305,9 +335,9 @@ export default {
           let isValid = true;
           if (!this.form.name) {
               isValid = false;
-              document.getElementById('title').classList.add('is-invalid');
+              document.getElementById('name').classList.add('is-invalid');
           } else {
-              document.getElementById('title').classList.remove('is-invalid');
+              document.getElementById('name').classList.remove('is-invalid');
           }
           if (!this.form.landlord_id) {
               isValid = false;
@@ -315,6 +345,14 @@ export default {
           } else {
               document.getElementById('landlord').classList.remove('is-invalid');
           }
+         if (!this.form.commission && !this.form.fixed_commission) {
+            toast.fire(
+               'Error',
+               'Enter either commission percentage OR fixed commission',
+               'error'
+            );
+            return false;
+         }
           return isValid;
       },
       addLandlord()
@@ -336,7 +374,7 @@ export default {
       getProperty() {
              axios.get('/api/pmsproperty/'+this.$route.params.id).then((response) => {
      
-             this.form = response.data.property[0];
+             this.form = response.data.property;
              console.log("props", this.form)
     
              });
@@ -357,13 +395,5 @@ export default {
       this.form.phone_number = this.user.phone
       console.log("user",this.user)
    },
-   computed: {
-        disableFixedCommission() {
-            return this.landlord.commission !== '';
-        },
-        disableCommission() {
-            return this.landlord.fixed_commission !== '';
-        }
-    },
 }
 </script>

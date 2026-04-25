@@ -241,10 +241,12 @@ Route::delete('pmstenant/{id}', [PmsTenantController::class, 'destroy']);
 Route::delete('pmsunit/{id}', [PmsUnitController::class, 'destroy']);
 Route::delete('pmsexpense/{id}', [PmsExpenseController::class, 'destroy']);
 Route::delete('pmsstatement/{id}', [PmsStatementController::class, 'destroy']);
+Route::delete('pmsproperty/{id}', [PmsPropertyController::class, 'destroy']);
 Route::delete('payment/{id}', [PaymentController::class, 'destroy']);
 
 Route::put('vacatetenant/{id}',[PmsTenantController::class,'vacate']);
 Route::put('vacateunit/{id}',[PmsUnitController::class,'vacate']);
+Route::put('reentertenant/{id}', [PmsTenantController::class, 'reEnter']);
 
 Route::put('approvetestimonial/{id}',[ListController::class,'approveTestimonial']);
 Route::put('edit-testimonial/{id}',[ListController::class,'editTestimonial']);

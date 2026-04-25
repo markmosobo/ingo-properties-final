@@ -455,9 +455,11 @@ class ListController extends Controller
     public function tenants()
     {
         $tenants = PmsTenant::with('tenantDocuments','unit','property')->get();
+        $properties = PmsProperty::latest()->with('landlord','images','units')->get();
 
         return response()->json([
-            'tenants' => $tenants
+            'tenants' => $tenants,
+            'properties' => $properties
         ]);
     }
     

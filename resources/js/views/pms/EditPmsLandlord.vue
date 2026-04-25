@@ -1,264 +1,245 @@
 <template>
-    <TheMaster>
-        <div class="card px-2">
-       <div class="card-body">
-          <!-- General Form Elements -->
-          <form @submit.prevent="">
-          <fieldset v-if="step == 1">
-             <h5 class="card-title text-center">Edit Landlord</h5>
- 
-             <div class="row m-auto p-auto justify-content- g-3 needs-validation" novalidate="" autocomplete="off">
-                <div class="row  mb-3"></div>
- 
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                   <input
-                      type="hidden"
-                      id="user_id"
-                      name="user_id"
-                      value="1"
-                      class="form-control"
-                   />
-                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">First Name*</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="text"
-                            placeholder="First Name"
-                            id="title"
-                            name="title"
-                            v-model="form.first_name"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Last Name*</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="text"
-                            placeholder="Last Name"
-                            id="title"
-                            name="title"
-                            v-model="form.last_name"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
- 
-                </div>
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Email Address</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="text"
-                            placeholder="Email Address"
-                            id="title"
-                            name="title"
-                            v-model="form.email"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Phone Number</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="text"
-                            placeholder="Phone Number"
-                            id="title"
-                            name="title"
-                            v-model="form.phone_no"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
+  <TheMaster>
+    <div class="card px-2">
+      <div class="card-body">
 
-                </div>
+        <form @submit.prevent="submit">
+          <fieldset v-if="step === 1">
 
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Physical Address</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="text"
-                            placeholder="Physical Address"
-                            id="title"
-                            name="title"
-                            v-model="form.address"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">National ID Number</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="text"
-                            placeholder="National ID Number"
-                            id="title"
-                            name="title"
-                            v-model="form.id_number"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
+            <h5 class="card-title text-center mb-4">
+              Edit Landlord
+            </h5>
 
-                </div>
+            <div class="row g-3">
 
-             </div>
-             <!--  button -->
-             <div class="col-lg-12 felx mt-4 row">
-                <div class="col-sm-6 col-lg-6">
-                    <!-- <button @click.prevent="prev()" class="btn btn-dark">Previous</button> -->
-                </div>
-                <div class="col-sm-6 col-lg-6 text-end">
-                    <!-- <button type="submit" style="background-color: darkgreen; border-color: darkgreen;" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Submit</button> -->
-                    <button type="submit" 
-                          style="background-color: darkgreen; border-color: darkgreen;" 
-                          @click.prevent="submit()" 
-                          :class="{ 'btn-success': !submitting, 'btn-secondary': submitting }"
-                          class="btn rounded-pill"
-                          :disabled="submitting">
-                      <span v-if="!submitted">Submit</span>
-                      <span v-else>Submitting...</span>
-                  </button>
-                </div>
+              <!-- hidden user -->
+              <input type="hidden" v-model="form.user_id" />
+
+              <div class="col-md-6">
+                <label class="form-label">First Name *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="form.first_name"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Last Name *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="form.last_name"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Email Address</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  v-model="form.email"
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Phone Number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="form.phone_no"
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Physical Address</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="form.address"
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">National ID Number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="form.id_number"
+                />
+              </div>
+
+              <!-- COMMISSION % -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  Commission Percentage (%)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  class="form-control"
+                  placeholder="e.g 8"
+                  v-model.number="form.commission"
+                  :disabled="disableCommissionPercentage"
+                />
+              </div>
+
+              <!-- FIXED COMMISSION -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  Fixed Commission (KES)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  class="form-control"
+                  placeholder="e.g 12000"
+                  v-model.number="form.fixed_commission"
+                  :disabled="disableFixedCommission"
+                />
+              </div>
+
             </div>
+
+            <div class="d-flex justify-content-end mt-4">
+              <button
+                type="submit"
+                class="btn btn-success rounded-pill px-4"
+                :disabled="submitting"
+              >
+                <span v-if="!submitting">Submit</span>
+                <span v-else>Submitting...</span>
+              </button>
+            </div>
+
           </fieldset>
- 
-          </form>
- 
- 
-          <!-- End General Form Elements -->
-       </div>
+        </form>
+
+      </div>
     </div>
-    </TheMaster>
-    
- 
- 
-    <!--  actual form -->
- </template>
-    
- <script>
- import TheMaster from "@/components/dashboard/TheMaster.vue";
+  </TheMaster>
+</template>
 
- import axios from "axios";
- import Swal from 'sweetalert2';
+<script>
+import TheMaster from "@/components/dashboard/TheMaster.vue";
+import axios from "axios";
+import Swal from "sweetalert2";
 
- 
- const toast = Swal.mixin({
-     toast: true,
-     position: 'top-end',
-     showConfirmButton: false,
-     timer: 3000
- });
- 
- window.toast = toast;
- 
- export default {
-    components : {
-       TheMaster,
-    },
-    data () {
-       return {
-          form: {
-          role_id: '',
-          title: '',
-          
-          },
-          message: "",
-          successMessage: "",
-          loading: false,
-          step: 1, 
-          roles: [],
-          submitting: false,
-          submitted: false
-       }   
-    },
-    methods: {
-       //ID upload
-       onChangePhoto(e) {
-         console.log('loadings');
-         let file = e.target.files[0];
-         console.log(file)
-         let reader = new FileReader();
-         reader.onloadend = (file) => {
-            // console.log('RESULT', reader.result)
-            this.form.image = reader.result;
-         }
-         reader.readAsDataURL(file);
-       },
-        getLandlord() {
-             axios.get('/api/landlord/'+this.$route.params.id).then((response) => {
-     
-             this.form = response.data.landlord;
-             console.log("props", this.form)
-    
-             });
-        },
-       async submit() {
-            // Start submitting process
-            this.submitting = true;
-            
-            try {
-                // Simulate asynchronous submission process (you would replace this with your actual submission logic)
-                await this.submitForm();
+const toast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 3000,
+});
 
-                // Submission successful
-                this.submitted = true;
-            } catch (error) {
-                // Handle submission error
-                console.error("Submission error:", error);
-            } finally {
-                // End submitting process
-                this.submitting = false;
-            }
-        },
-       async submitForm(){
-          axios.put("/api/landlord/"+this.$route.params.id, this.form)
-          .then(function (response) {
-             console.log(response);
-             // this.step = 1;
-             toast.fire(
-                'Success!',
-                'Landlord details updated!',
-                'success'
-             )
-          })
-          .catch(function (error) {
-             console.log(error);
-             // Swal.fire(
-             //    'error!',
-             //    // phone_error + id_error + pass_number,
-             //    'error'
-             // )
-          });
-          this.$router.push('/pmslandlords')
-       }
- 
+export default {
+  components: { TheMaster },
+
+  data() {
+    return {
+      step: 1,
+      submitting: false,
+
+      form: {
+        user_id: 1,
+        first_name: "",
+        last_name: "",
+        email: "",
+        phone_no: "",
+        address: "",
+        id_number: "",
+
+        // MUST match migration
+        commission: null,        // decimal(8,2)
+        fixed_commission: null,  // decimal(10,2)
+      },
+    };
+  },
+
+  computed: {
+    // Disable % if fixed exists
+    disableCommissionPercentage() {
+      return this.form.fixed_commission > 0;
     },
-    mounted() {
-      this.getLandlord();
-    }
- 
- }
- </script>
-    
- 
- 
+
+    // Disable fixed if % exists
+    disableFixedCommission() {
+      return this.form.commission > 0;
+    },
+  },
+
+  watch: {
+    // If % is entered → clear fixed
+    "form.commission"(val) {
+      if (val > 0) {
+        this.form.fixed_commission = null;
+      }
+    },
+
+    // If fixed is entered → clear %
+    "form.fixed_commission"(val) {
+      if (val > 0) {
+        this.form.commission = null;
+      }
+    },
+  },
+
+  methods: {
+    async getLandlord() {
+      try {
+        const res = await axios.get(
+          `/api/landlord/${this.$route.params.id}`
+        );
+
+        const landlord = res.data.landlord;
+
+        this.form = {
+          user_id: landlord.user_id,
+          first_name: landlord.first_name,
+          last_name: landlord.last_name,
+          email: landlord.email,
+          phone_no: landlord.phone_no,
+          address: landlord.address,
+          id_number: landlord.id_number,
+          commission: landlord.commission,
+          fixed_commission: landlord.fixed_commission,
+        };
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async submit() {
+      this.submitting = true;
+
+      try {
+        await axios.put(
+          `/api/landlord/${this.$route.params.id}`,
+          this.form
+        );
+
+        toast.fire(
+          "Success!",
+          "Landlord updated successfully",
+          "success"
+        );
+
+        this.$router.push("/pmslandlords");
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.submitting = false;
+      }
+    },
+  },
+
+  mounted() {
+    this.getLandlord();
+  },
+};
+</script>

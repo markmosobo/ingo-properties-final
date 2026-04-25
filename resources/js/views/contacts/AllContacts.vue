@@ -259,24 +259,24 @@
                                    
                 })
         },
-loadLists() {
-  this.loading = true;
+        loadLists() {
+          this.loading = true;
 
-  axios.get('api/lists/contacts').then((response) => {
-    this.contacts = response.data.contacts;
-    this.sociallinks = response.data.sociallinks;
+          axios.get('api/lists/contacts').then((response) => {
+            this.contacts = response.data.contacts;
+            this.sociallinks = response.data.sociallinks;
 
-    console.log("contacts", this.contacts);
-    console.log("social", this.sociallinks);
+            console.log("contacts", this.contacts);
+            console.log("social", this.sociallinks);
 
-    setTimeout(() => {
-      $("#AllSocialLinksTable").DataTable();
-    }, 10);
+            setTimeout(() => {
+              $("#AllSocialLinksTable").DataTable();
+            }, 10);
 
-  }).finally(() => {
-    this.loading = false;
-  });
-},        
+          }).finally(() => {
+            this.loading = false;
+          });
+        },        
 
       },
       components : {

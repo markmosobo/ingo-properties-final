@@ -12,7 +12,16 @@ class Landlord extends Model
         'first_name',
         'last_name',
         'email',
-        'phone_no'
+        'phone_no',
+        'address',
+        'id_number',
+        'commission',
+        'fixed_commission'
+    ];
+
+    protected $casts = [
+        'commission' => 'float',
+        'fixed_commission' => 'float',
     ];
 
     // app/Models/Landlord.php
