@@ -169,9 +169,20 @@ class PmsInvoiceController extends Controller
 
     public function propAllSettledInvoices(Request $request, $id)
     {
-       $property = PmsProperty::findOrFail($id);
-        $propertyallsettledinvoices = PmsStatement::latest()->whereNotNull('water_bill')->where('status',1)->with('tenant','property','unit')->get();
-        $propertyallinvoices = PmsStatement::latest()->whereNotNull('water_bill')->with('tenant','property','unit')->where('pms_property_id', $property->id)->get();
+        $property = PmsProperty::findOrFail($id);
+
+        // ALL invoices for this property
+        $propertyallinvoices = PmsStatement::latest()
+            ->where('pms_property_id', $property->id)
+            ->with('tenant','property','unit')
+            ->get();
+
+        // ONLY settled invoices for this property
+        $propertyallsettledinvoices = PmsStatement::latest()
+            ->where('pms_property_id', $property->id)
+            ->where('status', 1)
+            ->with('tenant','property','unit')
+            ->get();
 
         return response()->json([
             'status' => true,
@@ -179,7 +190,7 @@ class PmsInvoiceController extends Controller
             'propertyallsettledinvoices' => $propertyallsettledinvoices,
             'propertyallinvoices' => $propertyallinvoices
         ], 200);
-    } 
+    }
 
     public function sendLandlordInvoice(Request $request)
     {

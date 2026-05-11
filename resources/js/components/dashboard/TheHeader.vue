@@ -3,17 +3,30 @@
     <header id="header" class="header fixed-top d-flex align-items-center">
   
       <div class="d-flex align-items-center justify-content-between">
-      <router-link to="/" custom v-slot="{ href, navigate, isActive }">
-                <a
-                  :href="href"
-                  :class="{ active: isActive }"
-                  class="logo d-flex align-items-center"
-                  @click="navigate"
-                >
-          <img src="assets/img/logo.png" alt="">
-          <span class="d-none d-lg-block">Ingo Properties</span>
-        </a>
-        </router-link>
+<router-link to="/" custom v-slot="{ href, navigate, isActive }">
+  <a
+    :href="href"
+    :class="{ active: isActive }"
+    class="logo d-flex align-items-center gap-2"
+    @click="navigate"
+    style="text-decoration: none;"
+  >
+    <img 
+      src="@/assets/img/apex-logo.png" 
+      alt="Ingo Properties Logo"
+      style="height: 40px; width: 40px; object-fit: contain;"
+    >
+
+    <div class="d-none d-lg-block lh-sm">
+      <div style="font-weight: 700; font-size: 1.05rem; color: #1f3c88;">
+        Ingo <span style="color:#198754;">Properties</span>
+      </div>
+      <small style="font-size: 0.7rem; color: #6c757d;">
+        Property Management System
+      </small>
+    </div>
+  </a>
+</router-link>
         <i class="bi bi-list toggle-sidebar-btn" @click="handleSidebar"></i>
       </div><!-- End Logo -->
   

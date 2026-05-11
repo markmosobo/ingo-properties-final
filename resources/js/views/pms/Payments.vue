@@ -75,36 +75,55 @@
 
                 </div>
 
-               <!-- Add Payment Modal -->
-                <div class="modal fade" id="addPaymentModal" tabindex="-1" role="dialog" aria-labelledby="addPaymentModalLabel" aria-hidden="true">
+                <!-- Add Payment Modal -->
+                <div
+                  class="modal fade"
+                  id="addPaymentModal"
+                  tabindex="-1"
+                  role="dialog"
+                  aria-labelledby="addPaymentModalLabel"
+                  aria-hidden="true"
+                >
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
+
+                      <!-- Modal Header -->
                       <div class="modal-header">
-                        <h5 class="modal-title" id="addPaymentModalLabel">Add Payment Method</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal">
+                        <h5 class="modal-title" id="addPaymentModalLabel">
+                          Add Payment Method
+                        </h5>
+                        <button
+                          type="button"
+                          class="close"
+                          data-dismiss="modal"
+                          aria-label="Close"
+                          @click="closeModal"
+                        >
                           <span aria-hidden="true">&times;</span>
                         </button>
                       </div>
-                      
+
+                      <!-- Modal Body -->
                       <div class="modal-body">
-                        <!-- Full Name Field -->
+
+                        <!-- Account Name -->
                         <div class="form-group">
-                          <label for="fullName"><strong>Account Name:</strong></label>
-                          <input 
-                            type="text" 
-                            id="fullName" 
-                            v-model="form.name" 
-                            placeholder="Enter account name" 
+                          <label><strong>Account Name:</strong></label>
+                          <input
+                            type="text"
+                            v-model="form.name"
+                            placeholder="Enter account name"
                             class="form-control"
                           />
-                          <div v-if="errors.name" class="text-danger">{{ errors.name }}</div>
+                          <div v-if="errors.name" class="text-danger">
+                            {{ errors.name }}
+                          </div>
                         </div>
 
-                        <!-- Method Field -->
+                        <!-- Payment Method -->
                         <div class="form-group">
-                          <label for="label"><strong>Payment Method:</strong></label>
+                          <label><strong>Payment Method:</strong></label>
                           <select
-                            id="label"
                             v-model="form.method"
                             class="form-control"
                           >
@@ -113,42 +132,80 @@
                             <option value="MPESA Paybill">MPESA Paybill</option>
                             <option value="MPESA Till Number">MPESA Till Number</option>
                           </select>
-                          <div v-if="errors.method" class="text-danger">{{ errors.method }}</div>
-                        </div>
-
-
-                        <!-- account no. field -->
-                        <div v-if="form.method == 'Bank Transfer' || form.method == 'MPESA Paybill'" class="form-group">
-                          <label for="body"><strong>Account Number:</strong></label>
-                          <input 
-                            type="number" 
-                            id="fullName" 
-                            v-model="form.account_number" 
-                            placeholder="Enter account number" 
-                            class="form-control"
-                          />
-                        </div>
-
-                        <!-- till no. field -->
-                        <div v-if="form.method == 'MPESA Till Number'" class="form-group">
-                          <label for="body"><strong>Till Number:</strong></label>
-                          <input 
-                            type="number" 
-                            id="fullName" 
-                            v-model="form.till_number" 
-                            placeholder="Enter till number" 
-                            class="form-control"
-                          />
+                          <div v-if="errors.method" class="text-danger">
+                            {{ errors.method }}
                           </div>
                         </div>
-                      
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal">Close</button>
-                        <button type="button" @click="submitPayment" class="btn btn-primary" style="background-color: darkgreen; border-color: darkgreen;">Save</button>
+
+                        <!-- Paybill Number -->
+                        <div
+                          v-if="form.method === 'MPESA Paybill'"
+                          class="form-group"
+                        >
+                          <label><strong>Paybill Number:</strong></label>
+                          <input
+                            type="number"
+                            v-model="form.paybill_number"
+                            placeholder="Enter paybill number"
+                            class="form-control"
+                          />
+                        </div>
+
+                        <!-- Account Number -->
+                        <div
+                          v-if="form.method === 'Bank Transfer' || form.method === 'MPESA Paybill'"
+                          class="form-group"
+                        >
+                          <label><strong>Account Number:</strong></label>
+                          <input
+                            type="number"
+                            v-model="form.account_number"
+                            placeholder="Enter account number"
+                            class="form-control"
+                          />
+                        </div>
+
+                        <!-- Till Number -->
+                        <div
+                          v-if="form.method === 'MPESA Till Number'"
+                          class="form-group"
+                        >
+                          <label><strong>Till Number:</strong></label>
+                          <input
+                            type="number"
+                            v-model="form.till_number"
+                            placeholder="Enter till number"
+                            class="form-control"
+                          />
+                        </div>
+
                       </div>
+
+                      <!-- Modal Footer -->
+                      <div class="modal-footer">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          data-dismiss="modal"
+                          @click="closeModal"
+                        >
+                          Close
+                        </button>
+
+                        <button
+                          type="button"
+                          class="btn btn-primary"
+                          style="background-color: darkgreen; border-color: darkgreen;"
+                          @click="submitPayment"
+                        >
+                          Save
+                        </button>
+                      </div>
+
                     </div>
                   </div>
                 </div>
+
                 <!-- Edit Payment Modal -->
                 <div class="modal fade" id="EditPaymentModal" tabindex="-1" aria-labelledby="EditPaymentModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
@@ -396,8 +453,8 @@
             this.$router.push(location)
         },
         loadLists() {
-             axios.get('api/lists').then((response) => {
-             this.payments = response.data.lists.payments;
+             axios.get('api/lists/payments').then((response) => {
+             this.payments = response.data.payments;
              setTimeout(() => {
                   $("#AllPaymentsTable").DataTable();
               }, 10);

@@ -240,6 +240,7 @@
       data(){
         return {
           statements: [],
+          payments: [],
           collectedTotal: 0,
           expensesTotal: 0,
           isLoadingStatements: false,
@@ -315,6 +316,14 @@
         capitalizeFirstLetter(str) {
           return str.charAt(0).toUpperCase() + str.slice(1);
         },
+         convertDate(dateStr) {
+          const date = new Date(dateStr);
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const year = date.getFullYear();
+
+          return `${day}/${month}/${year}`;
+        },        
         formatNumber(value) {
             // Check if the value is not a number
             if (isNaN(value)) {
@@ -418,7 +427,7 @@
                     });
             });
         },
-        print(statement) {
+        async print(statement) {
             console.log("merc",statement);
             this.name = statement.property.name;
             this.firstName = statement.tenant.first_name;
@@ -428,16 +437,25 @@
             this.unitNumber = statement.tenant.pms_unit_id;
             this.tenantId = statement.pms_tenant_id;
             this.propertyId = statement.pms_property_id;
-            this.getProperty(this.propertyId);
+            this.unitId = statement.pms_unit_id;
+            await this.getProperty(this.propertyId);              
             this.refNo = statement.ref_no;
             this.details = statement.details;
             this.date = statement.created_at;
             this.status = statement.status;
             this.paid = statement.paid;
-            this.balance = statement.balance;
-            this.rentMonth = statement.rent_month;
+            // this.balance = statement.balance;
+            this.balance = statement.total - statement.paid;
             this.invoiceDate = statement.updated_at;
-            this.payDate = statement.paid_at;
+            this.payDate = statement.created_at;
+            this.rentInvoiceMonth = statement.rent_month;
+            // Assuming this.payDate is already assigned with statement.created_at
+            let payDate = new Date(this.payDate);
+
+            // Create a new Date object for dueDate based on payDate
+            this.dueDate = statement.rent_month;
+            console.log("stevo", this.dueDate)
+
             this.total = statement.total;
             this.payment = statement.payment_method;
             this.statementId = statement.id;
@@ -490,176 +508,231 @@
             };
         },
         buildPrintContent() {
-          // Determine whether to include the row
-          const showExpensesDeductionRow = this.expenses !== 0;
           const logoBase64 = this.logoBase64;
-          const watermarkText = 'INVOICE';
-          // Build the HTML content for the receipt
+
+          /* ------------------------------------
+            Build Payment Methods Dynamically
+          -------------------------------------*/
+          let paymentMethodsHTML = '';
+
+          this.payments.forEach((payment, index) => {
+            paymentMethodsHTML += `
+              <div style="margin-bottom: 12px;">
+                <strong>${index + 1}. ${payment.name}</strong> (${payment.method})<br>
+            `;
+
+            if (payment.method === 'MPESA Paybill') {
+              paymentMethodsHTML += `
+                Paybill Number: <strong>${payment.paybill_number}</strong><br>
+                Account Number: <strong>${payment.account_number}</strong><br>
+              `;
+            }
+
+            if (payment.method === 'MPESA Till Number') {
+              paymentMethodsHTML += `
+                Till Number: <strong>${payment.till_number}</strong><br>
+              `;
+            }
+
+            if (payment.method === 'Bank Transfer') {
+              paymentMethodsHTML += `
+                Bank Account: <strong>${payment.account_number}</strong><br>
+              `;
+            }
+
+            paymentMethodsHTML += `</div>`;
+          });
+
+          /* ------------------------------------
+            HTML Template
+          -------------------------------------*/
           const receiptHTML = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Invoice Of Payment - ${this.refNo}</title>
-              <style>
-                body {
-                  font-family: Arial, sans-serif;
-                  margin: 0;
-                  padding: 0;
-                  background-color: #f5f5f5;
-                }
-                .receipt {
-                  max-width: 600px;
-                  margin: 20px auto;
-                  padding: 20px;
-                  background-color: #fff;
-                  border: 2px solid #ccc;
-                  display: flex;
-                  flex-direction: column;
-                }
-                 .watermark {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%) rotate(-45deg);
-                    font-size: 80px;
-                    color: rgba(0, 0, 0, 0.1); /* Adjust the transparency as needed */
-                    white-space: nowrap;
-                    z-index: 0;
-                    pointer-events: none; /* Prevents watermark from interfering with other elements */
-                  }
-                .receipt-header {
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  margin-bottom: 50px;
-                }
-                .company-info {
-                  text-align: left;
-                }
-                .company-info img {
-                  max-width: 150px;
-                  height: auto;
-                }
-                .receipt-info {
-                  margin-bottom: 50px;
-                }
-                .receipt-info p {
-                  margin: 5px 0;
-                  color: #555;
-                }
-                 .additional-info {
-                  margin-bottom: 30px;
-                  font-size: 16px;
-                  color: #333333;
-                }
-                .additional-info p {
-                  margin: 8px 0;
-                }
-                .payment-info {
-                  margin-bottom: 30px;
-                  font-size: 16px;
-                  color: #333333;
-                  text-align: center;
-                }
-                .payment-info p {
-                  margin: 8px 0;
-                }
-                .receipt-table {
-                  width: 100%;
-                  border-collapse: collapse;
-                  margin-bottom: 50px;
-                }
-                .receipt-table th, .receipt-table td {
-                  padding: 8px;
-                  border-bottom: 1px solid #ccc;
-                }
-                .receipt-table th {
-                  text-align: left;
-                  background-color: #f2f2f2;
-                  color: #333;
-                }
-                .receipt-table td {
-                  text-align: left;
-                  color: #666;
-                }
-                .receipt-footer {
-                  text-align: center;
-                  margin-top: auto;
-                }
-                .receipt-footer p {
-                  margin: 5px 0;
-                  color: #777;
-                }
-              </style>
-            </head>
-            <body>
-            <div class="watermark">${watermarkText}</div>
-              <div class="receipt">
-                <div class="receipt-header">
-                  <div class="company-logo">
-                    <img src="${logoBase64}" alt="Company Logo" style="max-width: 150px; height: auto;">
-                  </div>
-                  <div class="company-info">
-                    <p>Cosyard Business Center, Kakamega Mumias Road, Kakamega.</p>
-                    <p>Phone: (0720) 020-401 </p>
-                    <p> Email: propertingo@gmail.com</p>
-                    <p> Website: www.ingoproperties.co.ke</p>
-                  </div>
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Rent Invoice - ${this.refNo}</title>
+
+            <style>
+              body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+                color: #333;
+              }
+
+              .receipt {
+                max-width: 750px;
+                margin: 20px auto;
+                padding: 25px;
+                background-color: #fff;
+                border-radius: 10px;
+                box-shadow: 0 0 15px rgba(0,0,0,0.1);
+                position: relative;
+              }
+
+              .watermark {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-45deg);
+                font-size: 75px;
+                color: rgba(0,0,0,0.06);
+                pointer-events: none;
+              }
+
+              .header {
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 2px solid #e0e0e0;
+                padding-bottom: 15px;
+                margin-bottom: 25px;
+              }
+
+              .logo img {
+                max-width: 150px;
+              }
+
+              .company {
+                text-align: right;
+                font-size: 0.95rem;
+                line-height: 1.5;
+              }
+
+              .info p {
+                margin: 4px 0;
+                font-size: 0.95rem;
+              }
+
+              .section-title {
+                font-weight: 600;
+                margin-top: 20px;
+                margin-bottom: 10px;
+                font-size: 1rem;
+              }
+
+              .table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+              }
+
+              .table th, .table td {
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+              }
+
+              .table th {
+                background: #f9f9f9;
+                text-align: left;
+              }
+
+              .payment-box {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f9f9f9;
+                border-radius: 6px;
+              }
+
+              .footer {
+                text-align: center;
+                margin-top: 25px;
+                font-size: 0.85rem;
+                color: #777;
+              }
+            </style>
+          </head>
+
+          <body>
+            <div class="receipt">
+              <div class="watermark">INVOICE</div>
+
+              <!-- HEADER -->
+              <div class="header">
+                <div class="logo">
+                  <img src="${logoBase64}" />
                 </div>
-                <div class="receipt-info">
-                  <p><strong>#${this.refNo}</strong></p>
-                  <p><strong>Rent Month:</strong> ${this.rentMonth}</p>
-                  <p><strong>Invoice Date:</strong> ${this.format_date(this.invoiceDate ?? 'N/A')}</p>
-                  <p><strong>Payment Date:</strong>  ${this.format_date(this.payDate ?? 'N/A')}</p>
-                  <p><strong>Payment Mode:</strong> ${this.payment ?? 'N/A'}</p>
-                  
-                </div>
-                <div class="additional-info">
-                    <p><strong>Invoiced To</strong></p>
-                    <p><strong></strong> ${this.tenant}</p>
-                    <p><strong></strong> ${this.name}</p>
-                    <p><strong></strong> ${this.details}</p>
-                </div>
-                <table class="receipt-table">
-                  <thead>
-                    <tr>
-                      <th>Description</th>
-                      <th>Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Total Rent Due (Incl. Water Bill)</td>
-                      <td>KES ${this.formatNumber(this.total)}</td>
-                    </tr>
-                    <tr>
-                      <td>Total Amount Paid</td>
-                      <td>KES ${this.formatNumber(this.paid)}</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <th>Total Balance:</th>
-                      <td>KES ${this.formatNumber(this.balance)}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-                <div class="payment-info">
-                  <p><strong>Payment Options:</strong></p>
-                  <p>MPESA: Till Number - 8788932</p>
-                </div>
-                <div class="receipt-footer">
-                  <p>Generated on ${new Date().toLocaleString()}</p>
+
+                <div class="company">
+                  <strong>Ingo Properties</strong><br>
+                  Cosyard Business Center<br>
+                  Kakamega – Mumias Road<br>
+                  0759 509 462<br>
+                  ingoproperties@gmail.com
                 </div>
               </div>
-            </body>
-            </html>
+
+              <!-- INVOICE INFO -->
+              <div class="info">
+                <p><strong>Invoice No:</strong> ${this.refNo}</p>
+                <p><strong>Rent Month:</strong> ${this.rentInvoiceMonth}</p>
+                <p><strong>Invoice Date:</strong> ${this.format_date(this.invoiceDate ?? 'N/A')}</p>
+                <p><strong>Due Date:</strong> ${this.convertDate(this.dueDate ?? 'N/A')}</p>
+                <p><strong>Status:</strong> ${this.paymentMethod}</p>
+              </div>
+
+              <!-- TENANT -->
+              <div class="section-title">Invoiced To</div>
+              <div class="info">
+                <p>${this.tenant}</p>
+                <p>${this.name}</p>
+                <p>${this.details}</p>
+              </div>
+
+              <!-- CHARGES -->
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td>Total Rent (Incl. Water)</td>
+                    <td>KES ${this.formatNumber(this.total)}</td>
+                  </tr>
+
+                  <tr>
+                    <td>Total Paid</td>
+                    <td>KES ${this.formatNumber(this.paid)}</td>
+                  </tr>
+                </tbody>
+
+                <tfoot>
+                  <tr>
+                    <th>Balance Due</th>
+                    <th>KES ${this.formatNumber(this.balance)}</th>
+                  </tr>
+                </tfoot>
+              </table>
+
+              <!-- PAYMENT METHODS -->
+              <div class="payment-box">
+                <strong>Payment Options (Pay to Ingo Properties):</strong>
+                <br><br>
+                ${paymentMethodsHTML}
+              </div>
+
+              <!-- FOOTER -->
+              <div class="footer">
+                Generated on ${new Date().toLocaleString()}
+              </div>
+
+            </div>
+          </body>
+          </html>
           `;
 
           return receiptHTML;
         },
+        async loadPayments() {
+          const res = await axios.get('/api/lists/payments');
+          this.payments = res.data.payments;
+        },        
         generatePDF() {
             let pdfName = 'Full Statement';
             var doc = new jsPDF('landscape');
@@ -998,6 +1071,7 @@
       },      
       mounted(){
         this.loadLists();
+        this.loadPayments();
         this.loadLogo();
         this.user = localStorage.getItem('user');
         this.user = JSON.parse(this.user);

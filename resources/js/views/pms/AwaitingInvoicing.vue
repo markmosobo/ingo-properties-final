@@ -112,6 +112,15 @@
                                   Create Invoice
                                 </a>
                               </router-link>
+
+                              <!-- Secondary action -->
+                              <button
+                                class="btn btn-sm rounded-pill text-white me-2"
+                                style="background: linear-gradient(135deg, #3b82f6, #2563eb); border: none;"
+                                @click="openBulkInvoiceModal"
+                              >
+                                ⚡ Auto Create (Property)
+                              </button>
                               <router-link v-if="statements.length !== 0" to="#" custom v-slot="{ href, navigate, isActive }">
                                 <a
                                   :href="href"
@@ -346,6 +355,60 @@
                         </div>
                       </div>
                     </div>
+
+                    <div class="modal fade" id="bulkInvoiceModal" tabindex="-1">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+
+                          <div class="modal-header">
+                            <h5 class="modal-title">Auto Create Invoices (By Property)</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                          </div>
+
+                          <div class="modal-body">
+
+                            <!-- Property -->
+                            <div class="mb-3">
+                              <label class="form-label">Property *</label>
+                              <select v-model="bulkForm.pms_property_id" class="form-control">
+                                <option value="">Select property</option>
+                                <option
+                                  v-for="property in properties"
+                                  :key="property.id"
+                                  :value="property.id"
+                                >
+                                  {{ property.name }}
+                                </option>
+                              </select>
+                            </div>
+
+                            <!-- Rent Month -->
+                            <div class="mb-3">
+                              <label class="form-label">Rent Month *</label>
+                              <select v-model="bulkForm.rentMonth" class="form-control">
+                                <option v-for="month in months" :key="month" :value="month">
+                                  {{ month }}
+                                </option>
+                              </select>
+                            </div>
+
+                            <div class="alert alert-warning">
+                              This will create invoices for <strong>all active tenants</strong>
+                              in the selected property.
+                            </div>
+
+                          </div>
+
+                          <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button class="btn btn-success" @click="bulkCreateInvoices">
+                              Create Invoices
+                            </button>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>                    
                  
                     <!--Edit Invoice Modal -->
                     <div class="modal fade" id="EditInvoiceModal" tabindex="-1" aria-labelledby="EditInvoiceModalLabel" aria-hidden="true">
@@ -413,6 +476,7 @@
         return {
           statements: [],
           tenants: [],
+          properties: [],
           months: [],
           collectedTotal: 0,
           expensesTotal: 0,
@@ -420,7 +484,7 @@
           selectedStatement: {}, // Initialize as an empty object
           currentMonth: '',
           form: {
-            water_bill : '',
+            water_bill : 0,
             rentMonth: '',
             pms_tenant_id: ''
           },
@@ -428,6 +492,10 @@
             water_bill: '',
             tenant: '',
             rentmonth: ''
+          },
+          bulkForm: {
+            pms_property_id: '',
+            rentMonth: ''
           },
           searchQuery: '',
           filteredTenants: [],
@@ -443,6 +511,44 @@
         navigateTo(location){
             this.$router.push(location)
         },
+        openBulkInvoiceModal() {
+          new bootstrap.Modal(
+            document.getElementById('bulkInvoiceModal')
+          ).show();
+        },
+        async bulkCreateInvoices() {
+          if (!this.bulkForm.pms_property_id || !this.bulkForm.rentMonth) {
+            toast.fire('Error', 'Property and rent month required', 'error');
+            return;
+          }
+
+          try {
+            const res = await axios.post(
+              '/api/pmsinvoices/bulk-create',
+              this.bulkForm
+            );
+
+            toast.fire(
+              'Success',
+              `${res.data.created} invoices created`,
+              'success'
+            );
+
+            // reload awaiting invoices
+            this.reloadLists();
+
+            bootstrap.Modal
+              .getInstance(document.getElementById('bulkInvoiceModal'))
+              .hide();
+
+          } catch (e) {
+            Swal.fire(
+              'Error',
+              e.response?.data?.message || 'Something went wrong',
+              'error'
+            );
+          }
+        },        
         createInvoice()
         {
           // Validate tenant
@@ -487,7 +593,7 @@
                 this.form.pms_tenant_id = '';
                 this.form.rentMonth = '';
                 this.form.water_bill = '';
-                this.loadLists();
+                this.reloadLists();
 
               });
 
@@ -515,7 +621,7 @@
             // Close the modal after invoicing
             const modal = bootstrap.Modal.getInstance(document.getElementById('EditInvoiceModal'));
             modal.hide();
-            this.loadLists()
+            this.reloadLists()
           }
         },
         saveEditInvoice() {
@@ -564,7 +670,7 @@
               'Invoice has been deleted.',
               'success'
             )
-            this.loadLists();
+            this.reloadLists();
             }).catch(() => {
               Swal.fire(
               'Failed!',
@@ -613,7 +719,7 @@
               response.data.message,
               'success'
             );
-            this.loadLists();
+            this.reloadLists();
           } catch (error) {
             console.error('Error generating statement:', error);
             // alert('Failed to generate monthly statement.');
@@ -624,7 +730,7 @@
 
         invoiceTenant(statement) {
           this.selectedStatement = statement;
-          this.form.water_bill = ''; // Reset the form field
+          this.form.water_bill = 0; // Reset the form field
           this.errors.water_bill = ''; // Reset the error message
           const modal = new bootstrap.Modal(document.getElementById('invoiceTenantModal'));
           modal.show();
@@ -676,7 +782,7 @@
                 // Reset form
                 this.form.water_bill = '';
                 this.form.cash = '';
-                this.loadLists();
+                this.reloadLists();
               });
           }
         },
@@ -1126,6 +1232,7 @@
             .then((response) => {
               this.statements = response.data.lists.allawaitinginvoicing;
               this.tenants = response.data.lists.pmstenants;
+              this.properties = response.data.lists.pmsproperties;
               this.filteredTenants = this.tenants;
               this.expenses = response.data.lists.pmsexpenses;
 
@@ -1138,7 +1245,24 @@
                   $("#AllStatementsTable").DataTable();
               }, 10);
             });
-        },        
+        },
+        reloadLists() {
+          this.isLoadingStatements = true;
+
+          axios.get('/api/lists')
+            .then((response) => {
+              this.statements = response.data.lists.allawaitinginvoicing;
+              this.tenants = response.data.lists.pmstenants;
+              this.properties = response.data.lists.pmsproperties;
+              this.filteredTenants = this.tenants;
+              this.expenses = response.data.lists.pmsexpenses;
+
+              this.totalAmountPaid = this.calculateTotalAmountPaid();
+            })
+            .finally(() => {
+              this.isLoadingStatements = false;
+            });
+        },                
         filterTenants() {
           const query = this.searchQuery.toLowerCase();
           this.filteredTenants = this.tenants.filter(tenant => {

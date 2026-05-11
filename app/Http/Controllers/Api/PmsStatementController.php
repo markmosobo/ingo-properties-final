@@ -546,7 +546,77 @@ class PmsStatementController extends Controller
         ], 200);
     }
 
+    public function bulkCreateInvoices(Request $request)
+    {
+        $request->validate([
+            'pms_property_id' => 'required|exists:pms_properties,id',
+            'rentMonth' => 'required|string'
+        ]);
 
+        $rentMonth = $request->rentMonth;
+        $propertyId = $request->pms_property_id;
+
+        // Get ACTIVE tenants in the property
+        // $tenants = PmsTenant::where('pms_property_id', $propertyId)
+        //     ->where('status', 1) // renting
+        //     ->with('unit')
+        //     ->get();
+        $tenants = PmsTenant::where('pms_property_id', $propertyId)
+            ->where('status', 1)
+            ->whereHas('unit')
+            ->get();
+
+
+        $created = 0;
+        $skipped = 0;
+
+        foreach ($tenants as $tenant) {
+
+            // Skip if invoice already exists
+            $exists = PmsStatement::where('pms_tenant_id', $tenant->id)
+                ->where('pms_unit_id', $tenant->pms_unit_id)
+                ->where('rent_month', $rentMonth)
+                ->exists();
+
+            if ($exists) {
+                $skipped++;
+                continue;
+            }
+
+            $now = now()->format('YmdHis');
+            $refNo = "INV{$now}{$tenant->id}";
+
+            $monthlyTotal =
+                $tenant->unit->monthly_rent +
+                $tenant->unit->garbage_fee +
+                $tenant->unit->security_fee;
+
+            PmsStatement::create([
+                'ref_no' => $refNo,
+                'pms_property_id' => $tenant->pms_property_id,
+                'pms_tenant_id' => $tenant->id,
+                'pms_unit_id' => $tenant->pms_unit_id,
+                'unit_number' => $tenant->unit->unit_number,
+                'details' => "Rent-{$tenant->unit->unit_number}-{$rentMonth}",
+                'rent_month' => $rentMonth,
+                'status' => 0,
+                'total' => $monthlyTotal,
+                'paid' => 0,
+                'balance' => $monthlyTotal,
+                'prev_arrears' => 0,
+                'overpayment' => 0,
+            ]);
+
+            $created++;
+        }
+
+        return response()->json([
+            'status' => true,
+            'created' => $created,
+            'skipped' => $skipped,
+            'message' => "Bulk invoicing completed"
+        ]);
+    }
  
     
 }

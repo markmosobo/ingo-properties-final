@@ -8,8 +8,19 @@
                   <div class="card top-selling overflow-auto">
       
                     <div class="card-body pb-0">
-                      <h5 class="card-title">Managed Properties <span>| Overview</span></h5>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                          Managed Properties <span>| Overview</span>
+                        </h5>
 
+                        <button
+                          class="btn btn-sm btn-success rounded-pill"
+                          @click="navigateTo('/add-pmsproperty')"
+                        >
+                          <i class="ri-add-circle-line me-1"></i>
+                          Add Property
+                        </button>
+                      </div>
                       <div v-if="loading" class="text-center py-5">
                         <div class="spinner-border text-success" role="status">
                           <span class="visually-hidden">Loading...</span>
@@ -65,20 +76,20 @@
     </template>
     
     <script>
-     import TheMaster from "@/components/dashboard/TheMaster.vue";
-     import axios from "axios";
-    import Swal from 'sweetalert2';
-    import "jquery/dist/jquery.min.js";
-    import "datatables.net-dt/js/dataTables.dataTables";
-    import "datatables.net-dt/css/jquery.dataTables.min.css";
-    import $ from "jquery";
-    
-    const toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-    });
+      import TheMaster from "@/components/dashboard/TheMaster.vue";
+      import axios from "axios";
+      import Swal from 'sweetalert2';
+      import "jquery/dist/jquery.min.js";
+      import "datatables.net-dt/js/dataTables.dataTables";
+      import "datatables.net-dt/css/jquery.dataTables.min.css";
+      import $ from "jquery";
+      
+      const toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000
+      });
     
     window.toast = toast;
     

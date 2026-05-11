@@ -52,7 +52,7 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">Invoices to Settle <span>| {{statements.length}} invoices to settle</span></h5>
+                      <h5 class="card-title">Unpaid/Partially Paid Invoices <span>| {{statements.length}} invoices to settle</span></h5>
                       <p class="card-text">
                         <div class="row">
                           <div class="col d-flex">
@@ -162,7 +162,7 @@
                                 Action
                               </button>
                               <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <a @click="navigateTo('/viewstatement/'+statement.id)" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Invoice</a>                                            
+                                <a @click="navigateTo('/viewstatement/'+statement.id)" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View Details</a>                                            
                                 <a v-if="statement.status == 0 && statement.water_bill == null" @click="invoiceTenant(statement.id)" class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Invoice</a>
                                 <a v-if="statement.status == 0 && statement.water_bill !== null" @click="settleTenant(statement)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle Invoice</a>
                                 <a @click="print(statement)" class="dropdown-item" href="#"><i class="ri-printer-line mr-2"></i>Print Invoice</a> 
@@ -187,79 +187,212 @@
                     <div class="modal fade" id="settleTenantModal" tabindex="-1" aria-labelledby="settleTenantModalLabel" aria-hidden="true">
                       <div class="modal-dialog">
                         <div class="modal-content">
+
+                          <!-- HEADER -->
                           <div class="modal-header">
                             <h5 class="modal-title" id="settleTenantModalLabel">Settle Invoice</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                           </div>
+
+                          <!-- BODY -->
                           <div class="modal-body">
-                            <p>#{{selectedStatement.ref_no}}</p>
+
+                            <!-- INVOICE SUMMARY -->
+                            <div class="alert alert-light border mb-3">
+                              <strong>Invoice:</strong> #{{ selectedStatement.ref_no }} <br>
+
+                              <strong>Status:</strong>
+                              <span v-if="selectedStatement && selectedStatement.paid >= selectedStatement.total" class="text-success">
+                                PAID
+                              </span>
+                              <span v-else class="text-warning">
+                                PENDING
+                              </span>
+                            </div>
+
                             <p v-if="selectedStatement && selectedStatement.tenant">
-                              <strong>Tenant Name:</strong> {{ selectedStatement.tenant.first_name }} {{ selectedStatement.tenant.last_name }}
+                              <strong>Tenant Name:</strong>
+                              {{ selectedStatement.tenant.first_name }} {{ selectedStatement.tenant.last_name }}
                             </p>
+
                             <p v-else>
                               <strong>Tenant Name:</strong> N/A
                             </p>
-                            <p v-if="selectedStatement">
-                              <div class="row">
-                                <div class="col-sm-6">
-                                 <strong>Amount Due:</strong> {{ formatNumber(selectedStatement.total) }}
-                                </div>
-                              </div>   
-                            </p>
-                            <p v-else>
-                              <strong>Amount Due:</strong> N/A
-                            </p>
-                            <label v-if="lastmonthBalance < 0" for="validationCustom04" class="form-label"
-                                ><span style="color: green;">Overpayment: <strong>KES {{lastmonthstatement.balance}}</strong></span>              
-                            </label>
 
-                            <label v-if="lastmonthstatement.balance > 0" for="validationCustom04" class="form-label"
-                              ><span style="color: red;">Last Month Arrears: <strong>KES {{lastmonthstatement.balance}}</strong></span></label
-                            >
-                            <p>
-                              <div class="row">
-                                <div class="col-sm-6">
-                                  <strong>Payment Method:</strong>
-                                  <select name="category" v-model="form.payment_method" class="form-select" id="payment-method-1">
-                                    <option value="0" disabled>Select Payment</option>
-                                    <option value="Mpesa" selected>MPESA</option>
-                                    <option value="Cash">Cash</option>
-                                    <option value="Bank">Bank Transfer</option>
-                                  </select>
-                                  <div v-if="errors.payment_method" class="text-danger">{{ errors.payment_method }}</div>
-                                </div>
-                                <div v-if="form.payment_method === 'Mpesa'" class="col-sm-6">
-                                  <strong>MPESA Code:</strong>
-                                  <input type="text" name="mpesa_code" v-model="form.mpesa_code" class="form-control">
-                                  <div v-if="errors.mpesa_code" class="text-danger">{{ errors.mpesa_code }}</div>
+                            <!-- FINANCIAL BREAKDOWN -->
+                            <div v-if="selectedStatement" class="row mb-3">
+
+                              <div class="col-sm-4">
+                                <small class="text-muted">Total</small>
+                                <div><strong>{{ formatNumber(selectedStatement.total) }}</strong></div>
+                              </div>
+
+                              <div class="col-sm-4">
+                                <small class="text-muted">Paid</small>
+                                <div class="text-success">
+                                  <strong>{{ formatNumber(selectedStatement.paid) }}</strong>
                                 </div>
                               </div>
-                            </p>
-                            <p>
-                              <div class="row">
-                                <div class="col-sm-6">
-                                  <strong>Amount Paid:</strong>
-                                  <input type="number" :disabled="!form.payment_method" name="cash" v-model="form.cash" class="form-control">
-                                  <div v-if="errors.cash" class="text-danger">{{ errors.cash }}</div>
+
+                              <div class="col-sm-4">
+                                <small class="text-muted">Balance</small>
+                                <div :class="selectedStatement.balance > 0 ? 'text-danger' : 'text-success'">
+                                  <strong>{{ formatNumber(selectedStatement.balance) }}</strong>
                                 </div>
-                                <div class="col-sm-6">
-                                  <strong>Balance</strong>
-                                  <h6 v-if="lastmonthBalance < 0">{{payableOverAmount}}</h6>
-                                  <h6 v-else>{{payableAmount}}</h6>
+                              </div>
+
+                            </div>
+
+                            <!-- LAST MONTH STATUS -->
+                            <label v-if="lastmonthBalance < 0" class="form-label">
+                              <span style="color: green;">
+                                Overpayment: <strong>KES {{ lastmonthstatement.balance }}</strong>
+                              </span>
+                            </label>
+
+                            <label v-if="lastmonthstatement.balance > 0" class="form-label">
+                              <span style="color: red;">
+                                Last Month Arrears: <strong>KES {{ lastmonthstatement.balance }}</strong>
+                              </span>
+                            </label>
+
+                            <!-- PAYMENT METHOD -->
+                            <div class="row">
+                              <div class="col-sm-6">
+
+                                <strong>Payment Method:</strong>
+
+                                <select
+                                  name="category"
+                                  v-model="form.payment_method"
+                                  class="form-select"
+                                  id="payment-method-1">
+
+                                  <option value="0" disabled>Select Payment</option>
+                                  <option value="Mpesa" selected>MPESA</option>
+                                  <option value="Cash">Cash</option>
+                                  <option value="Bank">Bank Transfer</option>
+
+                                </select>
+
+                                <small class="text-muted">
+                                  Select how the tenant is paying this invoice
+                                </small>
+
+                                <div v-if="errors.payment_method" class="text-danger">
+                                  {{ errors.payment_method }}
                                 </div>
-                              </div>    
+
+                              </div>
+
+                              <!-- MPESA CODE -->
+                              <div v-if="form.payment_method === 'Mpesa'" class="col-sm-6">
+
+                                <strong>MPESA Code:</strong>
+
+                                <input
+                                  type="text"
+                                  name="mpesa_code"
+                                  v-model="form.mpesa_code"
+                                  class="form-control"
+                                  placeholder="e.g. QKJ3X9L2">
+
+                                <small class="text-muted">
+                                  Optional but recommended for audit trail
+                                </small>
+
+                                <div v-if="errors.mpesa_code" class="text-danger">
+                                  {{ errors.mpesa_code }}
+                                </div>
+
+                              </div>
+                            </div>
+
+                            <!-- AMOUNT -->
+                            <div class="row mt-3">
+
+                              <div class="col-sm-6">
+
+                                <strong>Amount Paid:</strong>
+
+                                <input
+                                  type="number"
+                                  :disabled="!form.payment_method"
+                                  name="cash"
+                                  v-model="form.cash"
+                                  class="form-control">
+
+                                <small class="text-muted">
+                                  Suggested: {{ formatNumber(selectedStatement.balance) }}
+                                </small>
+
+                                <div v-if="errors.cash" class="text-danger">
+                                  {{ errors.cash }}
+                                </div>
+
+                                <!-- WARNING -->
+                                <div v-if="form.cash && form.cash != selectedStatement.balance"
+                                    class="alert alert-warning p-2 mt-2">
+                                  Amount differs from balance.
+                                </div>
+
+                              </div>
+
+                              <div class="col-sm-6">
+
+                                <strong>Balance Preview</strong>
+
+                                <h6 v-if="lastmonthBalance < 0">
+                                  {{ payableOverAmount }}
+                                </h6>
+
+                                <h6 v-else>
+                                  {{ payableAmount }}
+                                </h6>
+
+                              </div>
+
+                            </div>
+
+                            <!-- OVERPAYMENT ACTION -->
+                            <p v-if="lastmonthBalance < 0">
+                              <button
+                                @click.prevent="applyOverPayment"
+                                :disabled="!form.cash"
+                                class="btn btn-sm btn-outline-success mt-2">
+
+                                Apply Overpayment
+
+                              </button>
                             </p>
 
-                            <p>
-                              <button v-if="lastmonthBalance < 0" @click.prevent="applyOverPayment" :disabled="!form.cash">Apply Overpayment</button>
-                            </p>
-                            
+                            <!-- INFO FOOTER -->
+                            <small class="text-muted d-block mt-3">
+                              A receipt will be generated automatically after settlement.
+                            </small>
 
                           </div>
+
+                          <!-- FOOTER -->
                           <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-primary" @click.prevent="confirmSettleTenant">Settle Tenant</button>
+
+                            <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+                              Close
+                            </button>
+
+                            <button
+                              type="button"
+                              style="background-color: darkgreen; border-color: darkgreen;"
+                              class="btn btn-primary rounded-pill"
+                              :disabled="!form.cash || !form.payment_method"
+                              @click.prevent="confirmSettleTenant">
+
+                              Settle Tenant
+
+                            </button>
+
                           </div>
+
                         </div>
                       </div>
                     </div>
@@ -341,6 +474,7 @@
       data(){
         return {
           statements: [],
+          payments: [],
           awaitinginvoicing: [],
           invoicestosettlesmsnotsent: [],
           invoicestosettlesmssent: [],
@@ -634,69 +768,111 @@
           return receiptHTML;
         },
         async sendWhatsAppReminder(statement, event) {
-            // Prevent the default anchor behavior
-            event.preventDefault();
+          event.preventDefault();
 
-            this.unitId = statement.pms_unit_id;
-            this.rentMonth = statement.rent_month;
+          /* -------------------------------
+            Validate tenant phone number
+          --------------------------------*/
+          if (!statement.tenant || !statement.tenant.phone_number) {
+            Swal.fire({
+              title: 'Error Sending WhatsApp',
+              text: 'Please ensure the tenant has a valid phone number.',
+              icon: 'warning',
+            });
+            return;
+          }
 
-            // Ensure the tenant's phone number exists
-            if (!statement.tenant || !statement.tenant.phone_number) {
-                Swal.fire({
-                    title: 'Error sending WhatsApp',
-                    text: 'Please ensure ' + (statement.tenant ? statement.tenant.first_name : 'the tenant') + ' has a valid phone number',
-                    icon: 'warning',
-                });
-                return;
+          /* -------------------------------
+            Ensure payment methods exist
+          --------------------------------*/
+          if (!this.payments || !this.payments.length) {
+            Swal.fire({
+              title: 'Payment Methods Missing',
+              text: 'No payment methods have been configured.',
+              icon: 'warning',
+            });
+            return;
+          }
+
+          /* -------------------------------
+            Calculate due date
+          --------------------------------*/
+          const dueDate = this.calculateDueDate(statement.rent_month);
+
+          /* ------------------------------------
+            Build payment instructions (ALL)
+          -------------------------------------*/
+          let paymentInstructions = '';
+
+          this.payments.forEach((payment, index) => {
+            paymentInstructions += `${index + 1}. ${payment.name} – ${payment.method}\n`;
+
+            if (payment.method === 'MPESA Paybill') {
+              paymentInstructions +=
+                `   Paybill Number: ${payment.paybill_number}\n` +
+                `   Account Number: ${payment.account_number}\n`;
             }
 
-            // Check the property ID and get the relevant info
-            if (statement.pms_property_id == 5) {
-                this.accountNo = statement.unit.account_number;
-                this.paybillNo = statement.unit.paybill_number;
-            } else {
-                this.accountNo = statement.property.account_number;
-                this.paybillNo = statement.property.paybill_number;
+            if (payment.method === 'MPESA Till Number') {
+              paymentInstructions +=
+                `   Till Number: ${payment.till_number}\n`;
             }
 
-            // Calculate the due date (5th of the rent month)
-            this.dueDate = this.calculateDueDate(this.rentMonth);
-
-            // Prepare the message with a more professional format
-            const message = `Dear ${statement.tenant.first_name} ${statement.tenant.last_name},\n\n` +
-                `This is a kind reminder that your invoice for ${statement.rent_month}, Invoice No. ${statement.ref_no}, ` +
-                `which was generated on ${this.format_date(statement.created_at)}, is due on ${this.dueDate}.\n\n` +
-                `To service this invoice, please make your payment via M-Pesa Paybill Number: ${this.paybillNo},\n` +
-                `Account Number: ${this.accountNo}, for the amount of ${this.formatNumber(statement.total)}.\n\n` +
-                `Ingo Properties`;
-
-            // WhatsApp URL scheme with tenant's phone number and the encoded message
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=${statement.tenant.phone_number}&text=${encodeURIComponent(message)}`;
-
-            try {
-                // Open the WhatsApp URL in a new tab
-                window.open(whatsappUrl, '_blank');
-
-                // Increment the WhatsApp count in the pms_statements table
-                // await axios.post('/api/update-whatsapp-count', { 
-                //   id: statement.id,
-                //   tenantId: statement.tenant.id,
-                //   subject: this.rentMonth + ' Invoice Payment Reminder',
-                //   message: message,
-                //   });
-
-                toast.fire(
-                    'WhatsApp message sent to: ' + statement.tenant.phone_number,
-                    'WhatsApp message has been sent successfully.',
-                    'success'
-                );
-            } catch (error) {
-                Swal.fire({
-                    title: 'Error sending WhatsApp',
-                    text: error.response?.data?.message || error.message,
-                    icon: 'warning',
-                });
+            if (payment.method === 'Bank Transfer') {
+              paymentInstructions +=
+                `   Account Number: ${payment.account_number}\n`;
             }
+
+            paymentInstructions += `\n`;
+          });
+
+          /* ------------------------------------
+            WhatsApp message (PROFESSIONAL)
+          -------------------------------------*/
+          const message =
+        `Dear ${statement.tenant.first_name} ${statement.tenant.last_name},
+
+        We hope you are well.
+
+        This is a courteous reminder regarding your rent invoice for the month of ${statement.rent_month}.
+        Invoice Number: ${statement.ref_no}
+        Invoice Date: ${this.format_date(statement.created_at)}
+        Due Date: ${dueDate}
+
+        Amount Payable: KES ${this.formatNumber(statement.total)}
+
+        Kindly make payment using any of the following official Ingo Properties payment options:
+
+        ${paymentInstructions}
+        Once payment has been made, please share the confirmation for our records.
+
+        Should you have any questions or require clarification, please do not hesitate to contact us.
+
+        Warm regards,
+        Ingo Properties
+        Property Management Team`;
+
+          /* ------------------------------------
+            Open WhatsApp
+          -------------------------------------*/
+          const whatsappUrl =
+            `https://api.whatsapp.com/send?phone=${statement.tenant.phone_number}` +
+            `&text=${encodeURIComponent(message)}`;
+
+          window.open(whatsappUrl, '_blank');
+
+          /* ------------------------------------
+            Success feedback
+          -------------------------------------*/
+          toast.fire(
+            'WhatsApp Sent',
+            `Reminder sent successfully to ${statement.tenant.phone_number}`,
+            'success'
+          );
+        },
+        async loadPayments() {
+          const res = await axios.get('/api/lists/payments');
+          this.payments = res.data.payments;
         },
         calculateDueDate(rentMonth) {
           let dueDate = new Date(rentMonth);
@@ -726,7 +902,7 @@
               'Invoice has been deleted.',
               'success'
             )
-            this.loadLists();
+            this.reloadLists();
             }).catch(() => {
               Swal.fire(
               'Failed!',
@@ -763,7 +939,7 @@
             // Close the modal after invoicing
             const modal = bootstrap.Modal.getInstance(document.getElementById('EditInvoiceModal'));
             modal.hide();
-            this.loadLists()
+            this.reloadLists()
           }
         },
         saveEditInvoice() {
@@ -813,6 +989,13 @@
             this.balance = this.selectedStatement.balance;
             this.total = this.selectedStatement.total;
             this.unitNumber = this.selectedStatement.tenant.pms_unit_id;
+            this.propertyId = statement.pms_property_id;
+
+            if (this.propertyId) {
+              await this.getProperty(this.propertyId);
+              // make sure you assign a safe fallback
+              this.name = this.property?.name || statement.property?.name || 'N/A';
+            }
             this.getUnit(this.unitNumber);
             this.refNo = this.selectedStatement.ref_no;
             this.firstName = this.selectedStatement.tenant.first_name;
@@ -852,43 +1035,79 @@
           }
         },
         async confirmSettleTenant() {
-           // Validate amount
-          if (!this.form.cash) {
-            this.errors.cash = 'Amount paid is required.';
-            return;
-          }
-          if (this.selectedStatement && this.selectedStatement.id) {
-            // Implement your logic to invoice the tenant here
-            console.log("Settling tenant with statement ID:", this.selectedStatement.id);
-            await this.settleInvoice();
+          try {
 
-            // Open a new window for printing
-            const printWindow = window.open("", "_blank");
+            if (!this.form.cash) {
+              this.errors.cash = 'Amount paid is required.';
+              return;
+            }
 
-            // Build the content for printing
-            const receiptContent = this.buildReceiptContent();
+            if (this.selectedStatement && this.selectedStatement.id) {
 
-            // Write the content to the new window
-            printWindow.document.write(receiptContent);
+              console.log("Settling tenant with statement ID:", this.selectedStatement.id);
 
-            // Close the document stream
-            printWindow.document.close();
+              // 1. WAIT FOR BACKEND UPDATE FIRST
+              await this.settleInvoice();
 
-            // Trigger the print dialog
-            printWindow.print();
-            toast.fire(
+              // 2. OPEN PRINT WINDOW
+              const printWindow = window.open("", "_blank");
+
+              const receiptContent = this.buildReceiptContent();
+
+              printWindow.document.open();
+              printWindow.document.write(receiptContent);
+              printWindow.document.close();
+
+              // 3. WAIT FOR FULL RENDER
+              printWindow.onload = async () => {
+
+                try {
+                  const images = Array.from(printWindow.document.images);
+
+                  // 4. WAIT FOR IMAGE DECODING (CRITICAL FIX)
+                  await Promise.all(
+                    images.map(img => {
+                      if (img.decode) {
+                        return img.decode().catch(() => {});
+                      }
+                    })
+                  );
+
+                  // 5. FINAL PRINT
+                  setTimeout(() => {
+                    printWindow.focus();
+                    printWindow.print();
+                    printWindow.close();
+                  }, 200);
+
+                } catch (e) {
+                  console.warn("Print fallback triggered:", e);
+                  printWindow.print();
+                  printWindow.close();
+                }
+              };
+
+              toast.fire(
                 'Success!',
                 'Invoice updated!',
                 'success'
-            );
+              );
 
-            // Close the modal after invoicing
-            const modal = bootstrap.Modal.getInstance(document.getElementById('settleTenantModal'));
-            modal.hide();
-            //reset form
-            this.form.cash = '';
-            this.form.payment_method = 'Mpesa';
-            this.loadLists()
+              // 6. CLOSE MODAL
+              const modal = bootstrap.Modal.getInstance(
+                document.getElementById('settleTenantModal')
+              );
+              modal.hide();
+
+              // 7. RESET FORM
+              this.form.cash = '';
+              this.form.payment_method = 'Mpesa';
+
+              this.reloadLists();
+            }
+
+          } catch (error) {
+            console.error("Error in settlement:", error);
           }
         },
         settleInvoice() {
@@ -964,7 +1183,7 @@
             this.tenantId = statement.pms_tenant_id;
             this.propertyId = statement.pms_property_id;
             this.unitId = statement.pms_unit_id;
-              await this.getProperty(this.propertyId);              
+            await this.getProperty(this.propertyId);              
             this.refNo = statement.ref_no;
             this.details = statement.details;
             this.date = statement.created_at;
@@ -1034,350 +1253,516 @@
             };
         },
         buildPrintContent() {
-          // Determine whether to include the row
-          const showExpensesDeductionRow = this.expenses !== 0;
           const logoBase64 = this.logoBase64;
-          const watermarkText = 'INVOICE';
-          // Build the HTML content for the receipt
-          const receiptHTML = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Invoice Of Payment - ${this.refNo}</title>
-              <style>
-                body {
-                  font-family: Arial, sans-serif;
-                  margin: 0;
-                  padding: 0;
-                  background-color: #f5f5f5;
-                }
-                .receipt {
-                  max-width: 600px;
-                  margin: 20px auto;
-                  padding: 20px;
-                  background-color: #fff;
-                  border: 2px solid #ccc;
-                  display: flex;
-                  flex-direction: column;
-                }
-                 .watermark {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%) rotate(-45deg);
-                    font-size: 80px;
-                    color: rgba(0, 0, 0, 0.1); /* Adjust the transparency as needed */
-                    white-space: nowrap;
-                    z-index: 0;
-                    pointer-events: none; /* Prevents watermark from interfering with other elements */
-                  }
-                .receipt-header {
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  margin-bottom: 50px;
-                }
-                .company-info {
-                  text-align: left;
-                }
-                .company-info img {
-                  max-width: 150px;
-                  height: auto;
-                }
-                .receipt-info {
-                  margin-bottom: 50px;
-                }
-                .receipt-info p {
-                  margin: 5px 0;
-                  color: #555;
-                }
-                 .additional-info {
-                  margin-bottom: 30px;
-                  font-size: 16px;
-                  color: #333333;
-                }
-                .additional-info p {
-                  margin: 8px 0;
-                }
-                .payment-info {
-                  margin-bottom: 30px;
-                  font-size: 16px;
-                  color: #333333;
-                  text-align: center;
-                }
-                .payment-info p {
-                  margin: 8px 0;
-                }
-                .receipt-table {
-                  width: 100%;
-                  border-collapse: collapse;
-                  margin-bottom: 50px;
-                }
-                .receipt-table th, .receipt-table td {
-                  padding: 8px;
-                  border-bottom: 1px solid #ccc;
-                }
-                .receipt-table th {
-                  text-align: left;
-                  background-color: #f2f2f2;
-                  color: #333;
-                }
-                .receipt-table td {
-                  text-align: left;
-                  color: #666;
-                }
-                .receipt-footer {
-                  text-align: center;
-                  margin-top: auto;
-                }
-                .receipt-footer p {
-                  margin: 5px 0;
-                  color: #777;
-                }
-              </style>
-            </head>
-            <body>
-            <div class="watermark">${watermarkText}</div>
-              <div class="receipt">
-                <div class="receipt-header">
-                  <div class="company-logo">
-                    <img src="${logoBase64}" alt="Company Logo" style="max-width: 150px; height: auto;">
-                  </div>
-                  <div class="company-info">
-                    <p>Cosyard Business Center, Kakamega.</p>
-                    <p>Phone: (0759) 509-462 </p>
-                    <p> Email: ingoproperties@gmail.com</p>
-                    <p> Website: www.ingoproperties.co.ke</p>
-                  </div>
-                </div>
-                <div class="receipt-info">
-                  <p><strong>#${this.refNo}</strong></p>
-                  <p><strong>Rent Month:</strong> ${this.rentInvoiceMonth}</p>
-                  <p><strong>Invoice Date:</strong> ${this.format_date(this.invoiceDate ?? 'N/A')}</p>
-                  <p><strong>Due Date:</strong>  ${this.convertDate(this.dueDate ?? 'N/A')}</p>
-                  
-                </div>
-                <div class="additional-info">
-                    <p><strong>Invoiced To</strong></p>
-                    <p><strong></strong> ${this.tenant}</p>
-                    <p><strong></strong> ${this.name}</p>
-                    <p><strong></strong> ${this.details}</p>
-                </div>
-                <table class="receipt-table">
-                  <thead>
-                    <tr>
-                      <th>Description</th>
-                      <th>Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Total Rent Due (Incl. Water Bill)</td>
-                      <td>KES ${this.formatNumber(this.total)}</td>
-                    </tr>
-                    <tr>
-                      <td>Total Amount Paid</td>
-                      <td>KES ${this.formatNumber(this.paid)}</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <th>Total Balance:</th>
-                      <td>KES ${this.formatNumber(this.balance)}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-                <div class="payment-info">
-                  <p><strong>Payment Options:</strong></p>
-                  <p>Pay via MPESA : Till Number - 8788932 </p>
-                </div>
-                <div class="receipt-footer">
-                  <p>Generated on ${new Date().toLocaleString()}</p>
-                </div>
-              </div>
-            </body>
-            </html>
-          `;
 
-          return receiptHTML;
-        },
-        printReceipt() {
-          this.submit().then(() => {
-              // Continue with the rest of the function after submit completes
-              // this.$router.push('/statements');
-              this.$router.go(-1);
+          /* ------------------------------------
+            Build Payment Methods Dynamically
+          -------------------------------------*/
+          let paymentMethodsHTML = '';
 
-              // Open a new window for printing
-              const printWindow = window.open("", "_blank");
+          this.payments.forEach((payment, index) => {
+            paymentMethodsHTML += `
+              <div style="margin-bottom: 12px;">
+                <strong>${index + 1}. ${payment.name}</strong> (${payment.method})<br>
+            `;
 
-              // Build the content for printing
-              const receiptContent = this.buildReceiptContent();
+            if (payment.method === 'MPESA Paybill') {
+              paymentMethodsHTML += `
+                Paybill Number: <strong>${payment.paybill_number}</strong><br>
+                Account Number: <strong>${payment.account_number}</strong><br>
+              `;
+            }
 
-              // Write the content to the new window
-              printWindow.document.write(receiptContent);
+            if (payment.method === 'MPESA Till Number') {
+              paymentMethodsHTML += `
+                Till Number: <strong>${payment.till_number}</strong><br>
+              `;
+            }
 
-              // Close the document stream
-              printWindow.document.close();
+            if (payment.method === 'Bank Transfer') {
+              paymentMethodsHTML += `
+                Bank Account: <strong>${payment.account_number}</strong><br>
+              `;
+            }
 
-              // Trigger the print dialog
-              printWindow.print();
-              toast.fire(
-                  'Success!',
-                  'Invoice updated!',
-                  'success'
-              );
-          }).catch(error => {
-              console.error("Error during submission:", error);
-              // Handle error if needed
+            paymentMethodsHTML += `</div>`;
           });
-        },
 
-        buildReceiptContent(refNo) {
-         // Determine whether to include the row
-          const showGarbageFeeRow = this.unitGarbageFee !== 0;
-          const showSecurityFeeRow = this.unitSecurityFee !== 0;
-          const showWaterBillRow = this.waterBillAmount > 0;
-          // Build the HTML content for the receipt
+          /* ------------------------------------
+            HTML Template
+          -------------------------------------*/
           const receiptHTML = `
           <!DOCTYPE html>
           <html lang="en">
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Receipt Of Payment</title>
+            <title>Rent Invoice - ${this.refNo}</title>
+
             <style>
               body {
-                font-family: Arial, sans-serif;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 margin: 0;
                 padding: 0;
-                background-color: #f5f5f5;
-              }
-              .receipt {
-                max-width: 600px;
-                margin: 20px auto;
-                padding: 20px;
-                background-color: #fff;
-                border: 2px solid #ccc;
-                border-radius: 10px;
-              }
-              .receipt-header {
-                text-align: center;
-                margin-bottom: 20px;
-              }
-              .receipt-header h1 {
-                margin: 10px 0;
+                background-color: #f4f4f4;
                 color: #333;
               }
-              .receipt-info {
-                margin-bottom: 20px;
+
+              .receipt {
+                max-width: 750px;
+                margin: 20px auto;
+                padding: 25px;
+                background-color: #fff;
+                border-radius: 10px;
+                box-shadow: 0 0 15px rgba(0,0,0,0.1);
+                position: relative;
               }
-              .receipt-info p {
-                margin: 5px 0;
-                color: #555;
+
+              .watermark {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-45deg);
+                font-size: 75px;
+                color: rgba(0,0,0,0.06);
+                pointer-events: none;
               }
-              .receipt-table {
+
+              .header {
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 2px solid #e0e0e0;
+                padding-bottom: 15px;
+                margin-bottom: 25px;
+              }
+
+              .logo img {
+                max-width: 150px;
+              }
+
+              .company {
+                text-align: right;
+                font-size: 0.95rem;
+                line-height: 1.5;
+              }
+
+              .info p {
+                margin: 4px 0;
+                font-size: 0.95rem;
+              }
+
+              .section-title {
+                font-weight: 600;
+                margin-top: 20px;
+                margin-bottom: 10px;
+                font-size: 1rem;
+              }
+
+              .table {
                 width: 100%;
                 border-collapse: collapse;
-                margin-bottom: 20px;
+                margin-top: 10px;
               }
-              .receipt-table th, .receipt-table td {
-                padding: 8px;
-                border-bottom: 1px solid #ccc;
+
+              .table th, .table td {
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
               }
-              .receipt-table th {
+
+              .table th {
+                background: #f9f9f9;
                 text-align: left;
-                background-color: #f2f2f2;
-                color: #333;
               }
-              .receipt-table td {
-                text-align: left;
-                color: #666;
+
+              .payment-box {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f9f9f9;
+                border-radius: 6px;
               }
-              .receipt-footer {
+
+              .footer {
                 text-align: center;
-              }
-              .receipt-footer p {
-                margin: 5px 0;
+                margin-top: 25px;
+                font-size: 0.85rem;
                 color: #777;
               }
             </style>
           </head>
-          <body>
-            <img src="@/assets/img/apex-logo.png" alt="Company Logo" style="display: block; margin: 0 auto; max-width: 100%;">
 
+          <body>
             <div class="receipt">
-              <div class="receipt-header">
-                <h1>Ingo Properties</h1>
-                <p>Cosyard Business Center Kakamega-Mumias Rd, Kakamega</p>
-                <p>Phone: (0759) 509-462 | Email: ingoproperties@gmail.com</p>
+              <div class="watermark">INVOICE</div>
+
+              <!-- HEADER -->
+              <div class="header">
+                <div class="logo">
+                  <img src="${logoBase64}" />
+                </div>
+
+                <div class="company">
+                  <strong>Ingo Properties</strong><br>
+                  Cosyard Business Center<br>
+                  Kakamega – Mumias Road<br>
+                  0759 509 462<br>
+                  ingoproperties@gmail.com
+                </div>
               </div>
-              <div class="receipt-info">
-                <p><strong>#${this.refNo}</strong> </p>
-                <p><strong>Receipt Date:</strong> ${new Date().toLocaleString('en-GB')}</p>
-                <p><strong>Tenant:</strong> ${this.tenant}</p>
-                <p><strong>Payment Mode:</strong> ${this.form.payment_method}</p>
+
+              <!-- INVOICE INFO -->
+              <div class="info">
+                <p><strong>Invoice No:</strong> ${this.refNo}</p>
+                <p><strong>Rent Month:</strong> ${this.rentInvoiceMonth}</p>
+                <p><strong>Invoice Date:</strong> ${this.format_date(this.invoiceDate ?? 'N/A')}</p>
+                <p><strong>Due Date:</strong> ${this.convertDate(this.dueDate ?? 'N/A')}</p>
+                <p><strong>Status:</strong> ${this.paymentMethod}</p>
               </div>
-              <table class="receipt-table">
+
+              <!-- TENANT -->
+              <div class="section-title">Invoiced To</div>
+              <div class="info">
+                <p>${this.tenant}</p>
+                <p>${this.name}</p>
+                <p>${this.details}</p>
+              </div>
+
+              <!-- CHARGES -->
+              <table class="table">
                 <thead>
                   <tr>
                     <th>Description</th>
                     <th>Amount</th>
                   </tr>
                 </thead>
+
+                <tbody>
+                  <tr>
+                    <td>Total Rent (Incl. Water)</td>
+                    <td>KES ${this.formatNumber(this.total)}</td>
+                  </tr>
+
+                  <tr>
+                    <td>Total Paid</td>
+                    <td>KES ${this.formatNumber(this.paid)}</td>
+                  </tr>
+                </tbody>
+
+                <tfoot>
+                  <tr>
+                    <th>Balance Due</th>
+                    <th>KES ${this.formatNumber(this.balance)}</th>
+                  </tr>
+                </tfoot>
+              </table>
+
+              <!-- PAYMENT METHODS -->
+              <div class="payment-box">
+                <strong>Payment Options (Pay to Ingo Properties):</strong>
+                <br><br>
+                ${paymentMethodsHTML}
+              </div>
+
+              <!-- FOOTER -->
+              <div class="footer">
+                Generated on ${new Date().toLocaleString()}
+              </div>
+
+            </div>
+          </body>
+          </html>
+          `;
+
+          return receiptHTML;
+        },
+        printReceipt() {
+          this.submit()
+            .then(() => {
+
+              this.$router.go(-1);
+
+              const printWindow = window.open("", "_blank");
+
+              const receiptContent = this.buildReceiptContent();
+
+              printWindow.document.open();
+              printWindow.document.write(receiptContent);
+              printWindow.document.close();
+
+              // Wait for full DOM load
+              printWindow.onload = () => {
+
+                const images = printWindow.document.images;
+                let loaded = 0;
+
+                // If no images, print immediately
+                if (images.length === 0) {
+                  printWindow.focus();
+                  printWindow.print();
+                  printWindow.close();
+                  return;
+                }
+
+                // Track image loading
+                for (let img of images) {
+
+                  img.onload = () => {
+                    loaded++;
+
+                    if (loaded === images.length) {
+                      setTimeout(() => {
+                        printWindow.focus();
+                        printWindow.print();
+                        printWindow.close();
+                      }, 200); // small buffer for rendering stability
+                    }
+                  };
+
+                  // If already cached
+                  if (img.complete) {
+                    loaded++;
+                  }
+                }
+
+                // Safety fallback (in case some images don't trigger onload)
+                setTimeout(() => {
+                  if (loaded >= images.length) {
+                    printWindow.focus();
+                    printWindow.print();
+                    printWindow.close();
+                  }
+                }, 1500);
+
+              };
+
+              toast.fire(
+                'Success!',
+                'Receipt generated successfully!',
+                'success'
+              );
+
+            })
+            .catch(error => {
+              console.error("Error during submission:", error);
+            });
+        },
+
+        buildReceiptContent() {
+          const logoBase64 = this.logoBase64;
+
+          const showGarbageFeeRow = this.unitGarbageFee !== 0;
+          const showSecurityFeeRow = this.unitSecurityFee !== 0;
+          const showWaterBillRow = this.waterBillAmount > 0;
+
+          const isFullyPaid = this.balAmount <= 0;
+
+          const receiptHTML = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Payment Receipt - ${this.refNo}</title>
+
+            <style>
+              body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+                color: #333;
+              }
+
+              .receipt {
+                max-width: 750px;
+                margin: 20px auto;
+                padding: 25px;
+                background-color: #fff;
+                border-radius: 10px;
+                box-shadow: 0 0 15px rgba(0,0,0,0.1);
+                position: relative;
+              }
+
+              .watermark {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-45deg);
+                font-size: 70px;
+                color: rgba(0,0,0,0.05);
+                pointer-events: none;
+                white-space: nowrap;
+              }
+
+              .receipt-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 2px solid #e0e0e0;
+                padding-bottom: 15px;
+                margin-bottom: 25px;
+              }
+
+              .logo img {
+                max-width: 150px;
+              }
+
+              .company {
+                text-align: right;
+                font-size: 0.9rem;
+                line-height: 1.5;
+              }
+
+              .info p {
+                margin: 4px 0;
+                font-size: 0.95rem;
+              }
+
+              .section-title {
+                font-weight: 600;
+                margin: 20px 0 10px;
+                font-size: 1rem;
+              }
+
+              .table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+              }
+
+              .table th, .table td {
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+              }
+
+              .table th {
+                background: #f9f9f9;
+                text-align: left;
+              }
+
+              .payment-highlight {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f9f9f9;
+                border-radius: 8px;
+                font-size: 0.95rem;
+              }
+
+              .status {
+                font-weight: bold;
+                color: ${isFullyPaid ? 'green' : 'orange'};
+              }
+
+              .footer {
+                text-align: center;
+                margin-top: 25px;
+                font-size: 0.85rem;
+                color: #777;
+              }
+            </style>
+          </head>
+
+          <body>
+
+            <div class="receipt">
+              <div class="watermark">RECEIPT</div>
+
+              <!-- HEADER -->
+              <div class="receipt-header">
+                <div class="logo">
+                  <img src="${logoBase64}" />
+                </div>
+
+                <div class="company">
+                  <strong>Ingo Properties</strong><br>
+                  Cosyard Business Center<br>
+                  Kakamega – Mumias Road<br>
+                  0759 509 462<br>
+                  ingoproperties@gmail.com
+                </div>
+              </div>
+
+              <!-- RECEIPT INFO -->
+              <div class="info">
+                <p><strong>Receipt No:</strong> ${this.refNo}</p>
+                <p><strong>Type:</strong> Tenant Payment Receipt</p>
+                <p><strong>Date:</strong> ${new Date().toLocaleString('en-GB')}</p>
+                <p><strong>Tenant:</strong> ${this.tenant}</p>
+                <p><strong>Property:</strong> ${this.name}</p>
+                <p><strong>Unit:</strong> ${this.unitName || this.unitNumber}</p>
+                <p><strong>Payment Method:</strong> ${this.form.payment_method || 'Cash / M-PESA'}</p>
+                <p><strong>Status:</strong> 
+                  <span class="status">
+                    ${isFullyPaid ? 'FULLY PAID' : 'PARTIALLY PAID'}
+                  </span>
+                </p>
+              </div>
+
+              <!-- BREAKDOWN -->
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+
                 <tbody>
                   <tr>
                     <td>Rent Payment</td>
                     <td>KES ${this.formatNumber(this.unitRent)}</td>
                   </tr>
-                  <!-- Conditionally include water bill row -->
+
                   ${showWaterBillRow ? `
                   <tr>
                     <td>Water Bill</td>
                     <td>KES ${this.formatNumber(this.waterBillAmount)}</td>
-                  </tr>
-                  ` : ''}
-                  <!-- Conditionally include garbage collection fee row -->
+                  </tr>` : ''}
+
                   ${showGarbageFeeRow ? `
                   <tr>
                     <td>Garbage Collection Fee</td>
                     <td>KES ${this.formatNumber(this.unitGarbageFee)}</td>
-                  </tr>
-                  ` : ''}
-                  </tr>
-                  <!-- Conditionally include security fee row -->
+                  </tr>` : ''}
+
                   ${showSecurityFeeRow ? `
                   <tr>
                     <td>Security Fee</td>
                     <td>KES ${this.formatNumber(this.unitSecurityFee)}</td>
-                  </tr>
-                  ` : ''}
+                  </tr>` : ''}
                 </tbody>
+
                 <tfoot>
                   <tr>
-                    <th>Total Amount Due:</th>
-                    <td>KES ${this.formatNumber(this.total)}</td>
+                    <th>Total Amount</th>
+                    <th>KES ${this.formatNumber(this.total)}</th>
                   </tr>
                   <tr>
-                    <th>Amount Paid:</th>
-                    <td>KES ${this.formatNumber(this.amountPaid)}</td>
+                    <th>Amount Paid</th>
+                    <th>KES ${this.formatNumber(this.amountPaid)}</th>
                   </tr>
                   <tr>
-                    <th>Balance:</th>
-                    <td>KES ${this.formatNumber(this.balAmount)}</td>
+                    <th>Outstanding Balance</th>
+                    <th>KES ${this.formatNumber(this.balAmount)}</th>
                   </tr>
                 </tfoot>
               </table>
-              <div class="receipt-footer">
-                <p>You were served by ${this.user.first_name} ${this.user.last_name}.Thank you for your payment.</p>
-                <p>This receipt acknowledges the payment received for the above property management services.</p>
+
+              <!-- PAYMENT NOTE -->
+              <div class="payment-highlight">
+                Payment has been applied to rent and associated charges for this billing period.
               </div>
+
+              <!-- AUDIT FOOTER -->
+              <div class="footer">
+                Prepared by: ${this.user.first_name} ${this.user.last_name} <br>
+                Generated At: ${new Date().toLocaleString('en-GB', { hour12: false })} <br><br>
+                This is a computer-generated receipt and does not require a signature.
+              </div>
+
             </div>
+
           </body>
           </html>
-
-
           `;
 
           return receiptHTML;
@@ -1867,13 +2252,13 @@
         loadLists() {
           this.isLoadingStatements = true; // 👈 start spinner
 
-          axios.get('api/lists')
+          axios.get('api/lists/invoices-to-settle')
             .then((response) => {
-              this.statements = response.data.lists.invoicestosettle;
-              this.awaitinginvoicing = response.data.lists.awaitinginvoicing;
-              this.invoicestosettlesmsnotsent = response.data.lists.invoicestosettlesmsnotsent;
-              this.invoicestosettlesmssent = response.data.lists.invoicestosettlesmssent;
-              this.expenses = response.data.lists.pmsexpenses;
+              this.statements = response.data.invoicestosettle;
+              this.awaitinginvoicing = response.data.awaitinginvoicing;
+              this.invoicestosettlesmsnotsent = response.data.invoicestosettlesmsnotsent;
+              this.invoicestosettlesmssent = response.data.invoicestosettlesmssent;
+              this.expenses = response.data.pmsexpenses;
 
               this.totalAmountPaid = this.calculateTotalAmountPaid();
 
@@ -1887,7 +2272,28 @@
             .finally(() => {
               this.isLoadingStatements = false; // 👈 stop spinner
             });
-        },        
+        }, 
+        reloadLists() {
+          this.isLoadingStatements = true; // 👈 start spinner
+
+          axios.get('api/lists/invoices-to-settle')
+            .then((response) => {
+              this.statements = response.data.invoicestosettle;
+              this.awaitinginvoicing = response.data.awaitinginvoicing;
+              this.invoicestosettlesmsnotsent = response.data.invoicestosettlesmsnotsent;
+              this.invoicestosettlesmssent = response.data.invoicestosettlesmssent;
+              this.expenses = response.data.pmsexpenses;
+
+              this.totalAmountPaid = this.calculateTotalAmountPaid();
+
+            })
+            .catch((error) => {
+              console.error(error);
+            })
+            .finally(() => {
+              this.isLoadingStatements = false; // 👈 stop spinner
+            });
+        },                
         calculateTotalAmountPaid() {
         if (!this.expenses || this.expenses.length === 0) {
               return 0; // If expenses data is empty or undefined, return 0
@@ -1937,6 +2343,7 @@
       },      
       mounted(){
         this.loadLists();
+        this.loadPayments();
         this.loadLogo();                        
         // this.loginUwazii();
         this.formattedDate = this.getFormattedDate();

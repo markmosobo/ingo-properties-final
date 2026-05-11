@@ -108,6 +108,9 @@ Route::get('lists/roles', [ListController::class, 'roles']);
 Route::get('lists/abouts', [ListController::class, 'abouts']);
 Route::get('lists/testimonials', [ListController::class, 'testimonials']);
 
+Route::get('lists/payments', [ListController::class, 'payments']);
+Route::get('lists/invoices-to-settle', [ListController::class, 'invoicesToSettle']);
+
 
 Route::get('property/{id}', [PropertyController::class, 'single']);
 Route::get('category/{id}', [CategoryController::class, 'single']);
@@ -307,3 +310,8 @@ Route::post('/send-custom-mail', [PmsInvoiceController::class, 'sendCustomMail']
 //attach documents
 Route::post('/landlords/upload-document', [LandlordController::class, 'attachDocument']);
 Route::post('/users/upload-document', [UserController::class, 'attachDocument']);
+
+Route::post(
+  '/pmsinvoices/bulk-create',
+  [PmsStatementController::class, 'bulkCreateInvoices']
+);

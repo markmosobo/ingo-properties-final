@@ -530,6 +530,34 @@ class ListController extends Controller
             'testimonials' => $testimonials,
             'defaultPassword' => $defaultPassword,
         ]);
+    } 
+    
+    public function payments()
+    {
+
+        $payments = Payment::latest()->get();
+
+        return response()->json([
+            'payments' => $payments,
+        ]);
+    }
+    
+    public function invoicesToSettle()
+    {
+
+        $invoicestosettle = PmsStatement::latest()->whereNotNull('water_bill')->where('status',0)->with('property','tenant','unit')->get();
+        $invoicestosettlesmsnotsent = PmsStatement::latest()->whereNotNull('water_bill')->where('status',0)->where('sms_status', 0)->with('property','tenant','unit')->get();
+        $invoicestosettlesmssent = PmsStatement::latest()->whereNotNull('water_bill')->where('status',0)->where('sms_status', 1)->with('property','tenant','unit')->get();
+        $pmsexpenses = PmsExpense::with('user')->get();
+        $awaitinginvoicing = PmsStatement::latest()->where('water_bill', null)->where('status',0)->with('property','tenant','unit')->whereMonth('created_at', Carbon::now()->month)->get();
+
+        return response()->json([
+            'invoicestosettle' => $invoicestosettle,
+            'invoicestosettlesmsnotsent' => $invoicestosettlesmsnotsent,
+            'invoicestosettlesmssent' => $invoicestosettlesmssent,
+            'pmsexpenses' => $pmsexpenses,
+            'awaitinginvoicing' => $awaitinginvoicing,
+        ]);
     }    
 
 }
