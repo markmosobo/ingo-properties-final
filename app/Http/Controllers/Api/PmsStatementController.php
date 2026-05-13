@@ -16,40 +16,39 @@ class PmsStatementController extends Controller
 {
     public function store(Request $request)
     {
-            $startOfMonth = Carbon::now()->startOfMonth();
-            $formattedDate = $startOfMonth->format('M Y');
-            $orgDate = now();
-            $date = str_replace('-"', '/', $orgDate);
-            $newDate = date("YmdHis", strtotime($date));
-            $refno = "INV".$newDate." ".$request->unit_number." Rent+Deposit @".$request->total;
-            if($request->balance <= 0)
-            {
-                $payStatus = 1;
-            }
-            else
-            {
-                $payStatus = 0;
-            } // }
-            $pmsstatement = PmsStatement::create([
-                'ref_no' => $refno,
-                'pms_property_id' => $request->pms_property_id,
-                'pms_tenant_id' => $request->pms_tenant_id,
-                'details' => "Rent+Deposit - ".$request->unit_number."-".$formattedDate,
-                'total' => $request->total,
-                'paid' => $request->paid,
-                'balance' => $request->balance,
-                'status' => 0,
-                'payment_method' => $request->payment_method,
-                'water_bill' => 0                              
-            ]);
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $formattedDate = $startOfMonth->format('M Y');
 
-            return response()->json([
-                'status' => true,
-                'message' => "Statement Created successfully!",
-                'pmsstatement' => $pmsstatement
-            ], 200);
+        $orgDate = now();
+        $date = str_replace('-"', '/', $orgDate);
+        $newDate = date("YmdHis", strtotime($date));
 
-            
+        $refno = "INV".$newDate." ".$request->unit_number." Rent+Deposit @".$request->total;
+
+        // ✅ FIX: determine payment status properly
+        $payStatus = ($request->balance <= 0) ? 1 : 0;
+
+        $pmsstatement = PmsStatement::create([
+            'ref_no' => $refno,
+            'pms_property_id' => $request->pms_property_id,
+            'pms_tenant_id' => $request->pms_tenant_id,
+            'details' => "Rent+Deposit - ".$request->unit_number."-".$formattedDate,
+            'total' => $request->total,
+            'paid' => $request->paid,
+            'balance' => $request->balance,
+
+            // ✅ THIS is what was missing
+            'status' => $payStatus,
+
+            'payment_method' => $request->payment_method,
+            'water_bill' => 0
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => "Statement Created successfully!",
+            'pmsstatement' => $pmsstatement
+        ], 200);
     }
 
     public function update(Request $request, $id)

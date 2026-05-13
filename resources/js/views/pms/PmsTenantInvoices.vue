@@ -3,311 +3,188 @@
         <section class="section dashboard">
           <div class="row">
     
-                <!-- Top Selling -->
-                <div class="col-12">
-                  <div class="card top-selling overflow-auto">
-    
-                    <div class="filter">
-                      <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                        <li class="dropdown-header text-start">
-                          <h6>Filter</h6>
-                        </li>
-    
-                        <li>
-                            <router-link :to="`/pmstenantinvoices/${tenantId}`" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            This Month</a>
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link :to="`/pmslastmonthtenantinvoices/${tenantId}`" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            Last Month</a>
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link :to="`/pmslastninetytenantinvoices/${tenantId}`" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            Last 90 Days</a>
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link :to="`/pmsquartertenantinvoices/${tenantId}`" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            This Quarter</a>
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link :to="`/pmsyeartenantinvoices/${tenantId}`" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            This Year</a>
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link :to="`/pmslastyeartenantinvoices/${tenantId}`" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            Last Year</a>
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link :to="`/pmsalltenantinvoices/${tenantId}`" custom v-slot="{ href, navigate, isActive }">
-                            <a
-                                :href="href"
-                                :class="{ active: isActive }"
-                                class="dropdown-item"
-                                @click="navigate"
-                            >
-                            All Time</a>
-                            </router-link>
-                        </li>
+            <!-- Top Selling / Property Statements -->
+            <div class="col-12">
+              <div class="card top-selling overflow-auto">
 
-                      </ul>
-                    </div>
-    
-                    <div class="card-body pb-0">
-                      <h5 class="card-title">{{tenantName}}'s Invoices <span>| This Month</span></h5>
-                      <p class="card-text">
-                   
-                          <!-- <button v-if="statements.length !== 0" @click="generatePDF">Generate PDF</button> -->
-                          <div class="row">
-                        <div class="col d-flex">
-                          <button class="me-2" v-if="statements.length !== 0" @click="exportToExcel">Export</button>
-                          <button v-if="statements.length !== 0" @click="printInvoice" class="me-2">Print Invoice</button>
-                          <button v-if="statements.length !== 0" @click="generatePDF">Generate Rent Statement</button>
-                        </div>
-                        <div class="col-auto d-flex justify-content-end">
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupDrop1" type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <i class="ri-add-line"></i>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                              
-                                  <a @click="navigateTo('/pmsproperties' )" class="dropdown-item" href="#"><i class="ri-building-fill mr-2"></i>Properties</a>
-                                  <a @click="navigateTo('/pmstenants' )" class="dropdown-item" href="#"><i class="ri-user-fill mr-2"></i>Tenants</a>
-                                  <a @click="navigateTo('/pmslandlords' )" class="dropdown-item" href="#"><i class="ri-user-fill mr-2"></i>Landlords</a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-            
-                      </p>
-    
-                      <table id="AllStatementsTable" class="table table-borderless">
-                        <thead>
-                          <tr>
-                            <th scope="col">Invoice</th>
-                            <th scope="col">Property</th>                            
-                            <th scope="col">Detail</th>
-                            <th scope="col">Due</th>
-                            <th scope="col">Paid</th>
-                            <th scope="col">Bal</th>
-                            <th scope="col">Date Paid</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr v-for="statement in statements" :key="statement.id">
-                            <td>{{statement.ref_no}}</td>
-                            <td>{{statement.property.name}}</td>                            
-                            <td>{{statement.details}}</td>
-                            <td>{{formatNumber(statement.total)}}</td>
-                            <td>{{formatNumber(statement.paid)}}</td>
-                            <td>{{formatNumber(statement.balance)}}</td>
-                            <td>{{format_date(statement.paid_at ?? "N/A")}}</td>
-                            <td>
-                              <span v-if="statement.status == 0 && statement.water_bill == null" class="badge bg-info text-dark"><i class="bi bi-clipboard2-x"></i> Not Invoiced</span>
-                              <span v-else-if="statement.status == 1" class="badge bg-success"><i class="bi bi-clipboard2-check"></i> Settled</span>
-                              <span v-else-if="statement.status == 0 && statement.water_bill !== null" class="badge bg-warning text-dark"><i class="bi bi-clipboard2-x"></i> Not Settled</span>
-                              <span v-else class="badge bg-dark text-light"><i class="bi bi-exclamation-triangle me-1"></i> Vacant</span>
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                  <button id="btnGroupDrop1" type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-sm btn-primary rounded-pill dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  Action
-                                  </button>
-                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                  <a @click="navigateTo('/viewinvoice/'+statement.id )" class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a> 
-                                  <a @click="print(statement)" class="dropdown-item" href="#"><i class="ri-printer-line mr-2"></i>Print</a>
-                                  <a v-if="statement.status == 0 && statement.water_bill == null" @click="invoiceTenant(statement)" class="dropdown-item" href="#"><i class="ri-bill-line mr-2"></i>Invoice</a>
-                                  <a v-if="statement.status == 0 && statement.water_bill !== null" @click="settleTenant(statement)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle</a>                                                                             
-                                  <!-- <a v-if="statement.status == 0" @click="settleTenant(statement.statement_id, statement.pms_tenant_id)" class="dropdown-item" href="#"><i class="ri-check-fill mr-2"></i>Settle</a> -->
-                                  </div>
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-<!--                       <div><strong>Total: 
-                        Due: {{ formatNumber(calculateTotal('total')) }},
-                        Paid: {{ formatNumber(calculateTotal('paid')) }},
-                        Bal: {{ formatNumber(calculateTotal('balance')) }}
-                      </strong>
-                      </div>   -->  
-                    </div>
+                <div class="card-body pb-0">
 
-                    <!-- Modal -->
-                    <div class="modal fade" id="invoiceTenantModal" tabindex="-1" aria-labelledby="invoiceTenantModalLabel" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="invoiceTenantModalLabel">Invoice Tenant</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <p>#{{selectedStatement.ref_no}}</p>
-                            <p v-if="selectedStatement && selectedStatement.tenant">
-                              <strong>Tenant Name:</strong> {{ selectedStatement.tenant.first_name }} {{ selectedStatement.tenant.last_name }}
-                            </p>
-                            <p v-else>
-                              <strong>Tenant Name:</strong> N/A
-                            </p>
-                            <p v-if="selectedStatement">
-                              <strong>Amount Due:</strong> {{ formatNumber(selectedStatement.total) }}
-                            </p>
-                            <p v-else>
-                              <strong>Amount Due:</strong> N/A
-                            </p>
-                            <p>
-                              <strong>Water Bill:</strong>
-                              <input type="number" name="water_bill" v-model="form.water_bill" class="form-control">
-                              <div v-if="errors.water_bill" class="text-danger">{{ errors.water_bill }}</div>
-                            </p>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-primary" @click="confirmInvoiceTenant">
-                              <span v-if="loading">
-                                <i class="fa fa-spinner fa-spin"></i> Invoicing...
-                              </span>
-                              <span v-else>
-                                Invoice Tenant
-                              </span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  <!-- HEADER -->
+                  <h5 class="card-title d-flex justify-content-between align-items-center">
+                    <span>{{ tenantName }}'s Statements</span>
+                    <span class="text-muted small">
+                      Invoice Statements • {{ selectedMonthsLabel || 'All Time' }}
+                    </span>
+                  </h5>
 
-                    <!-- Modal -->
-                    <div class="modal fade" id="settleTenantModal" tabindex="-1" aria-labelledby="settleTenantModalLabel" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="settleTenantModalLabel">Settle Invoice</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <p>#{{selectedStatement.ref_no}}</p>
-                            <p v-if="selectedStatement && selectedStatement.tenant">
-                              <strong>Tenant Name:</strong> {{ selectedStatement.tenant.first_name }} {{ selectedStatement.tenant.last_name }}
-                            </p>
-                            <p v-else>
-                              <strong>Tenant Name:</strong> N/A
-                            </p>
-                            <p v-if="selectedStatement">
-                              <div class="row">
-                                <div class="col-sm-6">
-                                 <strong>Amount Due:</strong> {{ formatNumber(selectedStatement.total) }}
-                                </div>
-                                <div class="col-sm-6">
-                                 <strong>Amount Paid:</strong> {{ formatNumber(selectedStatement.paid) }}
-                                </div>
-                              </div>   
-                            </p>
-                            <p v-else>
-                              <strong>Amount Due:</strong> N/A
-                            </p>
-                            <label v-if="lastmonthBalance < 0" for="validationCustom04" class="form-label"
-                                ><span style="color: green;">Overpayment: <strong>KES {{lastmonthstatement.balance}}</strong></span>              
+                  <!-- MONTH FILTER (cleaned) -->
+                  <div class="row mb-4">
+                    <div class="col-md-4">
+
+                      <label class="form-label fw-semibold">Filter by Rent Month</label>
+
+                      <div class="dropdown w-100">
+                        <button
+                          class="btn btn-outline-secondary w-100 d-flex justify-content-between align-items-center"
+                          data-bs-toggle="dropdown"
+                        >
+                          <span>{{ selectedMonthsLabel }}</span>
+                          <i class="bi bi-chevron-down"></i>
+                        </button>
+
+                        <div class="dropdown-menu w-100 p-3 shadow-sm" style="max-height: 300px; overflow-y:auto;">
+
+                          <div
+                            v-for="month in availableMonths"
+                            :key="month"
+                            class="form-check mb-2"
+                          >
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              :value="month"
+                              v-model="selectedMonths"
+                              :id="'m-' + month"
+                            />
+                            <label class="form-check-label" :for="'m-' + month">
+                              {{ month }}
                             </label>
-
-                            <label v-if="lastmonthstatement.balance > 0" for="validationCustom04" class="form-label"
-                              ><span style="color: red;">Last Month Arrears: <strong>KES {{lastmonthstatement.balance}}</strong></span></label
-                            >
-                            <p>
-                              <div class="row">
-                                <div class="col-sm-6">
-                                  <strong>Payment Method:</strong>
-                                  <select name="category" v-model="form.payment_method" class="form-select" id="payment-method-1">
-                                    <option value="0" disabled>Select Payment</option>
-                                    <option value="Mpesa" selected>MPESA</option>
-                                    <option value="Cash">Cash</option>
-                                    <option value="Bank">Bank Transfer</option>
-                                  </select>
-                                  <div v-if="errors.payment_method" class="text-danger">{{ errors.payment_method }}</div>
-                                </div>
-                                <div v-if="form.payment_method === 'Mpesa'" class="col-sm-6">
-                                  <strong>MPESA Code:</strong>
-                                  <input type="text" name="mpesa_code" v-model="form.mpesa_code" class="form-control">
-                                  <div v-if="errors.mpesa_code" class="text-danger">{{ errors.mpesa_code }}</div>
-                                </div>
-                              </div>
-                            </p>
-                            <p>
-                              <div class="row">
-                                <div class="col-sm-6">
-                                  <strong>Amount Paid:</strong>
-                                  <input type="number" :disabled="!form.payment_method" name="cash" v-model="form.cash" class="form-control">
-                                  <div v-if="errors.cash" class="text-danger">{{ errors.cash }}</div>
-                                </div>
-                                <div class="col-sm-6">
-                                  <strong>Balance</strong>
-                                  <h6 v-if="lastmonthBalance < 0">{{payableOverAmount}}</h6>
-                                  <h6 v-else>{{payableAmount}}</h6>
-                                </div>
-                              </div>    
-                            </p>
-
-                            <p>
-                              <button v-if="lastmonthBalance < 0" @click.prevent="applyOverPayment" :disabled="!form.cash">Apply Overpayment</button>
-                            </p>
-                            
-
                           </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" style="background-color: darkgreen; border-color: darkgreen;" class="btn btn-primary" @click.prevent="confirmSettleTenant">Settle Tenant</button>
+
+                          <hr>
+
+                          <div class="d-flex justify-content-between">
+                            <button class="btn btn-sm btn-light" @click="clearMonthFilter">
+                              Clear
+                            </button>
+                            <small class="text-muted">
+                              {{ selectedMonths.length }} selected
+                            </small>
                           </div>
+
                         </div>
                       </div>
                     </div>
-    
                   </div>
-                </div><!-- End Top Selling -->
-    
+
+                  <!-- ACTION ROW (like tenant UI style) -->
+                  <div class="row mb-3">
+                    <div class="col d-flex flex-wrap gap-2">
+
+                      <button
+                        class="btn btn-sm btn-outline-primary"
+                        v-if="filteredStatements.length"
+                        @click="exportToExcel"
+                      >
+                        Export
+                      </button>
+
+                      <button
+                        class="btn btn-sm btn-outline-dark"
+                        v-if="filteredStatements.length"
+                        @click="printInvoice"
+                      >
+                        Print Statement
+                      </button>
+
+                      <button
+                        class="btn btn-sm btn-success"
+                        v-if="filteredStatements.length"
+                        @click="generatePDF"
+                      >
+                        Generate PDF
+                      </button>
+                    </div>
+                  </div>      
+
+                  <!-- LOADING -->
+                  <div v-if="isLoadingStatements" class="text-center py-4">
+                    <div class="spinner-border text-primary"></div>
+                    <div class="mt-2">Loading statements…</div>
+                  </div>
+
+                  <!-- TABLE -->
+                  <div v-else class="table-responsive">
+                    <table class="table table-borderless align-middle">
+
+                      <thead>
+                        <tr>
+                          <th>Unit</th>
+                          <th>Rent Month</th>
+                          <th>Due</th>
+                          <th>Paid</th>
+                          <th>Balance</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <tr v-for="statement in filteredStatements" :key="statement.id">
+
+                          <td>{{ statement.unit_number || 'N/A' }}</td>
+
+                          <td>{{ statement.rent_month }}</td>
+
+                          <td>{{ formatNumber(statement.total) }}</td>
+                          <td>{{ formatNumber(statement.paid) }}</td>
+                          <td>{{ formatNumber(statement.balance) }}</td>
+
+                          <td>
+                            <span v-if="statement.status == 1" class="badge bg-success">
+                              Settled
+                            </span>
+
+                            <span v-else-if="statement.water_bill == 0" class="badge bg-info text-dark">
+                              Not Invoiced
+                            </span>
+
+                            <span v-else class="badge bg-warning text-dark">
+                              Not Settled
+                            </span>
+                          </td>
+
+                          <td>
+                            <div class="btn-group">
+                              <button class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                Action
+                              </button>
+
+                              <div class="dropdown-menu">
+
+                                <a class="dropdown-item" @click="navigateTo('/viewstatement/' + statement.id)">
+                                  View
+                                </a>
+
+                                <a class="dropdown-item" @click="printReceipt(statement)">
+                                  Print Receipt
+                                </a>
+
+                              </div>
+                            </div>
+                          </td>
+
+                        </tr>
+                      </tbody>
+
+                    </table>
+                  </div>
+
+                  <!-- TOTALS -->
+                  <div class="mt-3">
+                    <strong>
+                      Total:
+                      Due: {{ formatNumber(calculateFilteredTotal('total')) }},
+                      Paid: {{ formatNumber(calculateFilteredTotal('paid')) }},
+                      Bal: {{ formatNumber(calculateFilteredTotal('balance')) }}
+                    </strong>
+                  </div>
+
+                </div>
+              </div>
             </div>
+    
+          </div>
         </section>
     </TheMaster>
     </template>
@@ -384,6 +261,12 @@
             mpesa_code: ''
           },
           loading: false,
+
+            isLoadingStatements: false,
+
+            selectedMonths: [],
+            selectedStatus: "",
+            availableMonths: [],          
         }
       },
       methods: {
@@ -610,6 +493,19 @@
           // Parse the date string using Moment.js and format it
            return moment(dateString).format('MMM YYYY');
         }, 
+        calculateFilteredTotal(field) {
+          return this.filteredStatements.reduce((sum, item) => {
+            let value = 0;
+
+            if (field === 'balance') {
+              value = (item.total || 0) - (item.paid || 0);
+            } else {
+              value = item[field] || 0;
+            }
+
+            return sum + value;
+          }, 0);
+        },         
          calculateTotalAmountPaid() {
         if (!this.expenses || this.expenses.length === 0) {
               return 0; // If expenses data is empty or undefined, return 0
@@ -686,21 +582,65 @@
               console.error('Error converting image to base64:', error);
             });
         },
-        printInvoice(){
-            // Open a new window for printing
-            const printWindow = window.open("", "_blank");
+        async printInvoice() {
+          const summary = this.tenantSummary;
 
-            // Build the content for printing
-            const invoiceContent = this.buildInvoiceContent();
+          // 🛑 Guard
+          if (!summary) {
+            console.warn('Tenant summary not ready yet');
+            return;
+          }
 
-            // Write the content to the new window
-            printWindow.document.write(invoiceContent);
+          const printWindow = window.open('', '_blank');
 
-            // Close the document stream
-            printWindow.document.close();
+          const invoiceContent = this.buildTenantStatementContent(summary);
 
-            // Trigger the print dialog
-            printWindow.print();
+          printWindow.document.open();
+          printWindow.document.write(invoiceContent);
+          printWindow.document.close();
+
+          // wait for DOM
+          printWindow.onload = () => {
+            const images = printWindow.document.images;
+            let loaded = 0;
+
+            // no images → print immediately
+            if (images.length === 0) {
+              printWindow.focus();
+              printWindow.print();
+              printWindow.close();
+              return;
+            }
+
+            // track image loading (logo included)
+            for (let img of images) {
+              img.onload = () => {
+                loaded++;
+
+                if (loaded === images.length) {
+                  setTimeout(() => {
+                    printWindow.focus();
+                    printWindow.print();
+                    printWindow.close();
+                  }, 200);
+                }
+              };
+
+              // already cached images
+              if (img.complete) {
+                loaded++;
+              }
+            }
+
+            // safety fallback (prevents infinite hang)
+            setTimeout(() => {
+              if (loaded >= images.length) {
+                printWindow.focus();
+                printWindow.print();
+                printWindow.close();
+              }
+            }, 1500);
+          };
         },
         buildInvoiceContent() {
           // Determine whether to include the row
@@ -870,6 +810,219 @@
 
           return receiptHTML;
         },
+        buildTenantStatementContent(summary) {
+          const logoBase64 = this.logoBase64;
+          const reference = this.generateReference(summary);
+
+          const statusColor =
+            summary.status === 'SETTLED' ? '#16a34a' :
+            summary.status === 'PARTIAL' ? '#f59e0b' :
+            summary.status === 'UNPAID' ? '#ef4444' :
+            '#6b7280';
+
+          return `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <title>Tenant Statement</title>
+
+        <style>
+        body {
+          font-family: 'Segoe UI', system-ui, sans-serif;
+          background: #f6f7fb;
+          margin: 0;
+          padding: 0;
+          color: #1f2937;
+        }
+
+        .page {
+          max-width: 900px;
+          margin: 30px auto;
+          padding: 0 15px;
+        }
+
+        .card {
+          background: #fff;
+          border-radius: 14px;
+          padding: 28px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .header {
+          display: flex;
+          justify-content: space-between;
+          padding-bottom: 20px;
+          border-bottom: 1px solid #eee;
+          margin-top: 10px;
+        }
+
+        .logo img { max-width: 160px; }
+
+        .company {
+          text-align: right;
+          font-size: 0.9rem;
+          color: #4b5563;
+        }
+
+        .meta {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin: 24px 0 30px;
+          padding: 18px;
+          background: #f9fafb;
+          border-radius: 10px;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 32px;
+        }
+
+        thead th {
+          padding: 12px;
+          background: #f3f4f6;
+        }
+
+        tbody td {
+          padding: 16px 12px;
+          border-bottom: 1px solid #eee;
+        }
+
+        tfoot td {
+          padding: 18px 12px;
+          font-weight: bold;
+        }
+
+        .highlight {
+          color: #0f766e;
+          font-weight: 600;
+        }
+
+        .footer {
+          margin-top: 40px;
+          text-align: center;
+          font-size: 0.85rem;
+          color: #6b7280;
+        }
+        </style>
+        </head>
+
+        <body>
+        <div class="page">
+        <div class="card">
+
+        <!-- HEADER -->
+        <div class="header">
+          <div class="logo">
+            <img src="${logoBase64}" />
+          </div>
+
+          <div class="company">
+            <strong>Ingo Properties</strong><br>
+            Cosyard Business Center<br>
+            Kakamega – Mumias Road<br>
+            0759 509 462<br>
+            ingoproperties@gmail.com
+          </div>
+        </div>
+
+        <!-- DOCUMENT TITLE (CENTERED + CAPS + BOLD) -->
+        <h2 style="
+          margin: 20px 0 10px 0;
+          text-align: center;
+          text-transform: uppercase;
+          color: #1f2937;
+          font-size: 20px;
+          font-weight: 800;
+          letter-spacing: 1px;
+        ">
+          Tenant Statement
+        </h2>
+
+        <!-- META -->
+        <div class="meta">
+          <div><strong>Tenant</strong><br>${summary.tenantName}</div>
+          <div><strong>Property</strong><br>${summary.property}</div>
+          <div><strong>Unit</strong><br>${summary.unit}</div>
+          <div><strong>Period</strong><br>${summary.period}</div>
+          <div><strong>Status</strong><br style="color:${statusColor}">${summary.status}</div>
+          <div><strong>Reference</strong><br>${reference}</div>
+        </div>
+
+        <table>
+        <thead>
+        <tr>
+          <th>Description</th>
+          <th>Amount (KES)</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+          <td>Total Rent</td>
+          <td>${this.formatNumber(summary.totalRent)}</td>
+        </tr>
+
+        <tr>
+          <td>Total Paid</td>
+          <td>${this.formatNumber(summary.totalPaid)}</td>
+        </tr>
+        </tbody>
+
+        <tfoot>
+        <tr>
+          <td>Balance</td>
+          <td class="highlight">${this.formatNumber(summary.balance)}</td>
+        </tr>
+        </tfoot>
+        </table>
+
+        <div class="footer">
+        This statement was system-generated by Ingo Properties Management System.
+        </div>
+
+        </div>
+        </div>
+        </body>
+        </html>
+        `;
+        }, 
+        generateReference(summary) {
+          if (!summary) return 'TEN-NA';
+
+          const propertyId = summary.propertyId ?? 'P0';
+          const unit = summary.unit ?? 'U0';
+          const tenantId = summary.tenantId ?? 'T0';
+
+          const monthMap = {
+            January: 1, February: 2, March: 3, April: 4,
+            May: 5, June: 6, July: 7, August: 8,
+            September: 9, October: 10, November: 11, December: 12,
+          };
+
+          const months = this.filteredStatements
+            .map(s => s.rent_month)
+            .filter(Boolean)
+            .sort((a, b) => {
+              const [m1, y1] = a.split(' ');
+              const [m2, y2] = b.split(' ');
+              return (y1 * 100 + monthMap[m1]) - (y2 * 100 + monthMap[m2]);
+            });
+
+          if (!months.length) {
+            return `TEN-${propertyId}-${unit}-${tenantId}-NA`;
+          }
+
+          const first = months[0];
+          const last = months[months.length - 1];
+
+          const period = first === last ? first : `${first}-to-${last}`;
+
+          return `TEN-${propertyId}-${unit}-${tenantId}-${period}`;
+        },               
         settleInvoice() {
             return new Promise((resolve, reject) => {
                 let payload; // Define payload variable outside the if-else blocks
@@ -1701,15 +1854,132 @@
         this.currentMonth = this.getCurrentMonth(); // Set the initial date
 
       },
+      watch: {
+        tenant(newVal) {
+          if (newVal) {
+            const summary = this.tenantSummary();
+            const ref = this.generateReference(summary);
+            console.log(ref);
+          }
+        }
+      },      
       computed: {
-      // Calculate total based on the provided key ('total', 'paid', 'balance')
-      // calculateTotal() {
-      //     return (key) => {
-      //       return this.formatNumber(
-      //         this.statements.reduce((acc, statement) => acc + parseFloat(statement[key]), 0)
-      //       );
-      //     };
-      //   },
+        filteredStatements() {
+          if (!this.selectedMonths.length) return this.statements;
+
+          return this.statements.filter(s =>
+            this.selectedMonths.includes(s.rent_month)
+          );
+        },
+        selectedMonthsLabel() {
+          if (!this.selectedMonths.length) {
+            return 'All Months';
+          }
+
+          if (this.selectedMonths.length === 1) {
+            return this.selectedMonths[0];
+          }
+
+          if (this.selectedMonths.length <= 3) {
+            return this.selectedMonths.join(', ');
+          }
+
+          return `${this.selectedMonths.length} months selected`;
+        },        
+        statementPeriod() {
+          if (!this.filteredStatements.length) return 'N/A';
+
+          const monthMap = {
+            January: 1,
+            February: 2,
+            March: 3,
+            April: 4,
+            May: 5,
+            June: 6,
+            July: 7,
+            August: 8,
+            September: 9,
+            October: 10,
+            November: 11,
+            December: 12,
+          };
+
+          const parsedMonths = this.filteredStatements
+            .map(s => s.rent_month)
+            .filter(Boolean)
+            .map(m => {
+              const [monthName, year] = m.split(' ');
+              return {
+                label: m,
+                year: Number(year),
+                month: monthMap[monthName],
+              };
+            });
+
+          if (!parsedMonths.length) return 'N/A';
+
+          // Sort chronologically
+          parsedMonths.sort((a, b) =>
+            a.year !== b.year
+              ? a.year - b.year
+              : a.month - b.month
+          );
+
+          const first = parsedMonths[0].label;
+          const last = parsedMonths[parsedMonths.length - 1].label;
+
+          return first === last ? first : `${first} – ${last}`;
+        }, 
+        tenantSummary() {
+          // 🛑 Guard: tenant not loaded yet
+          if (!this.tenant || !this.tenant.property || !this.tenant.unit) {
+            return null;
+          }
+
+          const totalRent = this.filteredStatements.reduce(
+            (sum, s) => sum + Number(s.total || 0),
+            0
+          );
+
+          const totalPaid = this.filteredStatements.reduce(
+            (sum, s) => sum + Number(s.paid || 0),
+            0
+          );
+
+          const balance = totalRent - totalPaid;
+
+          let status = 'UNKNOWN';
+          if (totalPaid === 0) status = 'UNPAID';
+          else if (totalPaid < totalRent) status = 'PARTIAL';
+          else status = 'SETTLED';
+
+          return {
+            tenantId: this.tenant.id,
+            tenantName: `${this.tenant.first_name} ${this.tenant.last_name}`,
+            propertyId: this.tenant.property.id,
+            property: this.tenant.property.name,
+            unit: this.tenant.unit.unit_number,
+            period: this.statementPeriod,
+            totalRent,
+            totalPaid,
+            balance,
+            status,
+          };
+        },
+        printableStatements() {
+          return this.filteredStatements;
+        },
+        availableMonths() {
+          const months = new Set();
+
+          this.statements.forEach(s => {
+            if (s.rent_month) {
+              months.add(s.rent_month);
+            }
+          });
+
+          return Array.from(months);
+        },       
          // Computed property to calculate total due
         totalDue() {
           return this.calculateTotal('total');

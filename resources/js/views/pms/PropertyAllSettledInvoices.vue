@@ -232,7 +232,8 @@
                     </div>
     
                   </div>
-                </div><!-- End Top Selling -->
+                </div>
+                <!-- End Top Selling -->
     
             </div>
         </section>
@@ -1345,35 +1346,35 @@
 
           return first === last ? first : `${first} – ${last}`;
         }, 
-landlordSummary() {
-  const totalRent = this.filteredStatements.reduce(
-    (sum, s) => sum + Number(s.total || 0),
-    0
-  );
+        landlordSummary() {
+          const totalRent = this.filteredStatements.reduce(
+            (sum, s) => sum + Number(s.total || 0),
+            0
+          );
 
-  const totalPaid = this.filteredStatements.reduce(
-    (sum, s) => sum + Number(s.paid || 0),
-    0
-  );
+          const totalPaid = this.filteredStatements.reduce(
+            (sum, s) => sum + Number(s.paid || 0),
+            0
+          );
 
-  const expenses = Number(this.totalAmountPaid || 0);
+          const expenses = Number(this.totalAmountPaid || 0);
 
-  // ✅ SINGLE SOURCE OF TRUTH
-  const commissionAmount = this.calculateCommissionAmount(this.filteredStatements);
+          // ✅ SINGLE SOURCE OF TRUTH
+          const commissionAmount = this.calculateCommissionAmount(this.filteredStatements);
 
-  const rentLessCommission = totalRent - commissionAmount;
-  const netRemmission = rentLessCommission - expenses;
+          const rentLessCommission = totalRent - commissionAmount;
+          const netRemmission = rentLessCommission - expenses;
 
-  return {
-    totalRent,
-    totalPaid,
-    commission: commissionAmount,
-    commissionMeta: this.commission,
-    expenses,
-    rentLessCommission,
-    netRemmission,
-  };
-},
+          return {
+            totalRent,
+            totalPaid,
+            commission: commissionAmount,
+            commissionMeta: this.commission,
+            expenses,
+            rentLessCommission,
+            netRemmission,
+          };
+        },
         printableStatements() {
           return this.filteredStatements;
         },
