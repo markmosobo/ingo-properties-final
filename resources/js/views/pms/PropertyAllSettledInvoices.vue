@@ -116,7 +116,6 @@
                             <th>Garbage</th>
                             <th>Water</th>
                             <th>Paid</th>
-                            <th>Paid On</th>
                             <th>Status</th>
                             <th>Action</th>
                           </tr>
@@ -139,7 +138,6 @@
                             <td>{{ statement.unit ? formatNumber(statement.unit.garbage_fee) : 'N/A' }}</td>
                             <td>{{ formatNumber(statement.water_bill ?? 0) }}</td>
                             <td>{{ formatNumber(statement.paid) }}</td>
-                            <td>{{ format_date(statement.paid_at) }}</td>
 
                             <td>
                               <span v-if="statement.status == 0 && !statement.water_bill" class="badge bg-info text-dark">
@@ -367,10 +365,18 @@
             return parts.join('.');
         },
 
-        format_date(value){
-          if(value){
-            return moment(String(value)).format('DD/MM/YYYY')
-          }
+        format_date(dateInput) {
+          if (!dateInput) return 'N/A';
+
+          const d = new Date(dateInput);
+
+          if (isNaN(d.getTime())) return 'N/A';
+
+          const day = String(d.getDate()).padStart(2, '0');
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const year = d.getFullYear();
+
+          return `${day}/${month}/${year}`;
         },
         capitalizeFirstLetter(str) {
           return str.charAt(0).toUpperCase() + str.slice(1);
@@ -587,7 +593,10 @@
           <div><strong>Landlord</strong><br>${this.landlord}</div>
           <div><strong>Property</strong><br>${this.property.name}</div>
           <div><strong>Period</strong><br>${this.statementPeriod}</div>
-          <div><strong>Generated On</strong><br>${new Date().toLocaleDateString()}</div>
+          <div>
+            <strong>Generated On</strong><br>
+            ${this.format_date(new Date())}
+          </div>
           <div><strong>Status</strong><br>${status}</div>
           <div><strong>Reference</strong><br>${reference}</div>
           </div>
@@ -1085,146 +1094,240 @@
           };
         },
         generatePDF() {
-            const statements = this.filteredStatements;
+          const statements = this.filteredStatements;
+          const summary = this.landlordSummary;
 
-            // 🔥 SINGLE SOURCE OF TRUTH
-            const summary = this.landlordSummary;
+          const doc = new jsPDF('landscape', 'mm', 'a4');
 
-            const doc = new jsPDF('landscape', 'mm', 'a4');
-            const pageWidth = doc.internal.pageSize.getWidth();
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const pageHeight = doc.internal.pageSize.getHeight();
 
-        // =========================
-        // HEADER
-        // =========================
-        const logoWidth = 40;
-        const logoHeight = 20;
-        const logoX = 20;
-        const logoY = 10;
+          // =========================
+          // COMPANY CONFIG (CLEAN SOURCE OF TRUTH)
+          // =========================
+          const company = {
+            name: "INGO PROPERTIES",
+            address1: "COSYARD BUSINESS CENTRE",
+            address2: "KAKAMEGA – MUMIAS ROAD",
+            phone: "0759 509 462",
+            email: "ingoproperties@gmail.com"
+          };
 
-        doc.addImage(
-            this.logoBase64 || '/images/apex-logo.png',
-            'PNG',
-            logoX,
-            logoY,
-            logoWidth,
-            logoHeight
-        );
+          // =========================
+          // HEADER
+          // =========================
+          const addHeader = () => {
+            doc.addImage(
+              this.logoBase64 || '/images/apex-logo.png',
+              'PNG',
+              20,
+              10,
+              40,
+              20
+            );
 
-        // Right-side company block (RESTORED)
-        const infoX = pageWidth - 20;
+            const infoX = pageWidth - 20;
 
-        doc.setFontSize(12);
-        doc.text("Ingo Properties", infoX, 10, { align: 'right' });
-        doc.setFontSize(10);
-        doc.text("Cosyard Business Centre", infoX, 16, { align: 'right' });
-        doc.text("Kakamega – Mumias Road", infoX, 22, { align: 'right' });
-        doc.text("0759 509 462", infoX, 28, { align: 'right' });
-        doc.text("ingoproperties@gmail.com", infoX, 34, { align: 'right' });
+            doc.setFontSize(12);
+            doc.text(company.name, infoX, 10, { align: 'right' });
 
-            // =========================
-            // TITLE
-            // =========================
-            const title =
-                `${this.property.name} - ${this.statementPeriod} Rent Statement`.toUpperCase();
+            doc.setFontSize(10);
+            doc.text(company.address1, infoX, 16, { align: 'right' });
+            doc.text(company.address2, infoX, 22, { align: 'right' });
+            doc.text(company.phone, infoX, 28, { align: 'right' });
+            doc.text(company.email, infoX, 34, { align: 'right' });
+          };
 
+          // =========================
+          // FOOTER (PAGE NUMBERS)
+          // =========================
+          const addFooter = (page, total) => {
+            doc.setFontSize(9);
+            doc.setTextColor(120);
+
+            doc.text(
+              `Page ${page} of ${total}`,
+              pageWidth / 2,
+              pageHeight - 8,
+              { align: 'center' }
+            );
+
+            doc.setTextColor(0);
+          };
+
+          // =========================
+          // TITLE BLOCK
+          // =========================
+          const addTitle = () => {
+            doc.setFont(undefined, 'bold');
             doc.setFontSize(16);
-            doc.text(title, pageWidth / 2, 35, { align: 'center' });
 
-            // =========================
-            // SUMMARY (🔥 NOW MATCHES UI EXACTLY)
-            // =========================
-            doc.setFontSize(11);
+            doc.text('RENT STATEMENT', pageWidth / 2, 38, { align: 'center' });
 
-            doc.text(`Total Rent: KES ${this.formatNumber(summary.totalRent)}`, 20, 45);
-            doc.text(`Commission: KES ${this.formatNumber(summary.commission)}`, 20, 52);
-            doc.text(`Expenses: KES ${this.formatNumber(summary.expenses)}`, 20, 59);
-            doc.text(`Net Remission: KES ${this.formatNumber(summary.netRemmission)}`, 20, 66);
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(12);
 
-            // =========================
-            // TABLE HEADER (unchanged)
-            // =========================
-            const headers = [
-                'H/S No.',
-                'Tenant Name',
-                'Due',
-                'Rent',
-                'Garbage',
-                'Water',
-                'Paid',
-                'Balance',
-                'Date Paid'
-            ];
-
-            const columnWidths = [20, 50, 20, 20, 20, 20, 20, 20, 30];
-
-            let tableY = 80;
-            let xPos = 20;
+            doc.text(
+              `PROPERTY: ${this.property.name}`.toUpperCase(),
+              pageWidth / 2,
+              46,
+              { align: 'center' }
+            );
 
             doc.setFontSize(10);
 
-            headers.forEach((header, i) => {
-                doc.rect(xPos, tableY, columnWidths[i], 8);
-                doc.text(header, xPos + 2, tableY + 6);
-                xPos += columnWidths[i];
+            doc.text(
+              `PERIOD: ${this.statementPeriod}`.toUpperCase(),
+              pageWidth / 2,
+              53,
+              { align: 'center' }
+            );
+          };
+
+          // =========================
+          // TABLE CONFIG
+          // =========================
+          const headers = [
+            'H/S No.',
+            'Tenant Name',
+            'Rent Month',
+            'Due',
+            'Rent',
+            'Garbage',
+            'Water',
+            'Paid',
+            'Balance',
+            'Date Paid'
+          ];
+
+          const widths = [18, 38, 22, 18, 18, 18, 18, 18, 18, 30];
+
+          const drawTableHeader = (y) => {
+            let x = 20;
+            doc.setFont(undefined, 'bold');
+
+            headers.forEach((h, i) => {
+              doc.rect(x, y, widths[i], 8);
+              doc.text(h, x + 2, y + 6);
+              x += widths[i];
             });
 
-            // =========================
-            // TABLE ROWS (UNCHANGED DATA SOURCE)
-            // =========================
-            let rowY = tableY + 8;
-            let currentRow = 0;
-            const maxRowsPerPage = 25;
+            doc.setFont(undefined, 'normal');
+          };
 
-            statements.forEach(statement => {
+          // =========================
+          // INIT
+          // =========================
+          let y = 58;
+          const rowHeight = 8;
+          const bottomLimit = pageHeight - 15;
 
-                if (currentRow >= maxRowsPerPage) {
-                    doc.addPage();
-                    rowY = 20;
-                    currentRow = 0;
+          let pageNumber = 1;
 
-                    let x = 20;
-                    headers.forEach((header, i) => {
-                        doc.rect(x, rowY, columnWidths[i], 8);
-                        doc.text(header, x + 2, rowY + 6);
-                        x += columnWidths[i];
-                    });
+          // =========================
+          // FIRST PAGE
+          // =========================
+          addHeader();
+          addTitle();
 
-                    rowY += 8;
+          const boxX = 20;
+          const boxY = y;
+          const boxW = 160;
+          const boxH = 22;
+
+          doc.setDrawColor(200);
+          doc.rect(boxX, boxY, boxW, boxH);
+
+          doc.setFontSize(10);
+
+          doc.text(`Total Rent: KES ${this.formatNumber(summary.totalRent)}`, boxX + 4, boxY + 7);
+          doc.text(`Commission: KES ${this.formatNumber(summary.commission)}`, boxX + 4, boxY + 14);
+          doc.text(`Expenses: KES ${this.formatNumber(summary.expenses)}`, boxX + 80, boxY + 7);
+          doc.text(`Net Remission: KES ${this.formatNumber(summary.netRemmission)}`, boxX + 80, boxY + 14);
+
+          y = boxY + boxH + 10;
+
+          drawTableHeader(y);
+          y += rowHeight;
+
+          // =========================
+          // ROW RENDERER
+          // =========================
+          const renderRows = (rows, startY) => {
+            let cy = startY;
+
+            rows.forEach((s) => {
+
+              if (cy + rowHeight > bottomLimit) {
+                doc.addPage();
+                pageNumber++;
+
+                addHeader();
+                drawTableHeader(20);
+
+                cy = 28;
+              }
+
+              let cx = 20;
+
+              const values = [
+                s.unit?.unit_number ?? 'N/A',
+                s.tenant ? `${s.tenant.first_name} ${s.tenant.last_name}` : 'Vacant',
+                s.rent_month ?? this.format_date(s.paid_at)?.slice(3, 10) ?? 'N/A',
+                s.total ?? 0,
+                s.unit?.monthly_rent ?? 0,
+                s.unit?.garbage_fee ?? 0,
+                s.water_bill ?? 0,
+                s.paid ?? 0,
+                s.balance ?? 0,
+                this.format_date(s.paid_at) ?? 'N/A'
+              ];
+
+              values.forEach((v, i) => {
+                doc.rect(cx, cy, widths[i], rowHeight);
+
+                const text = this.formatNumber(v);
+
+                const isNumber =
+                  i !== 1 &&
+                  i !== 0 &&
+                  i !== 2 &&
+                  i !== 9;
+
+                if (isNumber) {
+                  doc.text(text, cx + widths[i] - 2, cy + 6, { align: 'right' });
+                } else {
+                  doc.text(text, cx + 2, cy + 6);
                 }
 
-                let x = 20;
+                cx += widths[i];
+              });
 
-                const values = [
-                    statement.unit?.unit_number ?? 'N/A',
-                    statement.tenant
-                        ? `${statement.tenant.first_name} ${statement.tenant.last_name}`
-                        : 'Vacant',
-                    statement.total ?? 0,
-                    statement.unit?.monthly_rent ?? 0,
-                    statement.unit?.garbage_fee ?? 0,
-                    statement.water_bill ?? 0,
-                    statement.paid ?? 0,
-                    statement.balance ?? 0,
-                    this.format_date(statement.paid_at) ?? 'N/A'
-                ];
-
-                values.forEach((val, i) => {
-                    doc.rect(x, rowY, columnWidths[i], 8);
-                    doc.text(this.formatNumber(val), x + 2, rowY + 6);
-                    x += columnWidths[i];
-                });
-
-                rowY += 8;
-                currentRow++;
+              cy += rowHeight;
             });
 
-            // =========================
-            // EXPORT
-            // =========================
-            const pdfBlob = doc.output('blob');
-            const pdfUrl = URL.createObjectURL(pdfBlob);
+            return cy;
+          };
 
-            window.open(pdfUrl, '_blank');
+          y = renderRows(statements, y);
+
+          // =========================
+          // FINAL PAGE NUMBERS
+          // =========================
+          const totalPages = doc.internal.getNumberOfPages();
+
+          for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            addFooter(i, totalPages);
+          }
+
+          // =========================
+          // EXPORT
+          // =========================
+          const blob = doc.output('blob');
+          const url = URL.createObjectURL(blob);
+
+          window.open(url, '_blank');
         },
         getPropertyExpenses()
         {

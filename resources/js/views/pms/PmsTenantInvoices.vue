@@ -84,7 +84,7 @@
                         v-if="filteredStatements.length"
                         @click="printInvoice"
                       >
-                        Print Statement
+                        Print Tenant Statement
                       </button>
 
                       <button
@@ -92,7 +92,7 @@
                         v-if="filteredStatements.length"
                         @click="generatePDF"
                       >
-                        Generate PDF
+                        Generate Rent Statement
                       </button>
                     </div>
                   </div>      
@@ -307,7 +307,7 @@
                 });
         },
         getCurrentTimestamp() {
-          const now = new Date();
+          const now = this.format_date(new Date());
           const year = now.getFullYear();
           const month = String(now.getMonth() + 1).padStart(2, '0');
           const day = String(now.getDate()).padStart(2, '0');
@@ -1286,181 +1286,236 @@
           return receiptHTML;
         },
         printReceipt(statement) {
-          this.submit().then(() => {
-              // Continue with the rest of the function after submit completes
-              // this.$router.push('/statements');
-              this.$router.go(-1);
+          // ❌ DO NOT ROUTE BEFORE PRINT (causes broken receipt / missing logo)
+          // this.$router.push('/settledinvoices');
 
-              // Open a new window for printing
-              const printWindow = window.open("", "_blank");
+          const printWindow = window.open("", "_blank");
 
-              // Build the content for printing
-              const receiptContent = this.buildReceiptContent();
+          const receiptContent = this.buildReceiptContent(statement);
 
-              // Write the content to the new window
-              printWindow.document.write(receiptContent);
+          printWindow.document.open();
+          printWindow.document.write(receiptContent);
+          printWindow.document.close();
 
-              // Close the document stream
-              printWindow.document.close();
+          // ✅ WAIT FOR FULL RENDER (IMPORTANT FOR LOGO + STYLES)
+          printWindow.onload = () => {
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+          };
 
-              // Trigger the print dialog
-              printWindow.print();
-              toast.fire(
-                  'Success!',
-                  'Invoice updated!',
-                  'success'
-              );
-          }).catch(error => {
-              console.error("Error during submission:", error);
-              // Handle error if needed
-          });
+          // ✅ ROUTE AFTER PRINT (safe delay)
+          setTimeout(() => {
+            this.$router.push('/settledinvoices');
+          }, 800);
         },
 
-        buildReceiptContent(refNo) {
-         // Determine whether to include the row
-          const showGarbageFeeRow = this.unitGarbageFee !== 0;
-          const showSecurityFeeRow = this.unitSecurityFee !== 0;
-          // Build the HTML content for the receipt
-          const receiptHTML = `
+        buildReceiptContent(statement) {
+          const logoBase64 = this.logoBase64 || '';
+
+          const showGarbageFeeRow = statement.unit.garbage_fee !== 0;
+          const showSecurityFeeRow = statement.unit.security_fee !== 0;
+          const showWaterBillRow = statement.water_bill !== 0;
+
+          const isFullyPaid = this.balance <= 0;
+
+          return `
           <!DOCTYPE html>
           <html lang="en">
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Receipt Of Payment</title>
+            <title>Payment Receipt - ${statement.ref_no}</title>
+
             <style>
               body {
-                font-family: Arial, sans-serif;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 margin: 0;
                 padding: 0;
-                background-color: #f5f5f5;
-              }
-              .receipt {
-                max-width: 600px;
-                margin: 20px auto;
-                padding: 20px;
-                background-color: #fff;
-                border: 2px solid #ccc;
-                border-radius: 10px;
-              }
-              .receipt-header {
-                text-align: center;
-                margin-bottom: 20px;
-              }
-              .receipt-header h1 {
-                margin: 10px 0;
+                background: #f4f4f4;
                 color: #333;
               }
-              .receipt-info {
-                margin-bottom: 20px;
+
+              .receipt {
+                max-width: 750px;
+                margin: 20px auto;
+                padding: 25px;
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 0 15px rgba(0,0,0,0.1);
+                position: relative;
               }
-              .receipt-info p {
-                margin: 5px 0;
-                color: #555;
+
+              .watermark {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-45deg);
+                font-size: 70px;
+                color: rgba(0,0,0,0.05);
+                pointer-events: none;
               }
-              .receipt-table {
+
+              .receipt-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 2px solid #e0e0e0;
+                padding-bottom: 15px;
+                margin-bottom: 25px;
+              }
+
+              .logo img {
+                max-width: 150px;
+              }
+
+              .company {
+                text-align: right;
+                font-size: 0.9rem;
+                line-height: 1.5;
+              }
+
+              .info p {
+                margin: 4px 0;
+                font-size: 0.95rem;
+              }
+
+              .table {
                 width: 100%;
                 border-collapse: collapse;
-                margin-bottom: 20px;
+                margin-top: 10px;
               }
-              .receipt-table th, .receipt-table td {
-                padding: 8px;
-                border-bottom: 1px solid #ccc;
+
+              .table th, .table td {
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
               }
-              .receipt-table th {
+
+              .table th {
+                background: #f9f9f9;
                 text-align: left;
-                background-color: #f2f2f2;
-                color: #333;
               }
-              .receipt-table td {
-                text-align: left;
-                color: #666;
+
+              .status {
+                font-weight: bold;
+                color: ${isFullyPaid ? 'green' : 'orange'};
               }
-              .receipt-footer {
+
+              .footer {
                 text-align: center;
-              }
-              .receipt-footer p {
-                margin: 5px 0;
+                margin-top: 25px;
+                font-size: 0.85rem;
                 color: #777;
+              }
+
+              .payment-highlight {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f9f9f9;
+                border-radius: 8px;
               }
             </style>
           </head>
-          <body>
-            <img src="@/assets/img/apex-logo.png" alt="Company Logo" style="display: block; margin: 0 auto; max-width: 100%;">
 
+          <body>
             <div class="receipt">
+              <div class="watermark">RECEIPT</div>
+
+              <!-- HEADER -->
               <div class="receipt-header">
-                <h1>Ingo Properties</h1>
-                <p>Cosyard Business Center, Kakamega Mumias Road, Kakamega.</p>
-                <p>Phone: (0759) 509-462 | Email: ingoproperties@gmail.com</p>
+                <div class="logo">
+                  <img src="${logoBase64}" />
+                </div>
+
+                <div class="company">
+                  <strong>Ingo Properties</strong><br>
+                  Cosyard Business Center<br>
+                  Kakamega – Mumias Road<br>
+                  0759 509 462<br>
+                  ingoproperties@gmail.com
+                </div>
               </div>
-              <div class="receipt-info">
-                <p><strong>Invoice Number:</strong> ${this.refNo}</p>
-                <p><strong>Receipt Date:</strong> ${new Date().toLocaleString()}</p>
-                <p><strong>Rent Month:</strong> ${this.formatMonth(this.date)}</p>
-                <p><strong>Tenant:</strong> ${this.tenant}</p>
-                <p><strong>Property:</strong> ${this.name} - ${this.unitName}</p>
-                <p><strong>Payment Mode:</strong> ${this.form.payment_method}</p>
+
+              <!-- INFO -->
+              <div class="info">
+                <p><strong>Receipt No:</strong> ${statement.ref_no}</p>
+                <p><strong>Date:</strong> ${this.format_date(new Date())}</p>
+                <p><strong>Tenant:</strong> ${statement.tenant.first_name} ${statement.tenant.last_name}</p>
+                <p><strong>Details:</strong> ${statement.details}</p>
+                <p><strong>Rent Month:</strong> ${statement.rent_month}</p>
+                <p><strong>Payment Method:</strong> ${statement.payment_method || 'N/A'}</p>
+                <p><strong>Status:</strong> 
+                  <span class="status">
+                    ${isFullyPaid ? 'FULLY PAID' : 'PARTIALLY PAID'}
+                  </span>
+                </p>
               </div>
-              <table class="receipt-table">
+
+              <!-- TABLE -->
+              <table class="table">
                 <thead>
                   <tr>
                     <th>Description</th>
                     <th>Amount</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   <tr>
                     <td>Rent Payment</td>
-                    <td>KES ${this.formatNumber(this.unitRent)}</td>
+                    <td>KES ${this.formatNumber(statement.unit.monthly_rent)}</td>
                   </tr>
+
+                  ${showWaterBillRow ? `
                   <tr>
                     <td>Water Bill</td>
-                    <td>KES ${this.formatNumber(this.waterBillAmount)}</td>
-                  </tr>
-                  <!-- Conditionally include garbage collection fee row -->
+                    <td>KES ${this.formatNumber(statement.water_bill)}</td>
+                  </tr>` : ''}
+
                   ${showGarbageFeeRow ? `
                   <tr>
                     <td>Garbage Collection Fee</td>
-                    <td>KES ${this.formatNumber(this.unitGarbageFee)}</td>
-                  </tr>
-                  ` : ''}
-                  </tr>
-                  <!-- Conditionally include security fee row -->
+                    <td>KES ${this.formatNumber(statement.unit.garbage_fee)}</td>
+                  </tr>` : ''}
+
                   ${showSecurityFeeRow ? `
                   <tr>
                     <td>Security Fee</td>
-                    <td>KES ${this.formatNumber(this.unitSecurityFee)}</td>
-                  </tr>
-                  ` : ''}
+                    <td>KES ${this.formatNumber(statement.unit.security_fee)}</td>
+                  </tr>` : ''}
                 </tbody>
+
                 <tfoot>
                   <tr>
-                    <th>Total Amount Due:</th>
-                    <td>KES ${this.formatNumber(this.total)}</td>
+                    <th>Total</th>
+                    <th>KES ${this.formatNumber(statement.total)}</th>
                   </tr>
                   <tr>
-                    <th>Amount Paid:</th>
-                    <td>KES ${this.formatNumber(this.amountPaid)}</td>
+                    <th>Paid</th>
+                    <th>KES ${this.formatNumber(statement.paid)}</th>
                   </tr>
                   <tr>
-                    <th>Balance:</th>
-                    <td>KES ${this.formatNumber(this.balAmount)}</td>
+                    <th>Balance</th>
+                    <th>KES ${this.formatNumber(statement.balance)}</th>
                   </tr>
                 </tfoot>
               </table>
-              <div class="receipt-footer">
-                <p>You were served by ${this.user.first_name} ${this.user.last_name}.Thank you for your payment.</p>
-                <p>This receipt acknowledges the payment received for the above property management services.</p>
+
+              <!-- NOTE -->
+              <div class="payment-highlight">
+                Payment applied successfully to tenant account.
+              </div>
+
+              <!-- FOOTER -->
+              <div class="footer">
+                Prepared by: ${this.user.first_name} ${this.user.last_name}<br>
+                Generated: ${new Date().toLocaleString('en-GB', { hour12: false })}<br><br>
+                This is a system-generated receipt.
               </div>
             </div>
           </body>
           </html>
-
-
           `;
-
-          return receiptHTML;
         },
         exportToExcel() {
           const invoicesData = this.statements.map(statement => ({
@@ -1487,191 +1542,240 @@
           XLSX.writeFile(workbook, filename);
         },
         generatePDF() {
-            let pdfName = 'Full Statement';
-            var doc = new jsPDF('landscape');
-            const firstPageMaxRows = 13; // Rows for the first page
-            const subsequentPagesMaxRows = 30; // Rows for subsequent pages
+          const statements = this.filteredStatements;
+          const summary = this.tenantSummary;
 
-            // Add top-left header
-            const rightHeaderText = 'Ingo Properties\nKakamega-Webuye Rd, ACK Building\nTel: 0720 020 401\nP. O. Box 2973-50100, Kakamega\nEmail: propertIngo@gmail.com';
-            const rightHeaderFontSize = 12;
-            const rightheaderX = 20; // Adjust the X coordinate
-            const rightheaderY = 10;
+          if (!summary) {
+            console.warn('Summary not ready yet');
+            return;
+          }
 
-            doc.setFontSize(rightHeaderFontSize);
-            doc.setTextColor(44, 62, 80);
-            doc.text(rightHeaderText, rightheaderX, rightheaderY, { align: 'left' });
+          const doc = new jsPDF('landscape', 'mm', 'a4');
 
-            // Add top-right header
-            const headerText = 'Generated on: ' + new Date().toLocaleString()+'\n'+'Tenant: '+this.tenantName+'\n'+'ID Number: '+this.tenant.id_number + '\n'+'Phone: '+this.tenant.phone_number+'\n'+this.tenant.property.name+'\n'+this.tenant.unit.unit_number;
-            const headerFontSize = 12;
-            const headerX = doc.internal.pageSize.width - 20; // Adjust the X coordinate
-            const headerY = 10;
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const pageHeight = doc.internal.pageSize.getHeight();
 
-            doc.setFontSize(headerFontSize);
-            doc.setTextColor(44, 62, 80);
-            doc.text(headerText, headerX, headerY, { align: 'right' });
+          // =========================
+          // COMPANY (FORMATTED CLEAN)
+          // =========================
+          const company = {
+            name: "INGO PROPERTIES",
+            address1: "COSYARD BUSINESS CENTRE",
+            address2: "KAKAMEGA – MUMIAS ROAD",
+            phone: "0759 509 462",
+            email: "ingoproperties@gmail.com"
+          };
 
-            // Add image at the top
-            const imageUrl = '/images/apex-logo.png'; // Replace with the URL of your image
-            const imageWidth = 50; // Adjust the width of the image as needed
-            const imageHeight = 50; // Adjust the height of the image as needed
-            const imageX = (doc.internal.pageSize.width - imageWidth) / 2;
-            const imageY = 20;
-            doc.addImage(imageUrl, 'JPEG', imageX, imageY, imageWidth, imageHeight);
+          // =========================
+          // HEADER
+          // =========================
+          const addHeader = () => {
+            doc.addImage(
+              this.logoBase64 || '/images/apex-logo.png',
+              'PNG',
+              20,
+              10,
+              40,
+              20
+            );
 
-            // Add title
-            const titleText = (this.tenantName + " " + this.currentMonth + ' Rent Statement').toUpperCase();
-            const titleFontSize = 16;
-            const titleWidth = doc.getStringUnitWidth(titleText) * titleFontSize / doc.internal.scaleFactor;
-            const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
-            const titleY = imageY + imageHeight + 10;
+            const infoX = pageWidth - 20;
 
-            doc.setFontSize(titleFontSize);
-            doc.setTextColor(44, 62, 80); // Set text color to a dark shade
-            doc.text(titleText, titleX, titleY);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text(company.name.toUpperCase(), infoX, 10, { align: 'right' });
 
-            const roundedCommission = Math.round(this.property.commission * 100);
-            const commissionTotal = this.propertyCommission / 100 * this.totalPaid;
-            const netRemissionTotal = Math.round(this.totalPaid - (this.totalAmountPaid + commissionTotal));
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(company.address1.toUpperCase(), infoX, 16, { align: 'right' });
+            doc.text(company.address2.toUpperCase(), infoX, 22, { align: 'right' });
+            doc.text(company.phone, infoX, 28, { align: 'right' });
+            doc.text(company.email, infoX, 34, { align: 'right' });
+          };
 
-            // Add content headers
+          // =========================
+          // FOOTER (PAGE NUMBERS)
+          // =========================
+          const addFooter = (page, total) => {
+            doc.setFontSize(9);
+            doc.setTextColor(120);
 
-            doc.setFontSize(14);
-            doc.setTextColor(52, 73, 94); // Set text color to a slightly lighter shade
+            doc.text(
+              `Page ${page} of ${total}`,
+              pageWidth / 2,
+              pageHeight - 8,
+              { align: 'center' }
+            );
 
-            let textY = imageY + imageHeight + 20; // Initial y-coordinate for the first text
-
-            doc.text('Total Rent Due: ' + 'KES ' + this.formatNumber(this.totalDue), 20, textY);
-            textY += 10; // Increment y-coordinate for the next text
-
-            doc.text('Total Rent Paid: '+ 'KES ' +this.formatNumber(this.totalPaid), 20, textY);
-            textY += 10; // Increment y-coordinate for the next text
-
-            doc.text('Total Balance: ' + 'KES ' + this.formatNumber(this.totalBalance) , 20, textY);
-            textY += 10; // Increment y-coordinate for the next text
-
-            // Set font size for the table headers and data
-            const tableFontSize = 8;
-            doc.setFontSize(tableFontSize);
             doc.setTextColor(0);
+          };
 
-            let headerYPos = imageY + imageHeight + 45;
-            let cellHeight = 10;
-            let cellPadding = 2;
-            let lineHeight = 5;
-            let columnWidths = [20, 50, 20, 20, 20, 20, 20, 20, 30]; // Adjusted column widths for 9 columns
-            let columnHeaders = ['H/S NO.', 'TENANT NAME', 'DUE', 'RENT', 'GARBAGE', 'WATER', 'PAID', 'BALANCE', 'DATE PAID']; // Example headers
+          // =========================
+          // TITLE BLOCK
+          // =========================
+          const addTitle = () => {
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(16);
 
-            let xPos = 20;
-            doc.setDrawColor(0);
+            doc.text('RENT STATEMENT', pageWidth / 2, 38, { align: 'center' });
 
-            for (let i = 0; i < columnWidths.length; i++) {
-                doc.rect(xPos, headerYPos, columnWidths[i], cellHeight);
-                doc.setTextColor(0); // Set text color to black
-                doc.text(columnHeaders[i], xPos + cellPadding, headerYPos + cellHeight - cellPadding);
-                xPos += columnWidths[i];
-            }
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(12);
 
-            let currentPage = 1;
-            let currentRow = 0;
-            let maxRowsPerPage = firstPageMaxRows; // Set initial max rows for the first page
+            doc.text(
+              `TENANT: ${summary.tenantName}`.toUpperCase(),
+              pageWidth / 2,
+              46,
+              { align: 'center' }
+            );
 
-            // Initialize totals
-            let totals = Array(columnHeaders.length).fill(0);
+            doc.setFontSize(10);
 
-            this.statements.forEach((statement, index) => {
-                if (currentRow >= maxRowsPerPage) {
-                    doc.addPage();
-                    headerYPos = 20;
-                    currentRow = 0;
-                    currentPage++;
-                    maxRowsPerPage = subsequentPagesMaxRows; // Set max rows for subsequent pages
+            doc.text(
+              `PERIOD: ${summary.period}`.toUpperCase(),
+              pageWidth / 2,
+              53,
+              { align: 'center' }
+            );
+          };
 
-                    xPos = 20;
-                    for (let i = 0; i < columnWidths.length; i++) {
-                        doc.rect(xPos, headerYPos, columnWidths[i], cellHeight, 'F');
-                        doc.setTextColor(0); // Set text color to black
-                        doc.text(columnHeaders[i], xPos + cellPadding, headerYPos + cellHeight - cellPadding);
-                        xPos += columnWidths[i];
-                    }
-                    headerYPos += cellHeight;
-                }
+          // =========================
+          // TABLE CONFIG
+          // =========================
+          const headers = [
+            'H/S No.',
+            'Rent Month',
+            'Due',
+            'Rent',
+            'Garbage',
+            'Water',
+            'Paid',
+            'Balance',
+            'Date Paid'
+          ];
 
-                let yPos = headerYPos + (currentRow + 1) * lineHeight;
-                xPos = 20;
-                for (let i = 0; i < columnWidths.length; i++) {
-                    doc.rect(xPos, yPos, columnWidths[i], cellHeight);
-                    switch (i) {
-                        case 0:
-                            const unitNumber = statement.unit ? statement.unit.unit_number : 'N/A';
-                            const truncatedText = unitNumber.length > 4 ? unitNumber.slice(0, 4) + '...' : unitNumber;
-                            doc.text(truncatedText, xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            break;
-                        case 1:
-                            doc.text(
-                                statement.tenant ? `${statement.tenant.first_name} ${statement.tenant.last_name}` : 'Vacant',
-                                xPos + cellPadding,
-                                yPos + cellHeight - cellPadding
-                            );
-                            break;
-                        case 2:
-                            doc.text(this.formatNumber(statement.total), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[2] += parseFloat(statement.total) || 0;
-                            break;
-                        case 3:
-                            let monthlyRent = statement.unit ? parseFloat(statement.unit.monthly_rent) : 0;
-                            doc.text(this.formatNumber(monthlyRent), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[3] += monthlyRent || 0;
-                            break;
-                        case 4:
-                            let garbageFee = statement.unit ? parseFloat(statement.unit.garbage_fee) : 0;
-                            doc.text(this.formatNumber(garbageFee), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[4] += garbageFee || 0;
-                            break;
-                        case 5:
-                            let waterBill = parseFloat(statement.water_bill) || 0;
-                            doc.text(this.formatNumber(waterBill), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[5] += waterBill;
-                            break;
-                        case 6:
-                            let paidAmount = parseFloat(statement.paid) || 0;
-                            doc.text(this.formatNumber(paidAmount), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[6] += paidAmount;
-                            break;
-                        case 7:
-                            let balance = parseFloat(statement.balance) || 0;
-                            doc.text(this.formatNumber(balance), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            totals[7] += balance;
-                            break;
-                        case 8:
-                            doc.text(this.format_date(statement.paid_at ?? 'N/A'), xPos + cellPadding, yPos + cellHeight - cellPadding);
-                            break;
-                    }
-                    xPos += columnWidths[i];
-                }
-                currentRow++;
+          const widths = [18, 30, 18, 18, 18, 18, 18, 18, 30];
+
+          const rowHeight = 8;
+          const bottomLimit = pageHeight - 15;
+
+          const drawTableHeader = (y) => {
+            let x = 20;
+            doc.setFont(undefined, 'bold');
+
+            headers.forEach((h, i) => {
+              doc.rect(x, y, widths[i], rowHeight);
+              doc.text(h, x + 2, y + 6);
+              x += widths[i];
             });
 
-            // Add totals row
-            let totalsYPos = headerYPos + (currentRow + 1) * lineHeight;
-            xPos = 20;
-            doc.setDrawColor(0);
-            for (let i = 0; i < columnWidths.length; i++) {
-                doc.rect(xPos, totalsYPos, columnWidths[i], cellHeight);
-                if (i > 1 && i < columnWidths.length - 1) { // Skip first two and last column
-                    doc.text(this.formatNumber(totals[i]), xPos + cellPadding, totalsYPos + cellHeight - cellPadding);
-                }
-                xPos += columnWidths[i];
+            doc.setFont(undefined, 'normal');
+          };
+
+          // =========================
+          // INIT
+          // =========================
+          let y = 58;
+          let page = 1;
+
+          addHeader();
+          addTitle();
+
+          // =========================
+          // INFO BLOCK
+          // =========================
+          doc.setFontSize(11);
+
+          doc.text(`Property: ${summary.property}`, 20, y); y += 6;
+          doc.text(`Unit: ${summary.unit}`, 20, y); y += 6;
+          doc.text(`Status: ${summary.status}`, 20, y); y += 10;
+
+          // =========================
+          // SUMMARY BOX
+          // =========================
+          const boxX = 20;
+          const boxY = y;
+          const boxW = 160;
+          const boxH = 22;
+
+          doc.setDrawColor(200);
+          doc.rect(boxX, boxY, boxW, boxH);
+
+          doc.setFontSize(10);
+
+          doc.text(`Total Rent: KES ${this.formatNumber(summary.totalRent)}`, boxX + 4, boxY + 7);
+          doc.text(`Total Paid: KES ${this.formatNumber(summary.totalPaid)}`, boxX + 4, boxY + 14);
+          doc.text(`Balance: KES ${this.formatNumber(summary.balance)}`, boxX + 80, boxY + 7);
+
+          y = boxY + boxH + 10;
+
+          drawTableHeader(y);
+          y += rowHeight;
+
+          // =========================
+          // ROWS (WITH PAGINATION)
+          // =========================
+          statements.forEach((s) => {
+
+            if (y + rowHeight > bottomLimit) {
+              doc.addPage();
+              page++;
+
+              addHeader();
+              drawTableHeader(20);
+
+              y = 28;
             }
 
-            // Add footer
-            doc.setFontSize(10);
-            doc.text('Generated on: ' + new Date().toLocaleString(), 20, doc.internal.pageSize.height - 10);
+            let cx = 20;
 
-            // Save the PDF
-            let fileName = this.tenantName + " " + this.formatMonth(new Date()) + ' Rent Statement' + '_Total_Pages_' + currentPage + '.pdf';
-            doc.save(fileName);
+            const values = [
+              s.unit?.unit_number ?? 'N/A',
+              s.rent_month ?? this.format_date(s.paid_at)?.slice(3, 10) ?? 'N/A',
+              s.total ?? 0,
+              s.unit?.monthly_rent ?? 0,
+              s.unit?.garbage_fee ?? 0,
+              s.water_bill ?? 0,
+              s.paid ?? 0,
+              s.balance ?? 0,
+              this.format_date(s.paid_at) ?? 'N/A'
+            ];
+
+            values.forEach((v, i) => {
+              doc.rect(cx, y, widths[i], rowHeight);
+
+              const text = this.formatNumber(v);
+              const isNumber = i !== 0 && i !== 1 && i !== 8;
+
+              if (isNumber) {
+                doc.text(text, cx + widths[i] - 2, y + 6, { align: 'right' });
+              } else {
+                doc.text(text, cx + 2, y + 6);
+              }
+
+              cx += widths[i];
+            });
+
+            y += rowHeight;
+          });
+
+          // =========================
+          // PAGE NUMBERS (FINAL PASS)
+          // =========================
+          const totalPages = doc.internal.getNumberOfPages();
+
+          for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            addFooter(i, totalPages);
+          }
+
+          // =========================
+          // EXPORT
+          // =========================
+          const blob = doc.output('blob');
+          const url = URL.createObjectURL(blob);
+
+          window.open(url, '_blank');
         },
       //   generatePDF() {
       //       let pdfName = 'Full Statement';
@@ -1857,7 +1961,7 @@
       watch: {
         tenant(newVal) {
           if (newVal) {
-            const summary = this.tenantSummary();
+            const summary = this.tenantSummary;
             const ref = this.generateReference(summary);
             console.log(ref);
           }

@@ -164,6 +164,7 @@ import TheMaster from '@/components/dashboard/TheMaster.vue'
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import moment from 'moment';
+import IngoLogo from '@/assets/img/apex-logo.png';
 
 const toast = Swal.mixin({
     toast: true,
@@ -195,6 +196,7 @@ export default {
             unitGarbageFee: '',
             unitName: '',
             invoice: '',
+            logoBase64: '',
             user: [],
             invoiceTenantPermission: '',
             settleInvoicePermission: ''
@@ -311,174 +313,248 @@ export default {
             this.$router.push('/settledinvoices');
         },
         printReceipt() {
-            // this.submit();
-            this.$router.push('/settledinvoices')
+        this.$router.push('/settledinvoices');
 
-            // Open a new window for printing
-            const printWindow = window.open("", "_blank");
+        const printWindow = window.open("", "_blank");
+        const receiptContent = this.buildReceiptContent();
 
-            // Build the content for printing
-            const receiptContent = this.buildReceiptContent();
+        printWindow.document.open();
+        printWindow.document.write(receiptContent);
+        printWindow.document.close();
 
-            // Write the content to the new window
-            printWindow.document.write(receiptContent);
-
-            // Close the document stream
-            printWindow.document.close();
-
-            // Trigger the print dialog
+        // ✅ IMPORTANT TRICK: wait for full render before printing
+        printWindow.onload = function () {
+            printWindow.focus();
             printWindow.print();
+            printWindow.close();
+        };
         },
-        buildReceiptContent(refNo) {
-            // Determine whether to include the row
-            const showGarbageFeeRow = this.unitGarbageFee !== 0;
-            const showSecurityFeeRow = this.unitSecurityFee !== 0;
-            const showWaterBillRow = this.waterBill !== 0;
-            const showPaymentMethod = this.paymentMethod !== null;
-            // Build the HTML content for the receipt
-            const receiptHTML = `
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                  <meta charset="UTF-8">
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                  <title>Receipt Of Payment</title>
-                  <style>
-                    body {
-                      font-family: Arial, sans-serif;
-                      margin: 0;
-                      padding: 0;
-                      background-color: #f5f5f5;
-                    }
-                    .receipt {
-                      max-width: 600px;
-                      margin: 20px auto;
-                      padding: 20px;
-                      background-color: #fff;
-                      border: 2px solid #ccc;
-                      border-radius: 10px;
-                    }
-                    .receipt-header {
-                      text-align: center;
-                      margin-bottom: 20px;
-                    }
-                    .receipt-header h1 {
-                      margin: 10px 0;
-                      color: #333;
-                    }
-                    .receipt-info {
-                      margin-bottom: 20px;
-                    }
-                    .receipt-info p {
-                      margin: 5px 0;
-                      color: #555;
-                    }
-                    .receipt-table {
-                      width: 100%;
-                      border-collapse: collapse;
-                      margin-bottom: 20px;
-                    }
-                    .receipt-table th, .receipt-table td {
-                      padding: 8px;
-                      border-bottom: 1px solid #ccc;
-                    }
-                    .receipt-table th {
-                      text-align: left;
-                      background-color: #f2f2f2;
-                      color: #333;
-                    }
-                    .receipt-table td {
-                      text-align: left;
-                      color: #666;
-                    }
-                    .receipt-footer {
-                      text-align: center;
-                    }
-                    .receipt-footer p {
-                      margin: 5px 0;
-                      color: #777;
-                    }
-                  </style>
-                </head>
-                <body>
-                  <div class="receipt">
-                    <div class="receipt-header">
-                      <h1>Ingo Properties</h1>
-                     <p>Cosyard Business Center Kakamega-Mumias Rd, Kakamega</p>
-                     <p>Phone: (0759) 509-462 | Email: ingoproperties@gmail.com</p>
-                    </div>
-                    <div class="receipt-info">
-                      <p><strong>#${this.refNo}</strong></p>
-                      <p><strong>Receipt Date:</strong> ${new Date().toLocaleString('en-GB')}</p>
-                      <p><strong>Details:</strong> ${this.details}</p>
-                      <p><strong>Rent Month:</strong> ${this.rentMonth}</p>
-                      <p><strong>Tenant:</strong> ${this.tenant}</p>
-                      <!-- Conditionally include water bill row -->
-                       ${showPaymentMethod ? `
-                      <p><strong>Payment Mode:</strong> ${this.paymentMethod}</p>
-                       ` : ''}                      
-                    </div>
-                    <table class="receipt-table">
-                      <thead>
-                        <tr>
-                          <th>Description</th>
-                          <th>Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Rent Payment</td>
-                          <td>KES ${this.formatNumber(this.unitRent)}</td>
-                        </tr>
-                        <!-- Conditionally include water bill row -->
-                          ${showWaterBillRow ? `
-                          <tr>
-                            <td>Water Bill</td>
-                            <td>KES ${this.formatNumber(this.waterBill)}</td>
-                          </tr>
-                          ` : ''}
+        buildReceiptContent() {
+        const logoBase64 = this.logoBase64 || '';
 
-                        <!-- Conditionally include garbage collection fee row -->
-                          ${showGarbageFeeRow ? `
-                          <tr>
-                            <td>Garbage Collection Fee</td>
-                            <td>KES ${this.formatNumber(this.unitGarbageFee)}</td>
-                          </tr>
-                          ` : ''}
-                          </tr>
-                          <!-- Conditionally include security fee row -->
-                          ${showSecurityFeeRow ? `
-                          <tr>
-                            <td>Security Fee</td>
-                            <td>KES ${this.formatNumber(this.unitSecurityFee)}</td>
-                          </tr>
-                          ` : ''}
-                      </tbody>
-                      <tfoot>
-                        <tr>
-                          <th>Total Amount Due:</th>
-                          <td>KES ${this.formatNumber(this.total)}</td>
-                        </tr>
-                        <tr>
-                          <th>Amount Paid:</th>
-                          <td>KES ${this.formatNumber(this.paid)}</td>
-                        </tr>
-                        <tr>
-                          <th>Balance:</th>
-                          <td>KES ${this.formatNumber(this.balance)}</td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                    <div class="receipt-footer">
-                      <p>You were served by ${this.user.first_name} ${this.user.last_name}. Thank you for your payment.</p>
-                      <p>This receipt acknowledges the payment received for the above property management services.</p>
-                    </div>
-                  </div>
-                </body>
-                </html>
-            `;
+        const showGarbageFeeRow = this.unitGarbageFee !== 0;
+        const showSecurityFeeRow = this.unitSecurityFee !== 0;
+        const showWaterBillRow = this.waterBill !== 0;
 
-            return receiptHTML;
+        const isFullyPaid = this.balance <= 0;
+
+        const receiptHTML = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Payment Receipt - ${this.refNo}</title>
+
+            <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+                color: #333;
+            }
+
+            .receipt {
+                max-width: 750px;
+                margin: 20px auto;
+                padding: 25px;
+                background-color: #fff;
+                border-radius: 10px;
+                box-shadow: 0 0 15px rgba(0,0,0,0.1);
+                position: relative;
+            }
+
+            .watermark {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-45deg);
+                font-size: 70px;
+                color: rgba(0,0,0,0.05);
+                pointer-events: none;
+                white-space: nowrap;
+            }
+
+            .receipt-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 2px solid #e0e0e0;
+                padding-bottom: 15px;
+                margin-bottom: 25px;
+            }
+
+            .logo img {
+                max-width: 150px;
+            }
+
+            .company {
+                text-align: right;
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+
+            .info p {
+                margin: 4px 0;
+                font-size: 0.95rem;
+            }
+
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+
+            .table th, .table td {
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .table th {
+                background: #f9f9f9;
+                text-align: left;
+            }
+
+            .status {
+                font-weight: bold;
+                color: ${isFullyPaid ? 'green' : 'orange'};
+            }
+
+            .payment-highlight {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f9f9f9;
+                border-radius: 8px;
+                font-size: 0.95rem;
+            }
+
+            .footer {
+                text-align: center;
+                margin-top: 25px;
+                font-size: 0.85rem;
+                color: #777;
+            }
+            </style>
+        </head>
+
+        <body>
+            <div class="receipt">
+            <div class="watermark">RECEIPT</div>
+
+            <!-- HEADER -->
+            <div class="receipt-header">
+                <div class="logo">
+                <img src="${logoBase64}" />
+                </div>
+
+                <div class="company">
+                <strong>Ingo Properties</strong><br>
+                Cosyard Business Center<br>
+                Kakamega – Mumias Road<br>
+                0759 509 462<br>
+                ingoproperties@gmail.com
+                </div>
+            </div>
+
+            <!-- INFO -->
+            <div class="info">
+                <p><strong>Receipt No:</strong> ${this.refNo}</p>
+                <p><strong>Date:</strong> ${new Date().toLocaleString('en-GB')}</p>
+                <p><strong>Tenant:</strong> ${this.tenant}</p>
+                <p><strong>Details:</strong> ${this.details}</p>
+                <p><strong>Rent Month:</strong> ${this.rentMonth}</p>
+                <p><strong>Payment Method:</strong> ${this.paymentMethod || 'Cash / M-PESA'}</p>
+                <p><strong>Status:</strong> 
+                <span class="status">
+                    ${isFullyPaid ? 'FULLY PAID' : 'PARTIALLY PAID'}
+                </span>
+                </p>
+            </div>
+
+            <!-- TABLE -->
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>Rent Payment</td>
+                    <td>KES ${this.formatNumber(this.unitRent)}</td>
+                </tr>
+
+                ${showWaterBillRow ? `
+                <tr>
+                    <td>Water Bill</td>
+                    <td>KES ${this.formatNumber(this.waterBill)}</td>
+                </tr>` : ''}
+
+                ${showGarbageFeeRow ? `
+                <tr>
+                    <td>Garbage Collection Fee</td>
+                    <td>KES ${this.formatNumber(this.unitGarbageFee)}</td>
+                </tr>` : ''}
+
+                ${showSecurityFeeRow ? `
+                <tr>
+                    <td>Security Fee</td>
+                    <td>KES ${this.formatNumber(this.unitSecurityFee)}</td>
+                </tr>` : ''}
+                </tbody>
+
+                <tfoot>
+                <tr>
+                    <th>Total Amount</th>
+                    <th>KES ${this.formatNumber(this.total)}</th>
+                </tr>
+                <tr>
+                    <th>Amount Paid</th>
+                    <th>KES ${this.formatNumber(this.paid)}</th>
+                </tr>
+                <tr>
+                    <th>Balance</th>
+                    <th>KES ${this.formatNumber(this.balance)}</th>
+                </tr>
+                </tfoot>
+            </table>
+
+            <!-- NOTE -->
+            <div class="payment-highlight">
+                Payment has been applied to rent and associated charges for this billing period.
+            </div>
+
+            <!-- FOOTER -->
+            <div class="footer">
+                Prepared by: ${this.user.first_name} ${this.user.last_name} <br>
+                Generated At: ${new Date().toLocaleString('en-GB', { hour12: false })} <br><br>
+                This is a computer-generated receipt and does not require a signature.
+            </div>
+
+            </div>
+        </body>
+        </html>
+        `;
+
+        return receiptHTML;
+        },
+        loadLogo() {
+          fetch(IngoLogo)
+            .then(response => response.blob())
+            .then(blob => {
+              const reader = new FileReader();
+              reader.readAsDataURL(blob);
+              reader.onloadend = () => {
+                this.logoBase64 = reader.result;
+                // console.log(this.logoBase64)
+              };
+            })
+            .catch(error => {
+              console.error('Error converting image to base64:', error);
+            });
         },
         formatMonth(value) {
             if (value) {
@@ -501,6 +577,7 @@ export default {
     mounted() {
         this.getStatement();
         this.getInvoiceDate();
+        this.loadLogo();
         this.user = localStorage.getItem('user');
         this.user = JSON.parse(this.user);
         this.userId = this.user.id;
