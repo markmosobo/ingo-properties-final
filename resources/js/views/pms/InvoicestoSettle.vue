@@ -604,10 +604,9 @@
         },
 
         buildInvoiceContent() {
-          // Determine whether to include the row
-          const logoBase64 = this.logoBase64 || ''; // Fallback if no logo is provided
+          const logoBase64 = this.logoBase64 || '';
           const watermarkText = 'INVOICE';
-          // Build the HTML content for the receipt
+
           const receiptHTML = `
             <!DOCTYPE html>
             <html lang="en">
@@ -615,151 +614,164 @@
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Invoice Of Payment - ${this.refNo}</title>
+
               <style>
                 body {
-                  font-family: Arial, sans-serif;
+                  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                   margin: 0;
                   padding: 0;
-                  background-color: #f5f5f5;
+                  background-color: #f4f4f4;
+                  color: #333;
                 }
+
                 .receipt {
-                  max-width: 600px;
+                  max-width: 750px;
                   margin: 20px auto;
-                  padding: 20px;
+                  padding: 25px;
                   background-color: #fff;
-                  border: 2px solid #ccc;
-                  display: flex;
-                  flex-direction: column;
+                  border-radius: 10px;
+                  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+                  position: relative;
                 }
-                 .watermark {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%) rotate(-45deg);
-                    font-size: 80px;
-                    color: rgba(0, 0, 0, 0.1); /* Adjust the transparency as needed */
-                    white-space: nowrap;
-                    z-index: 0;
-                    pointer-events: none; /* Prevents watermark from interfering with other elements */
-                  }
+
+                .watermark {
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%) rotate(-45deg);
+                  font-size: 70px;
+                  color: rgba(0,0,0,0.05);
+                  pointer-events: none;
+                  white-space: nowrap;
+                }
+
+                /* ✅ EXACT SAME HEADER STYLE AS RECEIPT */
                 .receipt-header {
                   display: flex;
                   justify-content: space-between;
                   align-items: center;
-                  margin-bottom: 50px;
+                  border-bottom: 2px solid #e0e0e0;
+                  padding-bottom: 15px;
+                  margin-bottom: 25px;
                 }
-                .company-info {
-                  text-align: left;
+
+                .logo img {
+                  max-width: 140px;
                 }
-                .company-info img {
-                  max-width: 150px;
-                  height: auto;
+
+                .company {
+                  text-align: right;
+                  font-size: 0.9rem;
+                  line-height: 1.5;
                 }
-                .receipt-info {
-                  margin-bottom: 50px;
+                
+                .company strong {
+                  text-transform: uppercase;
                 }
-                .receipt-info p {
-                  margin: 5px 0;
-                  color: #555;
+
+                .info p {
+                  margin: 4px 0;
+                  font-size: 0.95rem;
                 }
-                 .additional-info {
-                  margin-bottom: 30px;
-                  font-size: 16px;
-                  color: #333333;
-                }
-                .additional-info p {
-                  margin: 8px 0;
-                }
-                .payment-info {
-                  margin-bottom: 30px;
-                  font-size: 16px;
-                  color: #333333;
-                  text-align: center;
-                }
-                .payment-info p {
-                  margin: 8px 0;
-                }
-                .receipt-table {
+
+                .table {
                   width: 100%;
                   border-collapse: collapse;
-                  margin-bottom: 50px;
+                  margin-top: 10px;
                 }
-                .receipt-table th, .receipt-table td {
-                  padding: 8px;
-                  border-bottom: 1px solid #ccc;
-                }
-                .receipt-table th {
+
+                .table th, .table td {
+                  padding: 10px;
+                  border-bottom: 1px solid #ddd;
                   text-align: left;
-                  background-color: #f2f2f2;
-                  color: #333;
                 }
-                .receipt-table td {
-                  text-align: left;
-                  color: #666;
+
+                .table th {
+                  background: #f9f9f9;
                 }
-                .receipt-footer {
+
+                .footer {
                   text-align: center;
-                  margin-top: auto;
-                }
-                .receipt-footer p {
-                  margin: 5px 0;
+                  margin-top: 25px;
+                  font-size: 0.85rem;
                   color: #777;
                 }
               </style>
             </head>
+
             <body>
-            <div class="watermark">${watermarkText}</div>
+              <div class="watermark">${watermarkText}</div>
+
               <div class="receipt">
+
+                <!-- ✅ HEADER (NOW 100% MATCHING RECEIPT) -->
                 <div class="receipt-header">
-                  <div class="company-logo">
-                    <img src="${logoBase64}" alt="Company Logo" style="max-width: 150px; height: auto;">
+                  <div class="logo">
+                    <img src="${logoBase64}" />
                   </div>
-                  <div class="company-info">
-                    <p>Kakamega-Webuye Rd, ACK Building</p>
-                    <p>Phone: (0720) 020-401 </p>
-                    <p> Email: propertapril@gmail.com</p>
-                    <p> Website: www.aprilproperties.co.ke</p>
+
+                  <div class="company">
+                    <strong>INGO PROPERTIES</strong><br>
+                    Cosyard Business Center<br>
+                    Kakamega – Mumias Road<br>
+                    0759 509 462<br>
+                    ingoproperties@gmail.com
                   </div>
                 </div>
-                <div class="receipt-info">
+
+                <!-- INFO -->
+                <div class="info">
                   <p><strong>#${this.refNo}</strong></p>
                   <p><strong>Invoice Date:</strong> ${this.format_date(this.invoicedAt ?? 'N/A')}</p>
-                  <p><strong>Due Date:</strong>  ${this.dueDate ?? 'N/A'}</p>
-                  
+                  <p><strong>Due Date:</strong> ${this.dueDate ?? 'N/A'}</p>
                 </div>
-                <div class="additional-info">
-                    <p><strong>Invoiced To</strong></p>
-                    <p><strong></strong> ${this.invoicedTenantFullName}</p>
-                    <p><strong></strong> ${this.name ?? 'Victoria Apartments'} - ${this.unitName}</p>
-                    <p><strong></strong> ${this.rentMonth}</p>
+
+                <!-- CUSTOMER INFO -->
+                <div class="info">
+                  <p><strong>Invoiced To:</strong></p>
+                  <p>${this.invoicedTenantFullName}</p>
+                  <p>${this.name ?? 'Property'} - ${this.unitName}</p>
+                  <p>${this.rentMonth}</p>
                 </div>
-                <table class="receipt-table">
+
+                <!-- TABLE -->
+                <table class="table">
                   <thead>
                     <tr>
                       <th>Description</th>
                       <th>Amount</th>
                     </tr>
                   </thead>
+
                   <tbody>
                     <tr>
-                      <td>Total Rent Due ${this.water}</td>
+                      <td>Total Rent Due</td>
                       <td>KES ${this.formatNumber(this.dueAmount)}</td>
                     </tr>
                   </tbody>
+
                   <tfoot>
                     <tr>
                       <th>Total Amount Due:</th>
-                      <td>KES ${this.formatNumber(this.dueAmount)}</td>
+                      <th>KES ${this.formatNumber(this.dueAmount)}</th>
                     </tr>
                   </tfoot>
                 </table>
-                <div class="payment-info">
+
+                <!-- PAYMENT INFO -->
+                <div class="info">
                   <p><strong>Payment Options:</strong></p>
-                  <p>Mobile Money: Paybill - ${this.paybillNo ?? 'N/A'} Account Number - ${this.accountNo ?? 'N/A'}</p>
+                  <p>
+                    Paybill: ${this.paybillNo ?? 'N/A'} |
+                    Account: ${this.accountNo ?? 'N/A'}
+                  </p>
                 </div>
-                <div class="receipt-footer">
-                  <p>Printed on ${this.format_date(new Date().toLocaleString())}</p>
+
+                <!-- FOOTER -->
+                <div class="footer">
+                  Printed on ${this.format_date(new Date().toLocaleString())}
                 </div>
+
               </div>
             </body>
             </html>
@@ -767,6 +779,7 @@
 
           return receiptHTML;
         },
+        
         async sendWhatsAppReminder(statement, event) {
           event.preventDefault();
 

@@ -291,6 +291,7 @@
 
  import axios from "axios";
  import Swal from 'sweetalert2';
+ import IngoLogo from '@/assets/img/apex-logo.png';
 
  
  const toast = Swal.mixin({
@@ -312,6 +313,8 @@
          balance: '',
          total: '',
          tenantId: null,
+         logoBase64: '',
+
          form:
          {
            payment_method: '',
@@ -341,159 +344,255 @@
           this.step++;
           this.submit();          
        },
+      loadLogo() {
+        fetch(IngoLogo)
+          .then(response => response.blob())
+          .then(blob => {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = () => {
+              this.logoBase64 = reader.result;
+              // console.log(this.logoBase64)
+            };
+          })
+          .catch(error => {
+            console.error('Error converting image to base64:', error);
+          });
+      },
       buildReceiptContent(refNo) {
-        // Determine whether to include the row
+        const logoBase64 = this.logoBase64;
+
         const showGarbageFeeRow = this.garbage_fee !== 0;
         const showSecurityFeeRow = this.security_fee !== 0;
         const showElectricityDepositRow = this.electricity_deposit !== 0;
         const showWaterDepositRow = this.water_deposit !== 0;
-        // Build the HTML content for the receipt
+
         const receiptHTML = `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Receipt Of Payment</title>
-              <style>
-                  body {
-                      font-family: Arial, sans-serif;
-                      margin: 0;
-                      padding: 0;
-                      background-color: #f5f5f5;
-                      color: #333;
-                  }
-                  .container {
-                      max-width: 600px;
-                      margin: 20px auto;
-                      padding: 20px;
-                      background-color: #fff;
-                      border: 2px solid #ccc;
-                      border-radius: 10px;
-                      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                  }
-                  .header {
-                      text-align: center;
-                      margin-bottom: 20px;
-                  }
-                  .header h1 {
-                      margin: 10px 0;
-                      color: #333;
-                  }
-                  .info {
-                      margin-bottom: 20px;
-                  }
-                  .info p {
-                      margin: 5px 0;
-                      color: #555;
-                  }
-                  .table {
-                      width: 100%;
-                      border-collapse: collapse;
-                      margin-bottom: 20px;
-                  }
-                  .table th, .table td {
-                      padding: 8px;
-                      border-bottom: 1px solid #ccc;
-                      text-align: left;
-                  }
-                  .table th {
-                      background-color: #f2f2f2;
-                      color: #333;
-                  }
-                  .table td {
-                      color: #666;
-                  }
-                  .footer {
-                      text-align: center;
-                      margin-top: 20px;
-                      color: #777;
-                  }
-              </style>
-          </head>
-          <body>
-          <div class="container">
-              <div class="header">
-                  <h1>INGO PROPERTIES</h1>
-                  <p>Cosyard Business Centre-Kakamega Mumias Rd, Kakamega</p>
-                  <p>Phone: (254) 759509462 | Email: ingoproperties@gmail.com</p>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Receipt - ${this.refNo}</title>
+
+          <style>
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              margin: 0;
+              padding: 0;
+              background-color: #f4f4f4;
+              color: #333;
+            }
+
+            .receipt {
+              max-width: 750px;
+              margin: 20px auto;
+              padding: 25px;
+              background-color: #fff;
+              border-radius: 10px;
+              box-shadow: 0 0 15px rgba(0,0,0,0.1);
+              position: relative;
+            }
+
+            .watermark {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%) rotate(-45deg);
+              font-size: 70px;
+              color: rgba(0,0,0,0.05);
+              pointer-events: none;
+              white-space: nowrap;
+            }
+
+            .receipt-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 2px solid #e0e0e0;
+              padding-bottom: 15px;
+              margin-bottom: 25px;
+            }
+
+            .logo img {
+              max-width: 140px;
+            }
+
+            .company {
+              text-align: right;
+              font-size: 0.9rem;
+              line-height: 1.5;
+            }
+
+            .info p {
+              margin: 4px 0;
+              font-size: 0.95rem;
+            }
+
+            .table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 10px;
+            }
+
+            .table th, .table td {
+              padding: 10px;
+              border-bottom: 1px solid #ddd;
+              text-align: left;
+            }
+
+            .table th {
+              background: #f9f9f9;
+            }
+
+            .footer {
+              text-align: center;
+              margin-top: 25px;
+              font-size: 0.85rem;
+              color: #777;
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="receipt">
+            <div class="watermark">RECEIPT</div>
+
+            <!-- HEADER (NOW CONSISTENT) -->
+            <div class="receipt-header">
+              
+              <!-- LOGO (CONSISTENT WITH OTHER RECEIPT) -->
+              <div class="logo">
+                <img src="${logoBase64}" />
               </div>
-              <div class="info">
-                  <p><strong>Invoice Number:</strong> ${this.refNo}</p>
-                  <p><strong>Receipt Date:</strong> ${new Date().toLocaleString()}</p>
-                  <p><strong>For:</strong> ${this.details}</p>
-                  <p><strong>Payment Mode:</strong> ${this.form.payment_method}</p>
-                  <p><strong>Property:</strong> ${this.name}</p>
-                  <p><strong>Tenant:</strong> ${this.tenant}</p>
+
+              <div class="company">
+                <strong>INGO PROPERTIES</strong><br>
+                Cosyard Business Center<br>
+                Kakamega – Mumias Road<br>
+                0759 509 462<br>
+                ingoproperties@gmail.com
               </div>
-              <table class="table">
-                  <thead>
-                  <tr>
-                      <th>Description</th>
-                      <th>Amount</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr>
-                      <td>Rent Deposit</td>
-                      <td>KES ${this.formatNumber(this.deposit)}</td>
-                  </tr>
-                  <tr>
-                      <td>Monthly Rent</td>
-                      <td>KES ${this.formatNumber(this.monthly_rent)}</td>
-                  </tr>
-                  ${showGarbageFeeRow ? `
-                  <tr>
-                      <td>Garbage Collection Fee</td>
-                      <td>KES ${this.formatNumber(this.garbage_fee)}</td>
-                  </tr>
-                  ` : ''}
-                  ${showSecurityFeeRow ? `
-                  <tr>
-                      <td>Security Fee</td>
-                      <td>KES ${this.formatNumber(this.security_fee)}</td>
-                  </tr>
-                  ` : ''}
-                  ${showElectricityDepositRow ? `
-                  <tr>
-                      <td>Electricity Deposit</td>
-                      <td>KES ${this.formatNumber(this.electricity_deposit)}</td>
-                  </tr>
-                  ` : ''}
-                  ${showWaterDepositRow ? `
-                  <tr>
-                      <td>Water Deposit</td>
-                      <td>KES ${this.formatNumber(this.water_deposit)}</td>
-                  </tr>
-                  ` : ''}
-                  </tbody>
-                  <tfoot>
-                  <tr>
-                      <th>Total Amount Due:</th>
-                      <td>KES ${this.formatNumber(this.depositRent)}</td>
-                  </tr>
-                  <tr>
-                      <th>Amount Paid:</th>
-                      <td>KES ${this.formatNumber(this.form.cash)}</td>
-                  </tr>
-                  <tr>
-                      <th>Balance:</th>
-                      <td>KES ${this.formatNumber(this.payableAmount)}</td>
-                  </tr>
-                  </tfoot>
-              </table>
-              <div class="footer">
-                  <p>You were served by ${this.user.first_name} ${this.user.last_name}. Thank you for your payment.</p>
-              </div>
+            </div>
+
+            <!-- INFO -->
+            <div class="info">
+              <p><strong>Invoice Number:</strong> ${this.refNo}</p>
+              <p><strong>Date:</strong> ${new Date().toLocaleString('en-GB')}</p>
+              <p><strong>Tenant:</strong> ${this.tenant}</p>
+              <p><strong>Property:</strong> ${this.name}</p>
+              <p><strong>Payment Method:</strong> ${this.form.payment_method}</p>
+              <p><strong>Served By:</strong> ${this.user.first_name} ${this.user.last_name}</p>
+            </div>
+
+            <!-- TABLE -->
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>Rent Deposit</td>
+                  <td>KES ${this.formatNumber(this.deposit)}</td>
+                </tr>
+
+                <tr>
+                  <td>Monthly Rent</td>
+                  <td>KES ${this.formatNumber(this.monthly_rent)}</td>
+                </tr>
+
+                ${showGarbageFeeRow ? `
+                <tr>
+                  <td>Garbage Collection Fee</td>
+                  <td>KES ${this.formatNumber(this.garbage_fee)}</td>
+                </tr>` : ''}
+
+                ${showSecurityFeeRow ? `
+                <tr>
+                  <td>Security Fee</td>
+                  <td>KES ${this.formatNumber(this.security_fee)}</td>
+                </tr>` : ''}
+
+                ${showElectricityDepositRow ? `
+                <tr>
+                  <td>Electricity Deposit</td>
+                  <td>KES ${this.formatNumber(this.electricity_deposit)}</td>
+                </tr>` : ''}
+
+                ${showWaterDepositRow ? `
+                <tr>
+                  <td>Water Deposit</td>
+                  <td>KES ${this.formatNumber(this.water_deposit)}</td>
+                </tr>` : ''}
+              </tbody>
+
+              <tfoot>
+                <tr>
+                  <th>Total Amount Due</th>
+                  <th>KES ${this.formatNumber(this.depositRent)}</th>
+                </tr>
+                <tr>
+                  <th>Amount Paid</th>
+                  <th>KES ${this.formatNumber(this.form.cash)}</th>
+                </tr>
+                <tr>
+                  <th>Balance</th>
+                  <th>KES ${this.formatNumber(this.payableAmount)}</th>
+                </tr>
+              </tfoot>
+            </table>
+
+            <!-- FOOTER -->
+            <div class="footer">
+              This is a system-generated receipt and does not require a signature.
+            </div>
+
           </div>
-          </body>
-          </html>
-
-
+        </body>
+        </html>
         `;
 
         return receiptHTML;
-      }, 
+      },
+      async printReceipt() {
+        try {
+          const statement = await this.submitStatement();
+
+          const printWindow = window.open("", "_blank");
+
+          const receiptContent = this.buildReceiptContent(statement);
+
+          printWindow.document.open();
+          printWindow.document.write(receiptContent);
+          printWindow.document.close();
+
+          // 🔥 WAIT FOR FULL LOAD (THIS FIXES LOGO ISSUE)
+          printWindow.onload = () => {
+            setTimeout(() => {
+              printWindow.focus();
+              printWindow.print();
+
+              // optional cleanup
+              printWindow.close();
+            }, 500); // small delay ensures image decode
+          };
+
+          toast.fire(
+            'Success!',
+            'Invoice saved!',
+            'success'
+          );
+
+          this.$router.push('/pmstenants');
+
+        } catch (error) {
+          console.error("Error submitting statement or printing receipt:", error);
+        }
+      },     
       formatMonth(value){
           if(value){
             return moment(String(value)).format('MMM YYYY');
@@ -623,7 +722,7 @@
           try {
             const response = await axios.get('/api/pmsproperty/' + parseInt(this.propertyId));
             console.log("propertiit", response);
-            this.property = response.data.property[0];
+            this.property = response.data.property;
             this.name = this.property.name;
             // Further processing of the response data if needed
           } catch (error) {
@@ -636,7 +735,7 @@
           try {
             const response = await axios.get('/api/pmstenant/' + parseInt(this.tenantId));
             console.log("tenant", response);
-            this.tenant = response.data.tenant[0];
+            this.tenant = response.data.tenant;
             this.tenant = this.tenant.first_name + " " + this.tenant.last_name;
             // Further processing of the response data if needed
           } catch (error) {
@@ -645,40 +744,7 @@
           }
         },
  
-      async printReceipt() {
-        try {
-          // Call submitStatement() method
-          const statement = await this.submitStatement();
 
-          // Navigate to the desired route after successful submission
-          this.$router.push('/pmstenants');
-
-          // Open a new window for printing
-          const printWindow = window.open("", "_blank");
-
-          // Build the content for printing
-          const receiptContent = this.buildReceiptContent(statement);
-
-          // Write the content to the new window
-          printWindow.document.write(receiptContent);
-
-          // Close the document stream
-          printWindow.document.close();
-
-          // Trigger the print dialog
-          printWindow.print();
-          toast.fire(
-              'Success!',
-              'Invoice saved!',
-              'success'
-            );
-        } catch (error) {
-          // Handle any errors that occurred during submission or printing
-          console.error("Error submitting statement or printing receipt:", error);
-          // For example, display an error message to the user
-          // this.errorMessage = "Failed to submit statement or print receipt. Please try again.";
-        }
-      },
 
 
       formatNumber(value) {
@@ -705,6 +771,7 @@
     },
     mounted() {
        this.loadLists();
+       this.loadLogo();                        
        this.user = JSON.parse(localStorage.getItem('user'));
     },
     computed: {
