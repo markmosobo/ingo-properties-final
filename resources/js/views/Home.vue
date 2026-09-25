@@ -1,6 +1,6 @@
 <template>
   <TheMaster>
-    <section class="section dashboard" v-if="user">
+    <section class="section dashboard" v-if="user.role_id === 1">
 
       <!-- WEBSITE -->
       <h5 class="fw-bold mb-3">Website</h5>
@@ -102,6 +102,49 @@
       </div>
 
     </section>
+<section class="section dashboard" v-if="user.role_id === 3">
+
+  <!-- MY PROPERTIES -->
+  <h5 class="fw-bold mb-3">My Listings</h5>
+
+  <div class="row g-3">
+    <div class="col-xxl-2 col-md-3 col-sm-4">
+      <div
+        class="card stat-card h-100"
+        role="button"
+      >
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between mb-3">
+            <div>
+              <h6 class="text-uppercase text-muted mb-1">
+                Listings
+              </h6>
+              <small class="text-muted">
+                My Listings
+              </small>
+            </div>
+
+            <div class="icon-circle">
+              <i class="bi bi-house"></i>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <h4 class="fw-bold mb-0">
+              {{ myproperties.length }}
+            </h4>
+            <small class="text-muted">
+              Total Listings
+            </small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>    
   </TheMaster>
 </template>
 
@@ -115,10 +158,11 @@ export default {
 
   data() {
     return {
-      user: null,
+      user: [],
 
       openproperties: [],
       closedproperties: [],
+      myproperties: [],
       projectscount: 0,
       testimonialscount: 0,
       blogscount: 0,
@@ -239,7 +283,15 @@ export default {
     navigateTo(route) {
       this.$router.push(route)
     },
-
+    getMyListings(){
+        axios.get('api/myproperties/'+this.user.id).then((response)=>{
+            this.myproperties = response.data.myproperties;
+            console.log("myproperties", this.myproperties)
+            setTimeout(() => {
+              $("#PropertiesTable").DataTable();
+          }, 10);
+        })
+    },
     loadLists() {
       axios.get('api/lists').then(res => {
         const d = res.data.lists
@@ -265,7 +317,9 @@ export default {
 
   mounted() {
     this.user = JSON.parse(localStorage.getItem('user'))
+    console.log("smanatha", this.user)
     this.loadLists()
+    this.getMyListings()
   }
 }
 </script>

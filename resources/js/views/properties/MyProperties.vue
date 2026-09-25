@@ -21,7 +21,7 @@
                     </div>
     
                     <div class="card-body pb-0">
-                      <h5 class="card-title">My Listings <span>| Today</span></h5>
+                      <h5 class="card-title">My Listings <span>| Uploaded listings</span></h5>
                       <p class="card-text">
                    
                       <router-link to="/add-property" custom v-slot="{ href, navigate, isActive }">
