@@ -48,31 +48,6 @@ class PropertyController extends Controller
     {
         $property = Property::create($request->validated());
 
-        // $property = Property::create([
-        //     'title' => $request->title,
-        //     'category_id' => $request->category_id,
-        //     'location_id' => $request->location_id,
-        //     'property_type_id' => $request->property_type_id,
-        //     'address' => $request->address,
-        //     'price' => $request->price,
-        //     'negotiable' => $request->negotiable,
-        //     'description' => $request->description,
-        //     'location' => $request->location,
-        //     'size' => $request->size,
-        //     'social_link' => $request->social_link,
-        //     'estate_name' => $request->estate_name,
-        //     'bathrooms' => $request->bathrooms,
-        //     'bedrooms' => $request->bedrooms,
-        //     'parking_space' => $request->parking_space,
-        //     'created_by' => $request->created_by,
-        //     'status' => '0',
-        //     'featured' => '0',
-        //     'property_status' => $request->property_status,
-        //     'land_type' => $request->land_type,
-        //     'property_use' => $request->property_use,
-        //     'land_area' => $request->land_area
-        // ]);
-
         if(isset($request->media)){
             foreach($request->media as $image){
                 $from = storage_path('app/public/tmp/uploads/' . $image['name']);
@@ -87,7 +62,7 @@ class PropertyController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => "Property Created successfully!",
+            'message' => "Listing created successfully!",
             'property' => $property
         ], 200);
     }
@@ -98,10 +73,14 @@ class PropertyController extends Controller
      * @param  \App\Models\Property  $property
      * @return \Illuminate\Http\Response
      */
-    public function show(Property $property)
-    {
-        //
-    }
+public function show($id)
+{
+    $property = Property::with('images')->findOrFail($id);
+
+    return response()->json([
+        'property' => $property
+    ]);
+}
 
     /**
      * Show the form for editing the specified resource.
@@ -177,7 +156,7 @@ class PropertyController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => "Property Updated successfully!",
+            'message' => "Listing Updated successfully!",
             'property' => $request
         ], 200);
     }
@@ -229,16 +208,13 @@ class PropertyController extends Controller
         ], 200);
     }
 
-    public function single(Request $request, $id)
+    public function single($id)
     {
-        // $property = Property::findOrFail($id);
-        $property = Property::with('images')->where('id', $id)->get();
+        $property = Property::with('images')->findOrFail($id);
 
         return response()->json([
-            'status' => true,
-            'message' => "Property",
             'property' => $property
-        ], 200);
+        ]);
     }
 
     public function approve(Request $request, $id)

@@ -1,686 +1,2457 @@
 <template>
-    <div class="card px-2">
-        <div class="card-body">
-    
-        <form @submit.prevent="">
-          <fieldset>
-             <h5 class="card-title text-center">Edit ad</h5>
- 
-             <div class="row m-auto p-auto justify-content- g-3 needs-validation" novalidate="" autocomplete="off">
-                <div class="row  mb-3"></div>
- 
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                   <input
-                      type="hidden"
-                      id="user_id"
-                      name="user_id"
-                      value="1"
-                      class="form-control"
-                   />
-                   <div class="col-sm-6">
-                      <label for="validationCustom04" class="form-label"
-                      >Category</label
-                      >
-                      <div class="col-sm-10">
-                         <select name="category" v-model="form.category_id" class="form-select">
-                            <option value="0" selected disabled>Select Category</option>
-                            <option v-for="category in categories" :value="category.id"
-                            :selected="category.id == form.category_id" :key="category.id">{{ category.name}}</option>
- 
-                         </select>
- 
-                      <div class="invalid-feedback">Please enter category!</div>
-                      </div>
-                   </div>
-                   <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Title</label>
-                      <div class="col-sm-10">
-                        <input
-                            type="text"
-                            placeholder="Title*"
-                            id="title"
-                            name="title"
-                            v-model="form.title"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter title!</div>
-                      </div>
-                   </div>
- 
-                </div>
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                    <div class="col-sm-6">
-                      <label for="validationCustom04" class="form-label"
-                      >Location</label
-                      >
-                      <div class="col-sm-10">
-                         <select name="location" v-model="form.location_id" class="form-select" id="">
-                            <option value="0" selected>Select Location</option>
-                            <option v-for="location in locations" :value="location.id"
-                            :selected="location.id == form.location_id" :key="location.id">{{ location.name}}</option>
- 
-                         </select>
- 
-                      <div class="invalid-feedback">Please enter location!</div>
-                      </div>
-                   </div>
-                   <div class="col-sm-6">
-                      <label for="validationCustom04" class="form-label"
-                      >Property Status</label
-                      >
-                      <div class="col-sm-10">
-                         <select name="category" v-model="form.property_status" class="form-select" id="">
-                            <option value="0" disabled selected>Select Status</option>
-                            <option value="sale" selected>For Sale</option>
-                            <option value="rent" selected>For Rent</option>
- 
-                         </select>
- 
-                      <div class="invalid-feedback">Please enter status!</div>
-                      </div>
-                </div>
-                </div>
+    <div class="listing-page">
 
-                 <div class="row mb-3">
-                    <div class="col-12">
-                      <label for="mediaPreview" class="form-label">Uploaded Media</label>
-                      <div class="d-flex flex-wrap" id="mediaPreview">
-                        <div
-                          v-for="(media, index) in form.images"
-                          :key="media.id"
-                          class="position-relative m-2"
-                        >
-                          <img
-                            :src="getImageUrl(media.name)"
-                            class="img-thumbnail"
-                            :alt="'media-' + index"
-                            style="width: 150px; height: 100px; object-fit: cover;"
-                          />
-                          <button
-                            type="button"
-                            class="btn btn-danger btn-sm position-absolute top-0 end-0"
-                            @click="removeImage(media)"
-                          >
-                            X
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                </div>
+        <div class="container-fluid px-2 px-md-4 py-3">
 
-                  <!-- Add New Media Checkbox -->
-                  <div class="row mb-3"></div>
-                    <div class="form-group row">
-                    <div class="col-sm-6">
-                      <input
-                        type="checkbox"
-                        id="addNewMedia"
-                        v-model="form.addNewMedia"
-                        class="form-check-input me-2"
-                      />
-                      <label for="addNewMedia" class="form-check-label">Add New Media</label>
-                    </div>
-                  </div>
-
-                <div class="row mb-3"></div>
-                <div v-if="form.addNewMedia" class="form-group row">
-                    <div class="col-sm-6">
-                      <label for="inputPassword" class="form-label">Media</label>
-                        <Uploader
-                            v-if="hasResponse"
-                            server='/api/posts/media/upload'
-                            :media="form.media.saved"
-                            location="/storage/properties"
-                            @init="initMedia"
-                            @change="changeMedia"
-                            @add="addMedia"
-                            @remove="removeMedia"
-                        />
-                   </div>
-                </div>
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                    <div class="col-sm-6">
-                    <label for="validationCustom04" class="form-label">Location</label>
-                    <div class="col-sm-10">
-                        <input type="text" placeholder="Specify location*" v-model="form.location" id="location" name="location" class="form-control"
-                            required="" />
-                        <div class="invalid-feedback">Please enter location!</div>
-                    </div>
-                    </div>
-                    <div class="col-sm-6">
-                    <label for="validationCustom04" class="form-label">Price</label>
-                        <div class="input-group has-validation col-sm-10">
-                            <span class="input-group-text" id="inputGroupPrepend"
-                            >Kes</span
-                            >
-                            <input
-                            type="text"
-                            name="username"
-                            class="form-control"
-                            v-model="form.price"
-                            id="yourUsername"
-                            required
-                            />
-                        <div class="invalid-feedback">Please enter  price!</div>
-                    </div>
-                    </div> 
-             
-                </div>
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                    <div v-if="form.category_id == '5' || form.category_id == '6'" class="col-sm-6">
-                    <label for="validationCustom04" class="form-label">Land Area</label>
-                    <div class="col-sm-10">
-                        <input type="text" placeholder="Square Metres(ac)" id="size" v-model="form.land_area" name="size" class="form-control"
-                            required="" />
-                        <div class="invalid-feedback">Please enter area</div>
-                    </div>
-                    </div>
-                    <div class="col-sm-6">
-                    <label for="inputPassword" class="form-label">Link to Social Media</label>
-                    <div class="col-sm-10">
-                        <input
-                            type="text"
-                            placeholder="Link to Social"
-                            id="social_link"
-                            name="social_link"
-                            v-model="form.social_link"
-                            class="form-control"
-                            required=""
-                        />
-                        <div class="invalid-feedback">Please enter social link!</div>
-                    </div>
-                    </div>
-                </div>
-                <div class="row mb-3"></div>
-                <div v-if="form.category_id == '5' || form.category_id == '6'" class="form-group row">
-                    <div class="col-sm-6">
-                        <label for="validationCustom04" class="form-label">Type</label>
-                        <div class="col-sm-10">
-                        <select name="type" v-model="form.land_type" class="form-select" id="">
-                            <option value="0" selected>Select Type</option>
-                            <option>Commercial Land</option>
-                            <option>Farmland</option>
-                            <option>Industrial Land</option>
-                            <option>Mixed-Use Land</option>
-                            <option>Quarry</option>
-                            <option>Residential Land</option>
-
-                        </select>
-                        <div class="invalid-feedback">Please enter property type!</div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                    <label for="validationCustom04" class="form-label">Property Use</label>
-                    <div class="col-sm-10">
-                        <select name="type" v-model="form.property_use" class="form-select" id="">
-                            <option value="0" selected>Property Use</option>
-                            <option>Commercial</option>
-                            <option>Mixed</option>
-                            <option>Residential</option>
-    
-                        </select>
-                        <div class="invalid-feedback">Please enter property type!</div>
-                    </div>
-                    </div>
-                </div>
-                <div class="row mb-3"></div>
-                <div v-if="form.category_id !== '5' || form.category_id !== '6'" class="form-group row">
-                    <div class="col-sm-6">
-                    <label for="validationCustom04" class="form-label">Address</label>
-                    <div class="col-sm-10">
-                        <input type="text" placeholder="Address*" id="address" v-model="form.address" name="address" class="form-control"
-                            required="" />
-                        <div class="invalid-feedback">Please enter address</div>
-                    </div>
-                    </div>
-                    <div class="col-sm-6">
-                    <label for="validationCustom04" class="form-label">Estate Name</label>
-                    <div class="col-sm-10">
-                        <input type="text" placeholder="Estate Name" v-model="form.estate_name" id="estate_name" name="estate_name" class="form-control"
-                            required="" />
-                        <div class="invalid-feedback">Please enter estate name!</div>
-                    </div>
-                    </div>
-                </div>    
-                <div class="row mb-3"></div>
-                <div v-if="form.category_id !== '5' || form.category_id !== '6'" class="form-group row">
-                    <div class="col-sm-6">
-                    <label for="validationCustom04" class="form-label">Property Type</label>
-                    <div class="col-sm-10">
-                        <select name="type" v-model="form.property_type_id" class="form-select" id="">
-                            <option value="0" selected>Select Type</option>
-                            <option v-for="type in propertytypes" :value="type.id"
-                            :selected="type.id == form.property_type_id" :key="type.id">{{ type.name}}</option>
-    
-                        </select>
-                        <div class="invalid-feedback">Please enter property type!</div>
-                    </div>
-                    </div>
-                    <div class="col-sm-6">
-                    <label for="validationCustom04" class="form-label">Size</label>
-                    <div class="col-sm-10">
-                        <input type="text" placeholder="Square Metres(sqm)" id="size" v-model="form.size" name="size" class="form-control"
-                            required="" />
-                        <div class="invalid-feedback">Please enter size</div>
-                    </div>
-                    </div>
-                </div>
-                <div class="row mb-3"></div>
-                <div v-if="form.category_id !== '5' || form.category_id !== '6'" class="form-group row">
-                    <div class="col-sm-6">
-                    <label for="validationCustom04" class="form-label">Bedrooms</label>
-                    <div class="col-sm-10">
-                        <select class="form-select" v-model="form.bedrooms" aria-label="Default select example">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10+">10+</option>
-                        </select>
-                        <div class="invalid-feedback">Please enter shipper bedrooms!</div>
-                    </div>
-                    </div>
-                    <div class="col-sm-6">
-                    <label for="validationCustom04" class="form-label">Bathrooms</label>
-                    <div class="col-sm-10">
-                        <select class="form-select" v-model="form.bathrooms" aria-label="Default select example">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10+">10+</option>
-                        </select>
-                        <div class="invalid-feedback">Please enter bathrooms!</div>
-                    </div>
-                    </div>
-                </div>
-                <div class="row mb-3"></div>
-                <div v-if="form.category_id !== '5' || form.category_id !== '6'" class="form-group row">
-                <div class="col-sm-6">
-                   <label for="validationCustom04" class="form-label">Facilities</label>
-                   <div class="col-sm-10">
-                     <div class="dropdown col-sm-10">
-                           <button class="btn dropdown-toggle"
-                                 type="button" 
-                                 id="multiSelectDropdown"
-                                 data-bs-toggle="dropdown" 
-                                 aria-expanded="false">
-                              Select
-                           </button>
-                           <ul class="dropdown-menu" 
-                              aria-labelledby="multiSelectDropdown">
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.electricity" 
-                                          value="1">
-                                       24 Hour Electricity
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.air_conditioning" 
-                                          value="1">
-                                        Air Conditioning
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.alarm" 
-                                          value="1">
-                                        Alarm
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.balcony"
-                                          value="1">
-                                        Balcony
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.chandelier" 
-                                          value="1">
-                                        Chandelier
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.car_parking"
-                                          value="1">
-                                        Car Parking
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.dining_area"
-                                          value="1">
-                                        Dining Area
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.dishwasher" 
-                                          value="1">
-                                        Dishwasher 
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.gym" 
-                                          value="1">
-                                        Gym
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.hot_water" 
-                                          value="1">
-                                        Hot Water
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.kitchen_cabinets" 
-                                          value="1">
-                                        Kitchen Cabinets
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.kitchen_shelf" 
-                                          value="1">
-                                        Kitchen Shelf
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.microwave" 
-                                          value="1">
-                                        Microwave
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.pets_allow" 
-                                          value="1">
-                                        Pets Allow
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.pop_ceiling" 
-                                          value="1">
-                                        Pop Ceiling
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.prepaid_meter"
-                                          value="1">
-                                        Pre-Paid Meter
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.refrigerator"
-                                          value="1">
-                                        Refrigerator
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.swimming_pool"
-                                          value="1">
-                                        Swimming Pool
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.tv" 
-                                          value="1">
-                                        TV
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.wardrobe" 
-                                          value="1">
-                                        Wardrobe
-                                 </label>
-                              </li>
-                              <li>
-                                 <label>
-                                 <input type="checkbox" v-model="form.wifi"
-                                          value="1">
-                                        Wifi
-                                 </label>
-                              </li>
-                           </ul>
-                     </div>
-                      <div class="invalid-feedback">Please enter facilities!</div>
-                   </div>
-                </div> 
-                </div>
-                <div class="row mb-3"></div>
-                <div class="form-group row">
-                    <div class="col-sm-12">
-                        <label for="validationCustom04" class="form-label">Description</label>
-                        <div class="col-sm-11">
-                            <textarea rows="3" placeholder="Description*" v-model="form.description" id="description" name="description" class="form-control"
-                                required=""></textarea>
-                            <div class="invalid-feedback">Please enter description!</div>
-                        </div>
-                    </div> 
-                </div>
-                <!-- <div class="row mb-3"></div>
-                <div class="form-group row">
-                    <div class="col-sm-6">
-                    <label for="validationCustom04" class="form-label">Phone Number</label>
-                    <div class="col-sm-10">
-                        <input type="number" placeholder="Phone Number" v-model="form.phone_number" id="phone_number" name="phone_number" class="form-control"
-                            required="" />
-                        <div class="invalid-feedback">Please enter phone number!</div>
-                    </div>
-                    </div> 
-                    <div class="col-sm-6">
-                    <input type="checkbox" v-model="form.negotiable" class="form-check-input">
-                    <label for="validationCustom04" class="form-label">Negotiable</label>
-                    </div> 
-                </div> -->
-             </div>
-             <!--  button -->
-             <div class="col-lg-12 felx mt-4 row">
-                <div class="col-sm-6 col-lg-6">
-                    <!-- <button @click.prevent="prev()" class="btn btn-dark">Previous</button> -->
-                </div>
-                <div class="col-sm-6 col-lg-6 text-end">
-                    <button type="submit" @click.prevent="submit()" class="btn btn-sm btn-primary rounded-pill">Update</button>
+            <!-- HEADER -->
+            <div class="listing-header mb-4">
+                <div>
+                    <h3 class="mb-1">Edit Listing</h3>
+                    <p class="text-muted mb-0">
+                        Update your property information and save your changes.
+                    </p>
                 </div>
             </div>
-          </fieldset>
- 
-          </form>
+
+
+            <!-- ERROR -->
+            <div
+                v-if="message"
+                class="alert alert-danger"
+            >
+                {{ message }}
+            </div>
+
+
+            <!-- SUCCESS -->
+            <div
+                v-if="successMessage"
+                class="alert alert-success"
+            >
+                {{ successMessage }}
+            </div>
+
+
+            <div class="listing-card">
+
+                <!-- =====================================================
+                     BASIC INFORMATION
+                ====================================================== -->
+
+                <div class="card-heading">
+
+                    <div>
+                        <span class="section-kicker">
+                            LISTING INFORMATION
+                        </span>
+
+                        <h4>
+                            What are you listing?
+                        </h4>
+
+                        <p>
+                            Update the category, location and listing status.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="row g-4">
+
+                    <!-- CATEGORY -->
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Property category
+                        </label>
+
+                        <select
+                            v-model="form.category_id"
+                            class="form-select form-select-lg"
+                            @change="categoryChanged"
+                        >
+
+                            <option value="" disabled>
+                                Select a category
+                            </option>
+
+                            <option
+                                v-for="category in categories"
+                                :key="category.id"
+                                :value="String(category.id)"
+                            >
+                                {{ category.name }}
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- LOCATION -->
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Area / Location
+                        </label>
+
+                        <select
+                            v-model="form.location_id"
+                            class="form-select form-select-lg"
+                        >
+
+                            <option value="" disabled>
+                                Select location
+                            </option>
+
+                            <option
+                                v-for="location in locations"
+                                :key="location.id"
+                                :value="String(location.id)"
+                            >
+                                {{ location.name }}
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            Listing status
+                        </label>
+
+                        <div class="choice-grid">
+
+                            <button
+                                v-if="allowRent"
+                                type="button"
+                                class="choice-card"
+                                :class="{
+                                    selected: form.property_status === 'rent'
+                                }"
+                                @click="form.property_status = 'rent'"
+                            >
+
+                                <span class="choice-icon">
+                                    🏠
+                                </span>
+
+                                <span>
+                                    <strong>For Rent</strong>
+
+                                    <small>
+                                        I'm looking for a tenant
+                                    </small>
+                                </span>
+
+                            </button>
+
+
+                            <button
+                                v-if="allowSale"
+                                type="button"
+                                class="choice-card"
+                                :class="{
+                                    selected: form.property_status === 'sale'
+                                }"
+                                @click="form.property_status = 'sale'"
+                            >
+
+                                <span class="choice-icon">
+                                    🏷️
+                                </span>
+
+                                <span>
+                                    <strong>For Sale</strong>
+
+                                    <small>
+                                        I'm looking for a buyer
+                                    </small>
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TITLE -->
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Listing title
+                        </label>
+
+                        <input
+                            type="text"
+                            v-model="form.title"
+                            class="form-control form-control-lg"
+                            placeholder="e.g. Spacious 3 Bedroom House"
+                        />
+
+                    </div>
+
+
+                    <!-- SPECIFIC LOCATION -->
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Specific location
+                        </label>
+
+                        <input
+                            type="text"
+                            v-model="form.location"
+                            class="form-control form-control-lg"
+                            placeholder="e.g. Kakamega Town"
+                        />
+
+                    </div>
+
+
+                    <!-- SOCIAL LINK -->
+                    <div class="col-12">
+
+                        <label class="form-label">
+
+                            Social media link
+
+                            <span class="optional">
+                                Optional
+                            </span>
+
+                        </label>
+
+                        <input
+                            type="url"
+                            v-model="form.social_link"
+                            class="form-control form-control-lg"
+                            placeholder="https://facebook.com/..."
+                        />
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     PHOTOS
+                ====================================================== -->
+
+                <div class="section-divider"></div>
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            PHOTOS
+                        </span>
+
+                        <h4>
+                            Property photos
+                        </h4>
+
+                        <p>
+                            Manage your existing photos or add new ones.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- EXISTING PHOTOS -->
+
+                <div class="form-section">
+
+                    <label class="form-label">
+                        Current photos
+                    </label>
+
+                    <div
+                        v-if="form.images && form.images.length"
+                        class="existing-photo-grid"
+                    >
+
+                        <div
+                            v-for="(image, index) in form.images"
+                            :key="image.id"
+                            class="existing-photo"
+                        >
+
+                            <img
+                                :src="getImageUrl(image.name)"
+                                :alt="'Property photo ' + (index + 1)"
+                            />
+
+                            <button
+                                type="button"
+                                class="remove-photo"
+                                @click="removeImage(image)"
+                                title="Remove photo"
+                            >
+                                ×
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        v-else
+                        class="empty-photos"
+                    >
+
+                        <i class="bi bi-image fs-2"></i>
+
+                        <p class="mb-0 mt-2">
+                            No photos currently uploaded.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ADD NEW PHOTOS -->
+
+                <div class="form-section">
+
+                    <label class="add-media-box">
+
+                        <input
+                            type="checkbox"
+                            v-model="form.addNewMedia"
+                            class="form-check-input"
+                        />
+
+                        <span>
+
+                            <strong>
+                                Add new photos
+                            </strong>
+
+                            <small>
+                                Upload additional photos to this listing.
+                            </small>
+
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <div
+                    v-if="form.addNewMedia"
+                    class="upload-box"
+                >
+
+                    <label class="form-label mb-3">
+                        New property photos
+                    </label>
+
+                    <Uploader
+                        v-if="hasResponse"
+                        server="/api/posts/media/upload"
+                        :media="form.media.saved"
+                        location="/storage/properties"
+                        @init="initMedia"
+                        @change="changeMedia"
+                        @add="addMedia"
+                        @remove="removeMedia"
+                    />
+
+                </div>
+
+
+                <!-- =====================================================
+                     PROPERTY DETAILS
+                ====================================================== -->
+
+                <div class="section-divider"></div>
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            PROPERTY DETAILS
+                        </span>
+
+                        <h4>
+                            Tell us about the property
+                        </h4>
+
+                        <p>
+                            Update the details people need to understand your listing.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LAND -->
+
+                <template v-if="isLand">
+
+                    <div class="row g-4">
+
+                        <!-- LAND TYPE -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Land type
+                            </label>
+
+                            <select
+                                v-model="form.land_type"
+                                class="form-select form-select-lg"
+                            >
+
+                                <option value="">
+                                    Select land type
+                                </option>
+
+                                <option>
+                                    Commercial Land
+                                </option>
+
+                                <option>
+                                    Farmland
+                                </option>
+
+                                <option>
+                                    Industrial Land
+                                </option>
+
+                                <option>
+                                    Mixed-Use Land
+                                </option>
+
+                                <option>
+                                    Quarry
+                                </option>
+
+                                <option>
+                                    Residential Land
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- PROPERTY USE -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Intended use
+                            </label>
+
+                            <select
+                                v-model="form.property_use"
+                                class="form-select form-select-lg"
+                            >
+
+                                <option value="">
+                                    Select intended use
+                                </option>
+
+                                <option>
+                                    Commercial
+                                </option>
+
+                                <option>
+                                    Mixed
+                                </option>
+
+                                <option>
+                                    Residential
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- LAND AREA -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Land size
+                            </label>
+
+                            <div class="input-group input-group-lg">
+
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    v-model="form.land_area"
+                                    class="form-control"
+                                    placeholder="e.g. 2"
+                                />
+
+                                <span class="input-group-text">
+                                    Acres
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- DESCRIPTION -->
+                        <div class="col-12">
+
+                            <label class="form-label">
+                                Description
+                            </label>
+
+                            <textarea
+                                v-model="form.description"
+                                rows="5"
+                                class="form-control"
+                                placeholder="Describe the land, access road, nearby landmarks, title deed information, water, electricity, etc."
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+                </template>
+
+
+                <!-- HOUSE / APARTMENT -->
+
+                <template v-else>
+
+                    <div class="row g-4">
+
+                        <!-- PROPERTY TYPE -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Property type
+                            </label>
+
+                            <select
+                                v-model="form.property_type_id"
+                                class="form-select form-select-lg"
+                            >
+
+                                <option value="">
+                                    Select property type
+                                </option>
+
+                                <option
+                                    v-for="type in propertytypes"
+                                    :key="type.id"
+                                    :value="String(type.id)"
+                                >
+                                    {{ type.name }}
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- ADDRESS -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Address / Landmark
+                            </label>
+
+                            <input
+                                type="text"
+                                v-model="form.address"
+                                class="form-control form-control-lg"
+                                placeholder="e.g. Near Kakamega Market"
+                            />
+
+                        </div>
+
+
+                        <!-- SIZE -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Size
+                            </label>
+
+                            <div class="input-group input-group-lg">
+
+                                <input
+                                    type="number"
+                                    v-model="form.size"
+                                    class="form-control"
+                                    placeholder="e.g. 1200"
+                                />
+
+                                <span class="input-group-text">
+                                    sq ft
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ESTATE -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+
+                                Estate / Building name
+
+                                <span class="optional">
+                                    Optional
+                                </span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                v-model="form.estate_name"
+                                class="form-control form-control-lg"
+                                placeholder="Estate or building name"
+                            />
+
+                        </div>
+
+
+                        <!-- BEDROOMS -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Bedrooms
+                            </label>
+
+                            <select
+                                v-model="form.bedrooms"
+                                class="form-select form-select-lg"
+                            >
+
+                                <option value="">
+                                    Select
+                                </option>
+
+                                <option
+                                    v-for="n in 10"
+                                    :key="n"
+                                    :value="String(n)"
+                                >
+                                    {{ n }}
+                                </option>
+
+                                <option value="10+">
+                                    10+
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- BATHROOMS -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Bathrooms
+                            </label>
+
+                            <select
+                                v-model="form.bathrooms"
+                                class="form-select form-select-lg"
+                            >
+
+                                <option value="">
+                                    Select
+                                </option>
+
+                                <option
+                                    v-for="n in 10"
+                                    :key="n"
+                                    :value="String(n)"
+                                >
+                                    {{ n }}
+                                </option>
+
+                                <option value="10+">
+                                    10+
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </template>
+
+
+                <!-- =====================================================
+                     FEATURES
+                ====================================================== -->
+
+                <template v-if="!isLand">
+
+                    <div class="section-divider"></div>
+
+                    <div class="card-heading">
+
+                        <div>
+
+                            <span class="section-kicker">
+                                FEATURES
+                            </span>
+
+                            <h4>
+                                Features & amenities
+                            </h4>
+
+                            <p>
+                                Select everything currently available at the property.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="feature-grid">
+
+                        <label
+                            v-for="feature in features"
+                            :key="feature.key"
+                            class="feature-option"
+                            :class="{
+                                selected: isFeatureSelected(feature.key)
+                            }"
+                        >
+
+                            <input
+                                type="checkbox"
+                                v-model="form[feature.key]"
+                            />
+
+                            <span class="feature-check">
+                                ✓
+                            </span>
+
+                            <span>
+                                {{ feature.label }}
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- PARKING -->
+
+                    <div class="form-section mt-4">
+
+                        <label class="form-label">
+                            Parking available?
+                        </label>
+
+                        <div class="inline-options">
+
+                            <label
+                                class="mini-choice"
+                                :class="{
+                                    selected:
+                                        String(form.parking_space) === '1'
+                                }"
+                            >
+
+                                <input
+                                    type="radio"
+                                    v-model="form.parking_space"
+                                    value="1"
+                                />
+
+                                Yes
+
+                            </label>
+
+
+                            <label
+                                class="mini-choice"
+                                :class="{
+                                    selected:
+                                        String(form.parking_space) === '2'
+                                }"
+                            >
+
+                                <input
+                                    type="radio"
+                                    v-model="form.parking_space"
+                                    value="2"
+                                />
+
+                                No
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </template>
+
+
+                <!-- =====================================================
+                     PRICING & CONTACT
+                ====================================================== -->
+
+                <div class="section-divider"></div>
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            PRICING & CONTACT
+                        </span>
+
+                        <h4>
+                            Price and contact information
+                        </h4>
+
+                        <p>
+                            Update the price and how interested people can reach you.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="row g-4">
+
+                    <!-- PRICE -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            {{ form.property_status === 'rent'
+                                ? 'Rental Price'
+                                : 'Sale Price'
+                            }}
+                        </label>
+
+                        <div class="input-group input-group-lg">
+
+                            <span class="input-group-text">
+                                KSh
+                            </span>
+
+                            <input
+                                type="number"
+                                v-model="form.price"
+                                class="form-control"
+                                placeholder="e.g. 2500000"
+                            />
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PAYMENT PERIOD ONLY FOR RENT -->
+
+                    <div
+                        v-if="form.property_status === 'rent'"
+                        class="col-md-6"
+                    >
+
+                        <label class="form-label">
+                            Payment period
+                        </label>
+
+                        <select
+                            v-model="form.price_period"
+                            class="form-select form-select-lg"
+                        >
+
+                            <option value="Month">
+                                Per Month
+                            </option>
+
+                            <option value="Quarter">
+                                Per Quarter
+                            </option>
+
+                            <option value="Year">
+                                Per Year
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- PHONE -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Contact phone
+                        </label>
+
+                        <input
+                            type="tel"
+                            v-model="form.phone_number"
+                            class="form-control form-control-lg"
+                        />
+
+                    </div>
+
+
+                    <!-- NEGOTIABLE -->
+
+                    <div class="col-12">
+
+                        <label class="negotiable-box">
+
+                            <input
+                                type="checkbox"
+                                v-model="form.negotiable"
+                                class="form-check-input"
+                            />
+
+                            <span>
+
+                                <strong>
+                                    Price is negotiable
+                                </strong>
+
+                                <small>
+                                    Let interested buyers or tenants know you're open to discussion.
+                                </small>
+
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- DESCRIPTION -->
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            Description
+                        </label>
+
+                        <textarea
+                            v-model="form.description"
+                            rows="5"
+                            class="form-control"
+                            placeholder="Describe the property, its condition, neighbourhood, nearby facilities and anything else people should know."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     SAVE
+                ====================================================== -->
+
+                <div class="wizard-actions">
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary rounded-pill px-4"
+                        @click="cancel"
+                        :disabled="loading"
+                    >
+                        ← Cancel
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-success rounded-pill px-5"
+                        @click="submit"
+                        :disabled="loading"
+                    >
+
+                        <span
+                            v-if="loading"
+                            class="spinner-border spinner-border-sm me-2"
+                        ></span>
+
+                        {{ loading ? 'Saving Changes...' : 'Save Changes' }}
+
+                    </button>
+
+                </div>
+
+            </div>
+
         </div>
+
     </div>
-    </template>
-    
-    <script>
-    import axios from "axios";
-    import Swal from 'sweetalert2';
-    import Uploader from 'vue-media-upload'
-    
-    const toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-    });
-    
-    window.toast = toast;
-    
-    export default {
-        props:{
-            id: {
-                type: String,
-                required: true
-            },
-            indexRoute:{
-                type: String,
-                required: true
-            },
-            storedMedia:{
-                type: Array,
-                default: [],
-            }
-        },
-       data () {
-          return {
-             categories: [],
-             locations: [],
-             form: {
-                category_id: '',
-                location_id: '',
-                social_link: '',
-                title: '',
-                id_image: '',
-                location: '',
-                address: '',
-                property_type_id: '',
-                size: '',
-                estate_name: '',
-                bedrooms: '',
-                bathrooms: '',
-                parking_space: '',
-                price: '',
-                phone_number: this.user,
-                negotiable: '',
-                created_by: '',
-                property_status: '',
-                description: '',
-                land_area: '',
-                land_type: '',
-                property_use: '',
-                electricity: '',
-                air_conditioning: '',
-                alarm: '',
-                balcony: '',
-                chandelier: '',
-                car_parking: '',
-                dining_area: '',
-                dishwasher: '',
-                gym: '',
-                hot_water: '',
-                kitchen_cabinets: '',
-                kitchen_shelf: '',
-                microwave: '',
-                pets_allow: '',
-                pop_ceiling: '',
-                prepaid_meter: '',
-                refrigerator: '',
-                swimming_pool: '',
-                tv: '',
-                wardrobe: '',
-                wifi: '',
-                addNewMedia: false,
-                media: {
-                    list: [], //all media (savedMedia + addedAdded)
-                    saved: [],
-                    added: [],
-                    removed: []
-                },
-             
-             },
-             message: "",
-             successMessage: "",
-             hasResponse: true,
-             loading: false,
-          }   
-       },
-       methods: {
-        getData(){
-        axios.get('/api/property/'+this.$route.params.id, {
-        }).then((response) => {
-            this.form = response.data.property[0];
-            this.form.media = {list: [], saved: [], added:[], removed:[]}
-            this.form.media.saved = this.form.images;
-            // console.log(response)
-            console.log("data", this.form.images)
-        })
-        },
-        initMedia(media){
-            this.form.media.list = media
-        },
-        changeMedia(media){
-            this.form.media.list = media
-        },
-        addMedia(addedImage, addedMedia){
-            this.form.media.added = addedMedia
-        },
-        removeMedia(removedImage, removedMedia){
-            this.form.media.removed = removedMedia
-        },
-        getImageUrl(fileName) {
-          const baseUrl = '/storage/properties/'; // Replace with your base URL
-          return baseUrl + fileName;
-        },
-        removeImage(media) {
-          console.log(media);
-          axios.delete('/api/propertyimage/'+media.id)
-            .then((response) => {
-                console.log(response)
-                this.getData();
-                // window.location.reload();
-            })
-        },
-        loadLists() {
-             axios.get('/api/lists').then((response) => {
-             this.categories = response.data.lists.categories;
-             this.propertytypes = response.data.lists.propertytypes;
-             this.locations = response.data.lists.locations;
+</template>
 
-    
-             });
-          },
-        submit(){
-            axios.put('/api/property/'+this.$route.params.id, this.form)
-            .then((response) => {
 
-                    toast.fire({
-                    title: 'Property Updated',
-                    text: "property updated ",
-                    icon: 'success',
-                })
-                this.getData();
-            })
-            this.$router.push('/all-properties');
-        },
-    },
-    mounted(){
-        this.user = JSON.parse(localStorage.getItem('user'));
-        this.getData();
-        this.loadLists();
-    },
-    components:{
+<script>
+
+import axios from "axios";
+import Swal from "sweetalert2";
+import Uploader from "vue-media-upload";
+
+
+const toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000
+});
+
+
+export default {
+
+    components: {
         Uploader
     },
 
-    
+
+    props: {
+
+        id: {
+            type: String,
+            required: false
+        },
+
+        indexRoute: {
+            type: String,
+            required: false
+        },
+
+        storedMedia: {
+            type: Array,
+            default: () => []
+        }
+
+    },
+
+
+    data() {
+
+        return {
+
+            categories: [],
+            propertytypes: [],
+            locations: [],
+
+            message: "",
+            successMessage: "",
+            user: [],
+
+            hasResponse: true,
+            loading: false,
+
+            form: {
+
+                category_id: "",
+                location_id: "",
+                social_link: "",
+
+                title: "",
+                id_image: "",
+
+                location: "",
+                address: "",
+
+                property_type_id: "",
+                size: "",
+                estate_name: "",
+
+                bedrooms: "",
+                bathrooms: "",
+                parking_space: "",
+
+                price: "",
+                price_period: "Month",
+
+                phone_number: "",
+
+                negotiable: false,
+
+                created_by: "",
+                property_status: "",
+
+                description: "",
+
+                land_area: "",
+                land_type: "",
+                property_use: "",
+
+                electricity: false,
+                air_conditioning: false,
+                alarm: false,
+                balcony: false,
+                chandelier: false,
+                car_parking: false,
+                dining_area: false,
+                dishwasher: false,
+                gym: false,
+                hot_water: false,
+                kitchen_cabinets: false,
+                kitchen_shelf: false,
+                microwave: false,
+                pets_allow: false,
+                pop_ceiling: false,
+                prepaid_meter: false,
+                refrigerator: false,
+                swimming_pool: false,
+                tv: false,
+                wardrobe: false,
+                wifi: false,
+
+                images: [],
+
+                addNewMedia: false,
+
+                media: {
+                    list: [],
+                    saved: [],
+                    added: [],
+                    removed: []
+                }
+
+            },
+
+
+            features: [
+
+                {
+                    key: "electricity",
+                    label: "24 Hour Electricity"
+                },
+
+                {
+                    key: "air_conditioning",
+                    label: "Air Conditioning"
+                },
+
+                {
+                    key: "alarm",
+                    label: "Alarm"
+                },
+
+                {
+                    key: "balcony",
+                    label: "Balcony"
+                },
+
+                {
+                    key: "chandelier",
+                    label: "Chandelier"
+                },
+
+                {
+                    key: "car_parking",
+                    label: "Car Parking"
+                },
+
+                {
+                    key: "dining_area",
+                    label: "Dining Area"
+                },
+
+                {
+                    key: "dishwasher",
+                    label: "Dishwasher"
+                },
+
+                {
+                    key: "gym",
+                    label: "Gym"
+                },
+
+                {
+                    key: "hot_water",
+                    label: "Hot Water"
+                },
+
+                {
+                    key: "kitchen_cabinets",
+                    label: "Kitchen Cabinets"
+                },
+
+                {
+                    key: "kitchen_shelf",
+                    label: "Kitchen Shelf"
+                },
+
+                {
+                    key: "microwave",
+                    label: "Microwave"
+                },
+
+                {
+                    key: "pets_allow",
+                    label: "Pets Allowed"
+                },
+
+                {
+                    key: "pop_ceiling",
+                    label: "POP Ceiling"
+                },
+
+                {
+                    key: "prepaid_meter",
+                    label: "Pre-Paid Meter"
+                },
+
+                {
+                    key: "refrigerator",
+                    label: "Refrigerator"
+                },
+
+                {
+                    key: "swimming_pool",
+                    label: "Swimming Pool"
+                },
+
+                {
+                    key: "tv",
+                    label: "TV"
+                },
+
+                {
+                    key: "wardrobe",
+                    label: "Wardrobe"
+                },
+
+                {
+                    key: "wifi",
+                    label: "Wi-Fi"
+                }
+
+            ]
+
+        };
+
+    },
+
+
+    computed: {
+
+        isLand() {
+
+            return (
+                String(this.form.category_id) === "5" ||
+                String(this.form.category_id) === "6"
+            );
+
+        },
+
+
+        isRentCategory() {
+
+            return (
+                String(this.form.category_id) === "1" ||
+                String(this.form.category_id) === "3" ||
+                String(this.form.category_id) === "5"
+            );
+
+        },
+
+
+        isSaleCategory() {
+
+            return (
+                String(this.form.category_id) === "2" ||
+                String(this.form.category_id) === "4" ||
+                String(this.form.category_id) === "6"
+            );
+
+        },
+
+
+        allowRent() {
+
+            return !this.isSaleCategory;
+
+        },
+
+
+        allowSale() {
+
+            return !this.isRentCategory;
+
+        }
+
+    },
+
+
+    methods: {
+
+        categoryChanged() {
+
+            if (this.isRentCategory && !this.isSaleCategory) {
+
+                this.form.property_status = "rent";
+
+            }
+
+            else if (this.isSaleCategory && !this.isRentCategory) {
+
+                this.form.property_status = "sale";
+
+            }
+
+        },
+
+
+        isFeatureSelected(key) {
+
+            return (
+                this.form[key] === true ||
+                this.form[key] === 1 ||
+                this.form[key] === "1"
+            );
+
+        },
+
+
+        getData() {
+
+            this.loading = true;
+
+            axios
+                .get("/api/property/" + this.$route.params.id)
+
+                .then((response) => {
+
+                    /*
+                     * Current API should return:
+                     *
+                     * {
+                     *     property: {...}
+                     * }
+                     */
+
+                    const property =
+                        response.data.property || response.data;
+
+
+                    this.form = {
+
+                        ...this.form,
+                        ...property,
+
+                        category_id:
+                            property.category_id != null
+                                ? String(property.category_id)
+                                : "",
+
+                        location_id:
+                            property.location_id != null
+                                ? String(property.location_id)
+                                : "",
+
+                        property_type_id:
+                            property.property_type_id != null
+                                ? String(property.property_type_id)
+                                : "",
+
+                        property_status:
+                            property.property_status || "",
+
+                        negotiable:
+                            Boolean(property.negotiable),
+
+                        images:
+                            property.images || [],
+
+                        addNewMedia: false,
+
+                        media: {
+                            list: [],
+                            saved: property.images || [],
+                            added: [],
+                            removed: []
+                        }
+
+                    };
+
+
+                    console.log("Edit property:", this.form);
+
+                })
+
+                .catch((error) => {
+
+                    console.error(error);
+
+                    this.message =
+                        "Unable to load the property.";
+
+                })
+
+                .finally(() => {
+
+                    this.loading = false;
+
+                });
+
+        },
+
+
+        initMedia(media) {
+
+            this.form.media.list = media;
+
+        },
+
+
+        changeMedia(media) {
+
+            this.form.media.list = media;
+
+        },
+
+
+        addMedia(addedImage, addedMedia) {
+
+            this.form.media.added = addedMedia;
+
+        },
+
+
+        removeMedia(removedImage, removedMedia) {
+
+            this.form.media.removed = removedMedia;
+
+        },
+
+
+        getImageUrl(fileName) {
+
+            return "/storage/properties/" + fileName;
+
+        },
+
+
+        removeImage(media) {
+
+            Swal.fire({
+
+                title: "Remove photo?",
+
+                text: "This photo will be removed from the listing.",
+
+                icon: "warning",
+
+                showCancelButton: true,
+
+                confirmButtonText: "Remove",
+
+                cancelButtonText: "Cancel"
+
+            }).then((result) => {
+
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+
+                axios
+                    .delete("/api/propertyimage/" + media.id)
+
+                    .then(() => {
+
+                        toast.fire({
+                            title: "Photo Removed",
+                            text: "The property photo has been removed.",
+                            icon: "success"
+                        });
+
+                        this.getData();
+
+                    })
+
+                    .catch((error) => {
+
+                        console.error(error);
+
+                        toast.fire({
+                            title: "Unable to remove photo",
+                            text: "Please try again.",
+                            icon: "error"
+                        });
+
+                    });
+
+            });
+
+        },
+
+
+        loadLists() {
+
+            axios
+                .get("/api/lists")
+
+                .then((response) => {
+
+                    this.categories =
+                        response.data.lists.categories || [];
+
+                    this.propertytypes =
+                        response.data.lists.propertytypes || [];
+
+                    this.locations =
+                        response.data.lists.locations || [];
+
+                })
+
+                .catch((error) => {
+
+                    console.error(error);
+
+                    this.message =
+                        "Unable to load listing categories and locations.";
+
+                });
+
+        },
+
+
+        validate() {
+
+            this.message = "";
+
+
+            if (!this.form.category_id) {
+
+                this.message =
+                    "Please select a property category.";
+
+                return false;
+
+            }
+
+
+            if (!this.form.location_id) {
+
+                this.message =
+                    "Please select a location.";
+
+                return false;
+
+            }
+
+
+            if (!this.form.property_status) {
+
+                this.message =
+                    "Please select whether the property is for rent or sale.";
+
+                return false;
+
+            }
+
+
+            if (!this.form.title || !this.form.title.trim()) {
+
+                this.message =
+                    "Please enter a listing title.";
+
+                return false;
+
+            }
+
+
+            if (!this.form.location || !this.form.location.trim()) {
+
+                this.message =
+                    "Please enter the specific location.";
+
+                return false;
+
+            }
+
+
+            if (this.isLand) {
+
+                if (!this.form.land_type) {
+
+                    this.message =
+                        "Please select the land type.";
+
+                    return false;
+
+                }
+
+
+                if (!this.form.land_area) {
+
+                    this.message =
+                        "Please enter the land size.";
+
+                    return false;
+
+                }
+
+            }
+
+            else {
+
+                if (!this.form.property_type_id) {
+
+                    this.message =
+                        "Please select the property type.";
+
+                    return false;
+
+                }
+
+            }
+
+
+            if (!this.form.price) {
+
+                this.message =
+                    "Please enter the property price.";
+
+                return false;
+
+            }
+
+
+            if (!this.form.phone_number) {
+
+                this.message =
+                    "Please enter a contact phone number.";
+
+                return false;
+
+            }
+
+
+            if (
+                !this.form.description ||
+                !this.form.description.trim()
+            ) {
+
+                this.message =
+                    "Please add a description.";
+
+                return false;
+
+            }
+
+
+            return true;
+
+        },
+
+
+        submit() {
+
+            if (!this.validate()) {
+                return;
+            }
+
+
+            this.loading = true;
+
+            this.message = "";
+            this.successMessage = "";
+
+
+            /*
+             * Clean up values that should not be sent
+             * as part of a normal property update.
+             */
+
+            const payload = {
+                ...this.form,
+
+                media: this.form.media,
+
+                images: undefined,
+
+                addNewMedia: undefined
+            };
+
+
+            axios
+                .put(
+                    "/api/property/" + this.$route.params.id,
+                    payload
+                )
+
+                .then((response) => {
+
+                    console.log(response);
+
+                    toast.fire({
+
+                        title: "Property Updated",
+
+                        text: "Your property has been updated successfully.",
+
+                        icon: "success"
+
+                    });
+
+
+                    this.getData();
+
+                    /*
+                     * Redirect ONLY after successful update.
+                     */
+                    const roleId = Number(this.user.role_id);
+
+                    if (roleId === 1 || roleId === 2) {
+
+                    this.$router.push("/all-properties");
+
+                    } else {
+
+                    this.$router.push("/my-properties");
+
+                    }
+
+                })
+
+                .catch((error) => {
+
+                    console.error(error);
+
+                    if (
+                        error.response &&
+                        error.response.data &&
+                        error.response.data.message
+                    ) {
+
+                        this.message =
+                            error.response.data.message;
+
+                    }
+
+                    else {
+
+                        this.message =
+                            "Something went wrong while updating the listing.";
+
+                    }
+
+                })
+
+                .finally(() => {
+
+                    this.loading = false;
+
+                });
+
+        },
+
+
+        cancel() {
+
+            this.$router.push(
+                this.indexRoute || "/all-properties"
+            );
+
+        }
+
+    },
+
+
+    mounted() {
+
+        this.loadLists();
+        const storedUser =
+        localStorage.getItem("user");
+        this.user = JSON.parse(storedUser);
+        this.form.phone_number =
+          this.user.phone || "";
+        this.getData();
+
     }
 
-    </script>
+};
+
+</script>
+
+
+<style scoped>
+
+/* ============================================================
+   PAGE
+============================================================ */
+
+.listing-page {
+
+    background: #f6f8fa;
+
+    min-height: 100vh;
+
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.listing-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+}
+
+
+.listing-header h3 {
+
+    font-weight: 700;
+
+    color: #1f2937;
+
+}
+
+
+/* ============================================================
+   CARD
+============================================================ */
+
+.listing-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e7ebee;
+
+    border-radius: 18px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 3px 15px rgba(0, 0, 0, 0.03);
+
+}
+
+
+.card-heading {
+
+    margin-bottom: 25px;
+
+}
+
+
+.card-heading h4 {
+
+    margin: 5px 0 5px;
+
+    font-weight: 700;
+
+    color: #20262c;
+
+}
+
+
+.card-heading p {
+
+    margin: 0;
+
+    color: #7a858f;
+
+}
+
+
+.section-kicker {
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    color: #198754;
+
+    letter-spacing: 1px;
+
+}
+
+
+.section-divider {
+
+    height: 1px;
+
+    background: #edf0f2;
+
+    margin: 35px 0;
+
+}
+
+
+/* ============================================================
+   FORM
+============================================================ */
+
+.form-label {
+
+    font-weight: 600;
+
+    color: #343a40;
+
+    margin-bottom: 9px;
+
+}
+
+
+.optional {
+
+    font-size: 11px;
+
+    font-weight: 500;
+
+    color: #89929a;
+
+    margin-left: 5px;
+
+}
+
+
+.form-control,
+.form-select {
+
+    border-color: #dce2e6;
+
+}
+
+
+.form-control:focus,
+.form-select:focus {
+
+    border-color: #198754;
+
+    box-shadow:
+        0 0 0 0.2rem rgba(25, 135, 84, 0.1);
+
+}
+
+
+/* ============================================================
+   CHOICES
+============================================================ */
+
+.choice-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 15px;
+
+}
+
+
+.choice-card {
+
+    border: 1px solid #dfe5e8;
+
+    background: #fff;
+
+    border-radius: 13px;
+
+    padding: 17px;
+
+    text-align: left;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    transition: 0.2s ease;
+
+}
+
+
+.choice-card:hover {
+
+    border-color: #198754;
+
+    transform: translateY(-1px);
+
+}
+
+
+.choice-card.selected {
+
+    border-color: #198754;
+
+    background: #f0faf5;
+
+}
+
+
+.choice-icon {
+
+    font-size: 28px;
+
+}
+
+
+.choice-card strong,
+.choice-card small {
+
+    display: block;
+
+}
+
+
+.choice-card small {
+
+    color: #8a939b;
+
+    margin-top: 3px;
+
+}
+
+
+/* ============================================================
+   PHOTOS
+============================================================ */
+
+.existing-photo-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fill, minmax(180px, 1fr));
+
+    gap: 15px;
+
+}
+
+
+.existing-photo {
+
+    position: relative;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    background: #f5f7f8;
+
+    aspect-ratio: 4 / 3;
+
+}
+
+
+.existing-photo img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+
+}
+
+
+.remove-photo {
+
+    position: absolute;
+
+    top: 8px;
+
+    right: 8px;
+
+    width: 32px;
+
+    height: 32px;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    background: rgba(220, 53, 69, 0.95);
+
+    color: #fff;
+
+    font-size: 20px;
+
+    line-height: 1;
+
+}
+
+
+.remove-photo:hover {
+
+    background: #dc3545;
+
+}
+
+
+.empty-photos {
+
+    text-align: center;
+
+    padding: 35px;
+
+    border: 1px dashed #cbd5d0;
+
+    border-radius: 14px;
+
+    color: #8a939b;
+
+}
+
+
+.add-media-box {
+
+    border: 1px solid #e1e6e9;
+
+    padding: 15px;
+
+    border-radius: 11px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    cursor: pointer;
+
+}
+
+
+.add-media-box span {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+.add-media-box small {
+
+    color: #8a939b;
+
+    margin-top: 3px;
+
+}
+
+
+.upload-box {
+
+    border: 1px dashed #cbd5d0;
+
+    border-radius: 15px;
+
+    padding: 25px;
+
+    background: #fbfdfc;
+
+    margin-top: 15px;
+
+}
+
+
+/* ============================================================
+   FEATURES
+============================================================ */
+
+.feature-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 10px;
+
+}
+
+
+.feature-option {
+
+    border: 1px solid #e0e5e8;
+
+    border-radius: 10px;
+
+    padding: 11px 13px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    background: #fff;
+
+    transition: 0.15s ease;
+
+}
+
+
+.feature-option:hover {
+
+    border-color: #198754;
+
+}
+
+
+.feature-option.selected {
+
+    border-color: #198754;
+
+    background: #f2faf6;
+
+}
+
+
+.feature-option input {
+
+    display: none;
+
+}
+
+
+.feature-check {
+
+    width: 20px;
+
+    height: 20px;
+
+    border: 1px solid #cfd7dc;
+
+    border-radius: 5px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 12px;
+
+    color: transparent;
+
+}
+
+
+.feature-option.selected .feature-check {
+
+    background: #198754;
+
+    border-color: #198754;
+
+    color: #fff;
+
+}
+
+
+/* ============================================================
+   PARKING
+============================================================ */
+
+.inline-options {
+
+    display: flex;
+
+    gap: 12px;
+
+}
+
+
+.mini-choice {
+
+    min-width: 100px;
+
+    border: 1px solid #dfe5e8;
+
+    padding: 11px 17px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    text-align: center;
+
+}
+
+
+.mini-choice input {
+
+    display: none;
+
+}
+
+
+.mini-choice.selected {
+
+    border-color: #198754;
+
+    background: #f2faf6;
+
+    color: #198754;
+
+    font-weight: 600;
+
+}
+
+
+/* ============================================================
+   NEGOTIABLE
+============================================================ */
+
+.negotiable-box {
+
+    border: 1px solid #e1e6e9;
+
+    padding: 15px;
+
+    border-radius: 11px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    cursor: pointer;
+
+}
+
+
+.negotiable-box span {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+.negotiable-box small {
+
+    color: #8a939b;
+
+    margin-top: 3px;
+
+}
+
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+.wizard-actions {
+
+    margin-top: 35px;
+
+    padding-top: 22px;
+
+    border-top: 1px solid #edf0f2;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 768px) {
+
+    .listing-card {
+
+        padding: 20px;
+
+    }
+
+
+    .choice-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .feature-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+
+    .existing-photo-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .feature-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .existing-photo-grid {
+
+        grid-template-columns: 1fr 1fr;
+
+    }
+
+
+    .wizard-actions {
+
+        gap: 10px;
+
+    }
+
+}
+
+</style>
