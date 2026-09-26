@@ -468,107 +468,247 @@
     <!-- END RECENT PROPERTY -->
 
     <!-- POPULAR CITY -->
-    <section class="wrap__heading ">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8 col-lg-6 mx-auto">
-                    <div class="title__head">
-                        <h2 class="text-center text-capitalize">
-                            our projects 
-                        </h2>
-                        <p class="text-center text-capitalize">find properties in these places.</p>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-            <div class="row">
-                <div v-for="project in featuredproject" :key="project.id" class="col-lg-5 col-xl-5 col-padd">
-                    <!-- CARD IMAGE -->
+<section class="wrap__heading">
+    <div class="container">
 
-                    <a href="#">
-                        <div class="card__image-hover-style-v3">
-                            <div class="card__image-hover-style-v3-thumb h-475">
-                                <img :src="getProjectPhoto() + project.image_path" alt="" class="img-fluid w-100">
-                            </div>
-                            <div class="overlay">
-                                <div class="desc">
-                                    <h6 class="text-capitalize">{{project.location}}</h6>
-                                    <p class="text-capitalize">{{project.name}}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-lg-7 col-xl-7">
-                    <div class="row">
-                        <div v-for="project in homeprojects" :key="project.id" class="col-md-6 col-padd">
-                            <!-- CARD IMAGE -->
-                            <a href="#">
-                                <div class="card__image-hover-style-v3">
-                                    <div class="card__image-hover-style-v3-thumb h-230">
-                                        <img :src="getProjectPhoto() + project.image_path" alt="" class="img-fluid w-100">
-                                    </div>
-                                    <div class="overlay">
-                                        <div class="desc">
-                                            <h6 class="text-capitalize">{{project.location}}</h6>
-                                            <p class="text-capitalize">{{project.name}}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
+        <!-- ==============================
+            SECTION HEADING
+        =============================== -->
+        <div class="row">
 
-                    </div>
+            <div class="col-md-8 col-lg-6 mx-auto">
+
+                <div class="title__head">
+
+                    <h2 class="text-center text-capitalize">
+                        our projects
+                    </h2>
+
+                    <p class="text-center text-capitalize">
+                        find properties in these places.
+                    </p>
+
                 </div>
+
             </div>
+
+            <div class="clearfix"></div>
+
         </div>
-    </section>
+
+
+        <!-- ==============================
+            PROJECTS
+        =============================== -->
+        <div class="row">
+
+            <!-- ==============================
+                FEATURED PROJECT
+                Laravel: ->first()
+                Therefore NO v-for
+            =============================== -->
+            <div
+                v-if="featuredproject"
+                class="col-lg-5 col-xl-5 col-padd"
+            >
+
+                <a href="#">
+
+                    <div class="card__image-hover-style-v3">
+
+                        <div
+                            class="card__image-hover-style-v3-thumb h-475"
+                        >
+
+                            <img
+                                :src="
+                                    getProjectPhoto() +
+                                    featuredproject.image_path
+                                "
+                                :alt="featuredproject.name"
+                                class="img-fluid w-100"
+                            >
+
+                        </div>
+
+
+                        <div class="overlay">
+
+                            <div class="desc">
+
+                                <h6 class="text-capitalize">
+                                    {{ featuredproject.location }}
+                                </h6>
+
+                                <p class="text-capitalize">
+                                    {{ featuredproject.name }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+
+            <!-- ==============================
+                HOME PROJECTS
+                Laravel: ->limit(4)->get()
+                Therefore v-for IS correct
+            =============================== -->
+            <div class="col-lg-7 col-xl-7">
+
+                <div class="row">
+
+                    <div
+                        v-for="project in homeprojects"
+                        :key="project.id"
+                        class="col-md-6 col-padd"
+                    >
+
+                        <a href="#">
+
+                            <div class="card__image-hover-style-v3">
+
+                                <div
+                                    class="card__image-hover-style-v3-thumb h-230"
+                                >
+
+                                    <img
+                                        :src="
+                                            getProjectPhoto() +
+                                            project.image_path
+                                        "
+                                        :alt="project.name"
+                                        class="img-fluid w-100"
+                                    >
+
+                                </div>
+
+
+                                <div class="overlay">
+
+                                    <div class="desc">
+
+                                        <h6 class="text-capitalize">
+                                            {{ project.location }}
+                                        </h6>
+
+                                        <p class="text-capitalize">
+                                            {{ project.name }}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
     <!-- END POPULAR CITY -->
 
     <!-- ABOUT -->
     <section class="home__about">
         <div class="container">
-            <div v-for="about in abouts" :key="about.id" class="row">
+
+            <div class="row">
+
                 <div class="col-lg-6">
+
                     <div class="title__leading">
-                        <!-- <h6 class="text-uppercase">trusted By thousands</h6> -->
-                        <h2 class="text-capitalize">why choose us?</h2>
+
+                        <h2 class="text-capitalize">
+                            why choose us?
+                        </h2>
+
                         <p>
-                            {{about.title}}
+                            {{ abouts.title }}
                         </p>
+
                         <p>
-                            {{ about?.description?.substring(0,500) + "..." }}
+                            {{
+                                abouts?.description
+                                    ? abouts.description.substring(0, 500) + "..."
+                                    : ""
+                            }}
                         </p>
-                        <router-link to="/aboutus" custom v-slot="{ href, navigate, isActive }">
+
+                        <router-link
+                            to="/aboutus"
+                            custom
+                            v-slot="{ href, navigate, isActive }"
+                        >
                             <a
                                 :href="href"
                                 :class="{ active: isActive }"
                                 class="btn rounded-pill btn-success mt-3 text-capitalize"
                                 @click="navigate"
-                            > 
-                            read more
-                            <i class="fa fa-angle-right ml-3 "></i></a>
-                            </router-link>
+                            >
+                                read more
+
+                                <i class="fa fa-angle-right ml-3"></i>
+                            </a>
+                        </router-link>
+
                     </div>
+
                 </div>
+
+
                 <div class="col-lg-6">
+
                     <div class="about__image">
+
                         <div class="about__image-top">
+
                             <div class="about__image-top-hover">
-                                <!-- <img src="images/gallery.jpg" alt="" class="img-fluid"> -->
-                                <img :src="getAboutPhoto() + about.image" alt="" class="img-fluid">
+
+                                <img
+                                    :src="getAboutPhoto() + abouts.image"
+                                    alt=""
+                                    class="img-fluid"
+                                >
 
                             </div>
 
                         </div>
+
+
                         <div class="about__image-bottom">
+
                             <div class="about__image-bottom-hover">
-                                <img :src="getAboutPhoto() + about.image" alt="" class="img-fluid">
+
+                                <img
+                                    :src="getAboutPhoto() + abouts.image"
+                                    alt=""
+                                    class="img-fluid"
+                                >
+
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
     </section>
     <!-- END ABOUT -->
@@ -759,7 +899,7 @@ export default {
             locations: [],
             services: [],
             recentblogs: [],
-            abouts: [],
+            abouts: {},
             homeprojects: [],
             hometestimonials: [],
             hometestimonial1: '',

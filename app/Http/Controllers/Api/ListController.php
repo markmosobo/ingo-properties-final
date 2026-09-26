@@ -313,7 +313,7 @@ class ListController extends Controller
         $recentblogs = Blog::with('category')->latest()->limit(6)->get();
         $abouts = About::latest()->first();
         $homeprojects = Project::where('featured', 0)
-            ->whereIn('status', [0, 1])
+            ->whereIn('status', [1, 2])
             ->limit(4)
             ->get();
         $hometestimonials = Testimonial::where('status', 1)->limit(4)->get();
